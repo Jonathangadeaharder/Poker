@@ -3,7 +3,7 @@
  * Interactive tutorial and demo for new users
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,8 @@ import {
   FlatList,
   Animated,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { sessionManager } from '../utils/sessionManager';
 
 const { width } = Dimensions.get('window');
 
@@ -63,8 +65,16 @@ const ONBOARDING_SLIDES = [
 
 export default function OnboardingScreen({ navigation, onComplete }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [demoXP, setDemoXP] = useState(0);
+  const [demoStreak, setDemoStreak] = useState(0);
   const flatListRef = useRef(null);
   const scrollX = useRef(new Animated.Value(0)).current;
+  const xpAnimation = useRef(new Animated.Value(0)).current;
+
+  // Record activity when user interacts
+  useEffect(() => {
+    sessionManager.recordActivity();
+  }, [currentIndex]);
 
   const viewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
@@ -82,11 +92,41 @@ export default function OnboardingScreen({ navigation, onComplete }) {
     }
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
+    // Mark onboarding as completed
+    try {
+      await AsyncStorage.setItem('onboarding_completed', 'true');
+    } catch (error) {
+      console.error('Error saving onboarding completion:', error);
+    }
+
     if (onComplete) {
       onComplete();
     }
-    navigation.replace('Home');
+    navigation.replace('MainApp');
+  };
+
+  const handleDemoXPClick = () => {
+    const newXP = demoXP + 10;
+    setDemoXP(newXP);
+
+    // Animate XP gain
+    Animated.sequence([
+      Animated.timing(xpAnimation, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(xpAnimation, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const handleDemoStreakClick = () => {
+    setDemoStreak(demoStreak + 1);
   };
 
   const renderSlide = ({ item }) => (
@@ -178,12 +218,59 @@ export default function OnboardingScreen({ navigation, onComplete }) {
         </TouchableOpacity>
       </View>
 
-      {/* Demo Interactive Element */}
+      {/* Demo Interactive Elements */}
       {currentIndex === 1 && (
         <View style={styles.demoContainer}>
-          <TouchableOpacity style={styles.demoButton}>
-            <Text style={styles.demoButtonText}>Try Earning XP! ✨</Text>
+          <Animated.View
+            style={[
+              styles.xpBadge,
+              {
+                transform: [
+                  {
+                    scale: xpAnimation.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [1, 1.2],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
+            <Text style={styles.xpBadgeText}>XP: {demoXP}</Text>
+          </Animated.View>
+          <TouchableOpacity
+            style={styles.demoButton}
+            onPress={handleDemoXPClick}
+          >
+            <Text style={styles.demoButtonText}>Earn +10 XP! ✨</Text>
           </TouchableOpacity>
+        </View>
+      )}
+
+      {currentIndex === 2 && (
+        <View style={styles.demoContainer}>
+          <View style={styles.streakDemo}>
+            <Text style={styles.streakDemoText}>
+              {demoStreak > 0 ? `${demoStreak} Day Streak! 🔥` : 'Start Your Streak! 🔥'}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={styles.demoButton}
+            onPress={handleDemoStreakClick}
+          >
+            <Text style={styles.demoButtonText}>Practice Today</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {currentIndex === 4 && (
+        <View style={styles.demoContainer}>
+          <View style={styles.progressDemo}>
+            <View style={styles.progressBar}>
+              <View style={[styles.progressFill, { width: '75%' }]} />
+            </View>
+            <Text style={styles.progressText}>75% Accuracy - Excellent! 📊</Text>
+          </View>
         </View>
       )}
     </View>
@@ -278,10 +365,67 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     borderWidth: 2,
     borderColor: '#fff',
+    marginTop: 15,
   },
   demoButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  xpBadge: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 25,
+    paddingVertical: 12,
+    borderRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  xpBadgeText: {
+    color: '#4caf50',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  streakDemo: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 25,
+    paddingVertical: 12,
+    borderRadius: 25,
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  streakDemoText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  progressDemo: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 30,
+    paddingVertical: 20,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#fff',
+    width: width * 0.8,
+  },
+  progressBar: {
+    height: 12,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    borderRadius: 6,
+    overflow: 'hidden',
+    marginBottom: 12,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 6,
+  },
+  progressText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
