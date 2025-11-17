@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { errorTracking } from '../services/errorTracking';
 
 export class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -28,13 +29,12 @@ export class ErrorBoundary extends React.Component {
       errorInfo,
     });
 
-    // Send to error tracking service (Sentry, etc.)
-    if (global.errorReportingService) {
-      global.errorReportingService.captureException(error, {
-        errorInfo,
+    // Send to error tracking service
+    errorTracking.captureError(error, {
+      errorBoundary: {
         componentStack: errorInfo.componentStack,
-      });
-    }
+      },
+    });
   }
 
   handleReset = () => {

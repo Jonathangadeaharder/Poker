@@ -7,6 +7,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import apiClient from '../services/apiClient';
 import { tokenStorage } from '../utils/secureStorage';
 import { sessionManager } from '../utils/sessionManager';
+import { errorTracking } from '../services/errorTracking';
 
 const AuthContext = createContext(null);
 
@@ -43,6 +44,9 @@ export function AuthProvider({ children }) {
           setUser(result.data.user);
           setIsAuthenticated(true);
 
+          // Set user in error tracking
+          errorTracking.setUser(result.data.user);
+
           // Start session monitoring
           sessionManager.startSession();
         } else {
@@ -68,6 +72,9 @@ export function AuthProvider({ children }) {
       if (result.success && result.data.user) {
         setUser(result.data.user);
         setIsAuthenticated(true);
+
+        // Set user in error tracking
+        errorTracking.setUser(result.data.user);
 
         // Start session monitoring
         sessionManager.startSession();
@@ -98,6 +105,9 @@ export function AuthProvider({ children }) {
       if (result.success && result.data.user) {
         setUser(result.data.user);
         setIsAuthenticated(true);
+
+        // Set user in error tracking
+        errorTracking.setUser(result.data.user);
 
         // Start session monitoring
         sessionManager.startSession();
@@ -142,6 +152,9 @@ export function AuthProvider({ children }) {
     setIsAuthenticated(false);
     await apiClient.clearAuth();
     sessionManager.endSession();
+
+    // Clear user from error tracking
+    errorTracking.clearUser();
   };
 
   /**

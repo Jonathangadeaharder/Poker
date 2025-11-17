@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Provider as PaperProvider, MD3LightTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+// Services
+import { errorTracking } from './src/services/errorTracking';
 
 // Context
 import { AuthProvider, useAuth } from './src/context/AuthContext';
@@ -207,15 +210,41 @@ function AppNavigator() {
 }
 
 export default function App() {
+  // Initialize error tracking on app start
+  useEffect(() => {
+    errorTracking.initialize();
+  }, []);
+
+  // Navigation state change handler
+  const handleNavigationStateChange = (state) => {
+    if (state) {
+      const currentRoute = getActiveRouteName(state);
+      if (currentRoute) {
+        errorTracking.trackScreenView(currentRoute);
+      }
+    }
+  };
+
   return (
     <ErrorBoundary>
       <PaperProvider theme={theme}>
         <AuthProvider>
-          <NavigationContainer>
+          <NavigationContainer onStateChange={handleNavigationStateChange}>
             <AppNavigator />
           </NavigationContainer>
         </AuthProvider>
       </PaperProvider>
     </ErrorBoundary>
   );
+}
+
+// Helper to get active route name
+function getActiveRouteName(state) {
+  const route = state.routes[state.index];
+
+  if (route.state) {
+    return getActiveRouteName(route.state);
+  }
+
+  return route.name;
 }

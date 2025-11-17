@@ -17,6 +17,13 @@ import { Text, TextInput, Button, Card, Checkbox } from 'react-native-paper';
 import { validateEmail, validateRequired } from '../../utils/validation';
 import { useAuth } from '../../context/AuthContext';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
+import {
+  createButtonA11y,
+  createTextInputA11y,
+  createCheckboxA11y,
+  createErrorA11y,
+  createHeaderA11y,
+} from '../../utils/accessibility';
 
 export default function LoginScreen({ navigation }) {
   const { login: authLogin } = useAuth();
