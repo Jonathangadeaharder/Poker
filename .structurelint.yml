@@ -1,10 +1,11 @@
 # structurelint configuration for Poker Training App
-# React Native / Expo project - Pragmatic enforcement with best practices
+# React Native / Expo - COMPREHENSIVE ENFORCEMENT
+# All 6 phases enabled (0, 1, 2, 3, 5, 8)
 
 root: true
 
 # ============================================================================
-# Entrypoints (files that don't need to be imported)
+# Entrypoints (Phase 2: files that don't need to be imported)
 # ============================================================================
 
 entrypoints:
@@ -16,28 +17,58 @@ entrypoints:
   - "__tests__/**"
 
 # ============================================================================
+# Phase 1: Architectural Layer Enforcement
+# ============================================================================
+
+layers:
+  # Data layer - Static configuration and constants
+  - name: 'data'
+    path: 'src/data/**'
+    dependsOn: []
+
+  # Core layer - Business logic and algorithms
+  - name: 'core'
+    path: 'src/core/**'
+    dependsOn: []
+
+  # Utils layer - Pure utility functions
+  - name: 'utils'
+    path: 'src/utils/**'
+    dependsOn: []
+
+  # Services layer - API and external integrations
+  - name: 'services'
+    path: 'src/services/**'
+    dependsOn: ['utils']
+
+  # Context layer - State management
+  - name: 'context'
+    path: 'src/context/**'
+    dependsOn: ['services', 'core', 'utils']
+
+  # Hooks layer - React hooks
+  - name: 'hooks'
+    path: 'src/hooks/**'
+    dependsOn: ['services', 'context', 'core', 'utils']
+
+  # Components layer - Reusable UI components
+  # Pragmatic: can import core/services for gamification and error tracking
+  - name: 'components'
+    path: 'src/components/**'
+    dependsOn: ['hooks', 'context', 'core', 'services', 'utils']
+
+  # Screens layer - Top-level screens (can import from all)
+  - name: 'screens'
+    path: 'src/screens/**'
+    dependsOn: ['components', 'hooks', 'context', 'services', 'core', 'data', 'utils']
+
+# ============================================================================
 # Rules
 # ============================================================================
 
 rules:
   # --------------------------------------------------------------------------
-  # Evidence-Based Complexity Metrics (Phase 5)
-  # --------------------------------------------------------------------------
-
-  max-cognitive-complexity:
-    max: 15
-    file-patterns:
-      - "**/*.js"
-      - "**/*.jsx"
-
-  max-halstead-effort:
-    max: 100000
-    file-patterns:
-      - "**/*.js"
-      - "**/*.jsx"
-
-  # --------------------------------------------------------------------------
-  # Project Structure Rules (Phase 0)
+  # Phase 0: Project Structure Rules
   # --------------------------------------------------------------------------
 
   max-depth: { max: 5 }
@@ -54,6 +85,7 @@ rules:
     "src/core/**/*.js": "camelCase"
     "src/data/**/*.js": "camelCase"
     "__tests__/**/*.js": "camelCase"
+    "docs/**/*.md": "SCREAMING_SNAKE_CASE"
 
   disallowed-patterns:
     - "**/*.tmp"
@@ -63,7 +95,20 @@ rules:
     - "**/*.swp"
 
   # --------------------------------------------------------------------------
-  # Test Validation (Phase 3) - Pragmatic approach
+  # Phase 1: Architectural Layer Enforcement
+  # --------------------------------------------------------------------------
+
+  enforce-layer-boundaries: true
+
+  # --------------------------------------------------------------------------
+  # Phase 2: Dead Code Detection (ENABLED with pragmatic exemptions)
+  # --------------------------------------------------------------------------
+
+  disallow-orphaned-files: true
+  disallow-unused-exports: true
+
+  # --------------------------------------------------------------------------
+  # Phase 3: Test Validation
   # --------------------------------------------------------------------------
 
   test-adjacency:
@@ -71,11 +116,8 @@ rules:
     file-patterns:
       - "src/**/*.js"
     exemptions:
-      # Data files don't need tests
       - "src/data/**/*.js"
-      # Screens are integration-heavy, tested via E2E
       - "src/screens/**/*.js"
-      # Simple UI components can be visually tested
       - "src/components/EmptyState.js"
       - "src/components/ErrorMessage.js"
       - "src/components/LoadingSpinner.js"
@@ -83,7 +125,6 @@ rules:
       - "src/components/XPBar.js"
       - "src/components/ErrorBoundary.js"
       - "src/components/AchievementBadge.js"
-      # Test infrastructure
       - "**/*.test.js"
       - "**/*.spec.js"
       - "**/__tests__/**"
@@ -94,41 +135,76 @@ rules:
     file-patterns:
       - "**/*.test.js"
       - "**/*.spec.js"
+    exemptions:
+      - "node_modules/**"
 
   # --------------------------------------------------------------------------
-  # Dead Code Detection (Phase 2) - Disabled for now
-  # Re-enable after cleaning up unused code
+  # Phase 5: Evidence-Based Complexity Metrics
   # --------------------------------------------------------------------------
 
-  disallow-orphaned-files: 0
-  disallow-unused-exports: 0
+  max-cognitive-complexity:
+    max: 15
+    file-patterns:
+      - "**/*.js"
+      - "**/*.jsx"
+
+  max-halstead-effort:
+    max: 100000
+    file-patterns:
+      - "**/*.js"
+      - "**/*.jsx"
+
+  # --------------------------------------------------------------------------
+  # Phase 8: GitHub Workflow Enforcement
+  # --------------------------------------------------------------------------
+
+  github-workflows:
+    require-tests: true
+    require-quality: true
+    required-triggers:
+      - pull_request
+      - push
 
 # ============================================================================
 # Overrides for Specific Directories
 # ============================================================================
 
 overrides:
-  # Screens directory - allow more files, exempt from testing
+  # Screens - used by React Navigation, not directly imported
   - files: ['src/screens/**']
     rules:
       max-files-in-dir: { max: 20 }
+      max-cognitive-complexity: { max: 20 }
+      max-halstead-effort: { max: 150000 }
+      disallow-orphaned-files: 0
+      disallow-unused-exports: 0
 
-  # Data directory
+  # Data directory - static data files
   - files: ['src/data/**']
     rules:
       disallow-orphaned-files: 0
       disallow-unused-exports: 0
 
-  # Test files
+  # Generic UI components - reusable but may not be used yet
+  - files: ['src/components/EmptyState.js', 'src/components/ErrorMessage.js']
+    rules:
+      disallow-orphaned-files: 0
+      disallow-unused-exports: 0
+
+  # Test files - relaxed rules
   - files: ['**/*.test.js', '**/*.spec.js', '__tests__/**']
     rules:
       max-cognitive-complexity: { max: 25 }
       max-halstead-effort: { max: 150000 }
+      disallow-orphaned-files: 0
+      disallow-unused-exports: 0
+      naming-convention: 0
 
-  # Entry points
-  - files: ['App.js', 'src/index.js', 'app.json']
+  # Entry points - exported for external use
+  - files: ['App.js', 'src/index.js', 'app.json', 'babel.config.js']
     rules:
       disallow-unused-exports: 0
+      disallow-orphaned-files: 0
 
   # Hooks must start with 'use'
   - files: ['src/hooks/**/*.js']
@@ -142,12 +218,18 @@ overrides:
       regex-match:
         "src/context/*.js": "regex:.*Context\\.js$"
 
-  # Documentation
-  - files: ['docs/**/*.md']
+  # Test files must match pattern
+  - files: ['__tests__/**/*.js', 'src/**/*.test.js', 'src/**/*.spec.js']
     rules:
-      naming-convention:
-        "docs/**/*.md": "SCREAMING_SNAKE_CASE"
+      regex-match:
+        "**/*.test.js": "regex:.*\\.test\\.js$"
+        "**/*.spec.js": "regex:.*\\.spec\\.js$"
+
+  # Documentation
+  - files: ['docs/**']
+    rules:
       max-files-in-dir: { max: 20 }
+      max-depth: { max: 3 }
 
   # Root level
   - files: ['*.{js,json,md}']
@@ -167,4 +249,3 @@ exclude:
   - build/**
   - coverage/**
   - "*.log"
-  - .github/**
