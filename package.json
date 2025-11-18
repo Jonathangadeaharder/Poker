@@ -8,7 +8,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "lint:structure": "structurelint .",
+    "lint:structure:watch": "structurelint . --watch"
   },
   "dependencies": {
     "expo": "~49.0.0",
