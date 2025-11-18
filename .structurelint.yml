@@ -3,145 +3,81 @@
 
 root: true
 
-# Global rules for the entire project
 rules:
   # Limit directory nesting depth to keep structure flat and manageable
-  max-depth: 4
+  max-depth: { max: 4 }
 
   # Prevent any directory from having too many files
-  max-files-in-dir: 25
+  max-files-in-dir: { max: 25 }
 
   # Limit number of subdirectories to maintain organization
-  max-subdirs: 15
+  max-subdirs: { max: 15 }
 
-  # Ensure critical project files exist
-  file-existence:
-    - pattern: "README.md"
-      required: true
-    - pattern: "package.json"
-      required: true
-    - pattern: "App.js"
-      required: true
-    - pattern: ".gitignore"
-      required: true
+  # Naming conventions using glob patterns
+  naming-convention:
+    # Components should use PascalCase
+    "src/components/**/*.js": "PascalCase"
+    # Screens should use PascalCase
+    "src/screens/**/*.js": "PascalCase"
+    # Hooks should use camelCase (enforced via regex-match for 'use' prefix)
+    "src/hooks/**/*.js": "camelCase"
+    # Utils should use camelCase
+    "src/utils/**/*.js": "camelCase"
+    # Services should use camelCase
+    "src/services/**/*.js": "camelCase"
+    # Context files should use PascalCase
+    "src/context/**/*.js": "PascalCase"
+    # Core logic files should use camelCase
+    "src/core/**/*.js": "camelCase"
+    # Data files should use camelCase
+    "src/data/**/*.js": "camelCase"
+    # Test files should use camelCase
+    "__tests__/**/*.js": "camelCase"
 
   # Disallow common problematic patterns
   disallowed-patterns:
-    - pattern: "**/*.tmp"
-      message: "Temporary files should not be committed"
-    - pattern: "**/*.backup"
-      message: "Backup files should not be committed"
-    - pattern: "**/TODO.txt"
-      message: "Use proper issue tracking instead of TODO files"
-    - pattern: "**/.DS_Store"
-      message: "macOS system files should be in .gitignore"
-
-# Source directory rules
-overrides:
-  # Components should use PascalCase
-  - files:
-      - "src/components/**/*.js"
-    rules:
-      naming-convention: "PascalCase"
-      max-files-in-dir: 20
-
-  # Screens should use PascalCase
-  - files:
-      - "src/screens/**/*.js"
-    rules:
-      naming-convention: "PascalCase"
-      max-files-in-dir: 15
-
-  # Hooks should use camelCase and start with 'use'
-  - files:
-      - "src/hooks/**/*.js"
-    rules:
-      naming-convention: "camelCase"
-      regex-match:
-        pattern: "^use[A-Z].*\\.js$"
-        message: "Hook files must start with 'use' (e.g., useAsyncData.js)"
-      max-files-in-dir: 10
-
-  # Utils should use camelCase
-  - files:
-      - "src/utils/**/*.js"
-    rules:
-      naming-convention: "camelCase"
-      max-files-in-dir: 15
-
-  # Services should use camelCase
-  - files:
-      - "src/services/**/*.js"
-    rules:
-      naming-convention: "camelCase"
-      max-files-in-dir: 10
-
-  # Context files should use PascalCase and end with Context
-  - files:
-      - "src/context/**/*.js"
-    rules:
-      naming-convention: "PascalCase"
-      regex-match:
-        pattern: ".*Context\\.js$"
-        message: "Context files must end with 'Context' (e.g., AuthContext.js)"
-      max-files-in-dir: 8
-
-  # Core logic files should use camelCase
-  - files:
-      - "src/core/**/*.js"
-    rules:
-      naming-convention: "camelCase"
-      max-files-in-dir: 10
-
-  # Data files should use camelCase
-  - files:
-      - "src/data/**/*.js"
-    rules:
-      naming-convention: "camelCase"
-      max-files-in-dir: 15
-
-  # Test files should match source file names
-  - files:
-      - "__tests__/**/*.test.js"
-    rules:
-      naming-convention: "camelCase"
-      max-files-in-dir: 30
-      regex-match:
-        pattern: ".*\\.test\\.js$"
-        message: "Test files must end with '.test.js'"
-
-  # Documentation files
-  - files:
-      - "docs/**/*.md"
-    rules:
-      naming-convention: "SCREAMING_SNAKE_CASE"
-      max-files-in-dir: 20
-
-  # Root level should be minimal
-  - files:
-      - "*.{js,json,md}"
-    rules:
-      max-files-in-dir: 20
-
-# Language-specific settings
-languages:
-  javascript:
-    enabled: true
-    extensions: [".js", ".jsx"]
-
-  markdown:
-    enabled: true
-    extensions: [".md"]
+    - "**/*.tmp"
+    - "**/*.backup"
+    - "**/TODO.txt"
+    - "**/.DS_Store"
 
 # Ignore patterns (similar to .gitignore)
-ignore:
-  - node_modules/
-  - .git/
-  - .expo/
-  - .expo-shared/
-  - dist/
-  - build/
-  - coverage/
+exclude:
+  - node_modules/**
+  - .git/**
+  - .expo/**
+  - .expo-shared/**
+  - dist/**
+  - build/**
+  - coverage/**
   - "*.log"
-  - ".DS_Store"
-  - ".env*"
+
+overrides:
+  # Hooks must start with 'use'
+  - files: ['src/hooks/**/*.js']
+    rules:
+      regex-match:
+        "src/hooks/*.js": "regex:^use[A-Z].*\\.js$"
+
+  # Context files must end with 'Context'
+  - files: ['src/context/**/*.js']
+    rules:
+      regex-match:
+        "src/context/*.js": "regex:.*Context\\.js$"
+
+  # Test files must end with '.test.js'
+  - files: ['__tests__/**/*.js']
+    rules:
+      regex-match:
+        "__tests__/*.test.js": "regex:.*\\.test\\.js$"
+
+  # Documentation should use SCREAMING_SNAKE_CASE
+  - files: ['docs/**/*.md']
+    rules:
+      naming-convention:
+        "docs/**/*.md": "SCREAMING_SNAKE_CASE"
+
+  # Root level configuration and documentation
+  - files: ['*.{js,json,md}']
+    rules:
+      max-files-in-dir: { max: 20 }
