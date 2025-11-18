@@ -1,58 +1,135 @@
 # structurelint configuration for Poker Training App
-# React Native / Expo project structure enforcement
+# React Native / Expo project - Pragmatic enforcement with best practices
 
 root: true
 
+# ============================================================================
+# Entrypoints (files that don't need to be imported)
+# ============================================================================
+
+entrypoints:
+  - "App.js"
+  - "babel.config.js"
+  - "app.json"
+  - "**/*.test.js"
+  - "**/*.spec.js"
+  - "__tests__/**"
+
+# ============================================================================
+# Rules
+# ============================================================================
+
 rules:
-  # Limit directory nesting depth to keep structure flat and manageable
-  max-depth: { max: 4 }
+  # --------------------------------------------------------------------------
+  # Evidence-Based Complexity Metrics (Phase 5)
+  # --------------------------------------------------------------------------
 
-  # Prevent any directory from having too many files
-  max-files-in-dir: { max: 25 }
+  max-cognitive-complexity:
+    max: 15
+    file-patterns:
+      - "**/*.js"
+      - "**/*.jsx"
 
-  # Limit number of subdirectories to maintain organization
-  max-subdirs: { max: 15 }
+  max-halstead-effort:
+    max: 100000
+    file-patterns:
+      - "**/*.js"
+      - "**/*.jsx"
 
-  # Naming conventions using glob patterns
+  # --------------------------------------------------------------------------
+  # Project Structure Rules (Phase 0)
+  # --------------------------------------------------------------------------
+
+  max-depth: { max: 5 }
+  max-files-in-dir: { max: 15 }
+  max-subdirs: { max: 10 }
+
   naming-convention:
-    # Components should use PascalCase
     "src/components/**/*.js": "PascalCase"
-    # Screens should use PascalCase
     "src/screens/**/*.js": "PascalCase"
-    # Hooks should use camelCase (enforced via regex-match for 'use' prefix)
     "src/hooks/**/*.js": "camelCase"
-    # Utils should use camelCase
     "src/utils/**/*.js": "camelCase"
-    # Services should use camelCase
     "src/services/**/*.js": "camelCase"
-    # Context files should use PascalCase
     "src/context/**/*.js": "PascalCase"
-    # Core logic files should use camelCase
     "src/core/**/*.js": "camelCase"
-    # Data files should use camelCase
     "src/data/**/*.js": "camelCase"
-    # Test files should use camelCase
     "__tests__/**/*.js": "camelCase"
 
-  # Disallow common problematic patterns
   disallowed-patterns:
     - "**/*.tmp"
     - "**/*.backup"
     - "**/TODO.txt"
     - "**/.DS_Store"
+    - "**/*.swp"
 
-# Ignore patterns (similar to .gitignore)
-exclude:
-  - node_modules/**
-  - .git/**
-  - .expo/**
-  - .expo-shared/**
-  - dist/**
-  - build/**
-  - coverage/**
-  - "*.log"
+  # --------------------------------------------------------------------------
+  # Test Validation (Phase 3) - Pragmatic approach
+  # --------------------------------------------------------------------------
+
+  test-adjacency:
+    pattern: "adjacent"
+    file-patterns:
+      - "src/**/*.js"
+    exemptions:
+      # Data files don't need tests
+      - "src/data/**/*.js"
+      # Screens are integration-heavy, tested via E2E
+      - "src/screens/**/*.js"
+      # Simple UI components can be visually tested
+      - "src/components/EmptyState.js"
+      - "src/components/ErrorMessage.js"
+      - "src/components/LoadingSpinner.js"
+      - "src/components/StreakFlame.js"
+      - "src/components/XPBar.js"
+      - "src/components/ErrorBoundary.js"
+      - "src/components/AchievementBadge.js"
+      # Test infrastructure
+      - "**/*.test.js"
+      - "**/*.spec.js"
+      - "**/__tests__/**"
+
+  test-location:
+    integration-test-dir: "__tests__"
+    allow-adjacent: true
+    file-patterns:
+      - "**/*.test.js"
+      - "**/*.spec.js"
+
+  # --------------------------------------------------------------------------
+  # Dead Code Detection (Phase 2) - Disabled for now
+  # Re-enable after cleaning up unused code
+  # --------------------------------------------------------------------------
+
+  disallow-orphaned-files: 0
+  disallow-unused-exports: 0
+
+# ============================================================================
+# Overrides for Specific Directories
+# ============================================================================
 
 overrides:
+  # Screens directory - allow more files, exempt from testing
+  - files: ['src/screens/**']
+    rules:
+      max-files-in-dir: { max: 20 }
+
+  # Data directory
+  - files: ['src/data/**']
+    rules:
+      disallow-orphaned-files: 0
+      disallow-unused-exports: 0
+
+  # Test files
+  - files: ['**/*.test.js', '**/*.spec.js', '__tests__/**']
+    rules:
+      max-cognitive-complexity: { max: 25 }
+      max-halstead-effort: { max: 150000 }
+
+  # Entry points
+  - files: ['App.js', 'src/index.js', 'app.json']
+    rules:
+      disallow-unused-exports: 0
+
   # Hooks must start with 'use'
   - files: ['src/hooks/**/*.js']
     rules:
@@ -65,19 +142,29 @@ overrides:
       regex-match:
         "src/context/*.js": "regex:.*Context\\.js$"
 
-  # Test files must end with '.test.js'
-  - files: ['__tests__/**/*.js']
-    rules:
-      regex-match:
-        "__tests__/*.test.js": "regex:.*\\.test\\.js$"
-
-  # Documentation should use SCREAMING_SNAKE_CASE
+  # Documentation
   - files: ['docs/**/*.md']
     rules:
       naming-convention:
         "docs/**/*.md": "SCREAMING_SNAKE_CASE"
+      max-files-in-dir: { max: 20 }
 
-  # Root level configuration and documentation
+  # Root level
   - files: ['*.{js,json,md}']
     rules:
-      max-files-in-dir: { max: 20 }
+      max-files-in-dir: { max: 25 }
+
+# ============================================================================
+# Ignore Patterns
+# ============================================================================
+
+exclude:
+  - node_modules/**
+  - .git/**
+  - .expo/**
+  - .expo-shared/**
+  - dist/**
+  - build/**
+  - coverage/**
+  - "*.log"
+  - .github/**
