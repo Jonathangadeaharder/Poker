@@ -253,6 +253,204 @@ export function getDailyGoalProgress(xpToday, goal = DAILY_GOALS.RECOMMENDED_XP)
   };
 }
 
+// Advanced Achievement Tracking
+export class AchievementManager {
+  constructor() {
+    this.unlockedAchievements = new Set();
+    this.progress = {};
+  }
+
+  /**
+   * Check and unlock achievements based on stats
+   */
+  checkAchievements(stats) {
+    const newlyUnlocked = [];
+
+    Object.entries(ACHIEVEMENTS).forEach(([key, achievement]) => {
+      if (this.unlockedAchievements.has(key)) return;
+
+      if (this.checkRequirement(achievement.requirement, stats)) {
+        this.unlockedAchievements.add(key);
+        newlyUnlocked.push(achievement);
+      }
+    });
+
+    return newlyUnlocked;
+  }
+
+  /**
+   * Check if requirement is met
+   */
+  checkRequirement(requirement, stats) {
+    const { type, count } = requirement;
+
+    switch (type) {
+      case 'sessions_completed':
+        return stats.sessionsCompleted >= count;
+      case 'streak':
+        return stats.currentStreak >= count;
+      case 'quizzes_completed':
+        return stats.quizzesCompleted >= count;
+      case 'perfect_quizzes':
+        return stats.perfectQuizzes >= count;
+      case 'perfect_quiz_streak':
+        return stats.perfectQuizStreak >= count;
+      case 'positions_studied':
+        return stats.positionsStudied >= count;
+      case 'stack_sizes_mastered':
+        return stats.stackSizesMastered >= count;
+      case 'leaks_studied':
+        return stats.leaksStudied >= count;
+      case 'speed_drills_fast':
+        return stats.speedDrillsFast >= count;
+      case 'training_plan_completed':
+        return stats.trainingPlanCompleted >= count;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Get achievement progress
+   */
+  getProgress(achievementId, stats) {
+    const achievement = ACHIEVEMENTS[achievementId];
+    if (!achievement) return null;
+
+    const { type, count } = achievement.requirement;
+    const current = stats[type] || 0;
+
+    return {
+      current,
+      required: count,
+      percentage: Math.min((current / count) * 100, 100),
+      unlocked: this.unlockedAchievements.has(achievementId),
+    };
+  }
+
+  /**
+   * Get all unlocked achievements
+   */
+  getUnlockedAchievements() {
+    return Array.from(this.unlockedAchievements).map(id => ACHIEVEMENTS[id]);
+  }
+
+  /**
+   * Get locked achievements with progress
+   */
+  getLockedAchievements(stats) {
+    return Object.entries(ACHIEVEMENTS)
+      .filter(([id]) => !this.unlockedAchievements.has(id))
+      .map(([id, achievement]) => ({
+        ...achievement,
+        progress: this.getProgress(id, stats),
+      }));
+  }
+}
+
+// Milestone System
+export const MILESTONES = {
+  TOTAL_XP: [
+    { threshold: 1000, reward: 100, title: '1K XP Milestone', icon: '🎯' },
+    { threshold: 5000, reward: 500, title: '5K XP Milestone', icon: '⭐' },
+    { threshold: 10000, reward: 1000, title: '10K XP Milestone', icon: '💎' },
+    { threshold: 25000, reward: 2500, title: '25K XP Milestone', icon: '👑' },
+    { threshold: 50000, reward: 5000, title: '50K XP Milestone', icon: '🏆' },
+  ],
+  TOTAL_QUESTIONS: [
+    { threshold: 100, reward: 50, title: '100 Questions', icon: '📝' },
+    { threshold: 500, reward: 250, title: '500 Questions', icon: '📚' },
+    { threshold: 1000, reward: 500, title: '1000 Questions', icon: '🎓' },
+    { threshold: 2500, reward: 1000, title: '2500 Questions', icon: '🧠' },
+  ],
+  PERFECT_SCORES: [
+    { threshold: 5, reward: 100, title: '5 Perfect Scores', icon: '💯' },
+    { threshold: 25, reward: 500, title: '25 Perfect Scores', icon: '🌟' },
+    { threshold: 100, reward: 2000, title: '100 Perfect Scores', icon: '✨' },
+  ],
+};
+
+export class MilestoneTracker {
+  constructor() {
+    this.reachedMilestones = new Set();
+  }
+
+  /**
+   * Check for newly reached milestones
+   */
+  checkMilestones(stats) {
+    const newMilestones = [];
+
+    // Check XP milestones
+    MILESTONES.TOTAL_XP.forEach(milestone => {
+      const key = `xp_${milestone.threshold}`;
+      if (!this.reachedMilestones.has(key) && stats.totalXP >= milestone.threshold) {
+        this.reachedMilestones.add(key);
+        newMilestones.push({ ...milestone, type: 'xp' });
+      }
+    });
+
+    // Check question milestones
+    MILESTONES.TOTAL_QUESTIONS.forEach(milestone => {
+      const key = `questions_${milestone.threshold}`;
+      if (!this.reachedMilestones.has(key) && stats.questionsAnswered >= milestone.threshold) {
+        this.reachedMilestones.add(key);
+        newMilestones.push({ ...milestone, type: 'questions' });
+      }
+    });
+
+    // Check perfect score milestones
+    MILESTONES.PERFECT_SCORES.forEach(milestone => {
+      const key = `perfect_${milestone.threshold}`;
+      if (!this.reachedMilestones.has(key) && stats.perfectScores >= milestone.threshold) {
+        this.reachedMilestones.add(key);
+        newMilestones.push({ ...milestone, type: 'perfect' });
+      }
+    });
+
+    return newMilestones;
+  }
+
+  /**
+   * Get next milestones
+   */
+  getNextMilestones(stats) {
+    const next = [];
+
+    // Next XP milestone
+    const nextXP = MILESTONES.TOTAL_XP.find(m => m.threshold > stats.totalXP);
+    if (nextXP) {
+      next.push({
+        ...nextXP,
+        type: 'xp',
+        progress: stats.totalXP / nextXP.threshold,
+      });
+    }
+
+    // Next questions milestone
+    const nextQ = MILESTONES.TOTAL_QUESTIONS.find(m => m.threshold > stats.questionsAnswered);
+    if (nextQ) {
+      next.push({
+        ...nextQ,
+        type: 'questions',
+        progress: stats.questionsAnswered / nextQ.threshold,
+      });
+    }
+
+    // Next perfect score milestone
+    const nextP = MILESTONES.PERFECT_SCORES.find(m => m.threshold > stats.perfectScores);
+    if (nextP) {
+      next.push({
+        ...nextP,
+        type: 'perfect',
+        progress: stats.perfectScores / nextP.threshold,
+      });
+    }
+
+    return next;
+  }
+}
+
 // Leaderboard (Optional - Local Highscores)
 export class Leaderboard {
   static getLocalHighscores() {

@@ -1,11 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Provider as PaperProvider, MD3LightTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-// Screens
+// Services
+import { errorTracking } from './src/services/errorTracking';
+
+// Context
+import { AuthProvider, useAuth } from './src/context/AuthContext';
+
+// Components
+import { LoadingSpinner } from './src/components/LoadingSpinner';
+import { ErrorBoundary } from './src/components/ErrorBoundary';
+
+// Auth Screens
+import LoginScreen from './src/screens/auth/LoginScreen';
+import RegisterScreen from './src/screens/auth/RegisterScreen';
+import ForgotPasswordScreen from './src/screens/auth/ForgotPasswordScreen';
+
+// Main Screens
 import HomeScreen from './src/screens/HomeScreen';
 import TrainingPlanScreen from './src/screens/TrainingPlanScreen';
 import RangeTrainerScreen from './src/screens/RangeTrainerScreen';
@@ -14,6 +29,7 @@ import ExploitativeGuideScreen from './src/screens/ExploitativeGuideScreen';
 import QuizGameScreen from './src/screens/QuizGameScreen';
 import SpacedRepetitionScreen from './src/screens/SpacedRepetitionScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
+import OnboardingScreen from './src/screens/OnboardingScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -141,12 +157,94 @@ function PracticeStack() {
   );
 }
 
-export default function App() {
+function AuthStack() {
   return (
-    <PaperProvider theme={theme}>
-      <NavigationContainer>
-        <TabNavigator />
-      </NavigationContainer>
-    </PaperProvider>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen
+        name="Login"
+        component={LoginScreen}
+      />
+      <Stack.Screen
+        name="Register"
+        component={RegisterScreen}
+      />
+      <Stack.Screen
+        name="ForgotPassword"
+        component={ForgotPasswordScreen}
+      />
+    </Stack.Navigator>
   );
+}
+
+function RootStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen
+        name="Onboarding"
+        component={OnboardingScreen}
+      />
+      <Stack.Screen
+        name="MainApp"
+        component={TabNavigator}
+      />
+    </Stack.Navigator>
+  );
+}
+
+function AppNavigator() {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <LoadingSpinner message="Loading..." />;
+  }
+
+  return isAuthenticated ? <RootStack /> : <AuthStack />;
+}
+
+export default function App() {
+  // Initialize error tracking on app start
+  useEffect(() => {
+    errorTracking.initialize();
+  }, []);
+
+  // Navigation state change handler
+  const handleNavigationStateChange = (state) => {
+    if (state) {
+      const currentRoute = getActiveRouteName(state);
+      if (currentRoute) {
+        errorTracking.trackScreenView(currentRoute);
+      }
+    }
+  };
+
+  return (
+    <ErrorBoundary>
+      <PaperProvider theme={theme}>
+        <AuthProvider>
+          <NavigationContainer onStateChange={handleNavigationStateChange}>
+            <AppNavigator />
+          </NavigationContainer>
+        </AuthProvider>
+      </PaperProvider>
+    </ErrorBoundary>
+  );
+}
+
+// Helper to get active route name
+function getActiveRouteName(state) {
+  const route = state.routes[state.index];
+
+  if (route.state) {
+    return getActiveRouteName(route.state);
+  }
+
+  return route.name;
 }

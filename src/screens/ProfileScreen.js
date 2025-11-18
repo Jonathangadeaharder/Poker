@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
-import { Card, Title, Paragraph, Divider, Switch, List } from 'react-native-paper';
+import { View, ScrollView, StyleSheet, Alert } from 'react-native';
+import { Card, Title, Paragraph, Divider, Switch, List, Button } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import XPBar from '../components/XPBar';
 import StreakFlame from '../components/StreakFlame';
 import { AchievementList } from '../components/AchievementBadge';
 import { ACHIEVEMENTS } from '../core/gamification';
 import soundManager from '../core/soundManager';
+import { useAuth } from '../context/AuthContext';
 
 export default function ProfileScreen() {
+  const { user, logout } = useAuth();
   const [profile, setProfile] = useState({
     totalXP: 1250, // Demo data
     currentStreak: 5,
@@ -66,10 +68,48 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            await logout();
+          },
+        },
+      ]
+    );
+  };
+
   const achievementsList = Object.values(ACHIEVEMENTS);
 
   return (
     <ScrollView style={styles.container}>
+      {/* User Info */}
+      {user && (
+        <Card style={styles.card}>
+          <Card.Content>
+            <Title style={styles.sectionTitle}>👤 Account</Title>
+            <Divider style={styles.divider} />
+            <Paragraph style={styles.userInfo}>
+              <Paragraph style={styles.bold}>Email: </Paragraph>
+              {user.email || 'Not available'}
+            </Paragraph>
+            <Paragraph style={styles.userInfo}>
+              <Paragraph style={styles.bold}>Username: </Paragraph>
+              {user.username || 'Not available'}
+            </Paragraph>
+          </Card.Content>
+        </Card>
+      )}
+
       {/* XP & Level */}
       <Card style={styles.card}>
         <Card.Content>
@@ -168,6 +208,16 @@ export default function ProfileScreen() {
               />
             )}
           />
+
+          <Divider style={styles.divider} />
+
+          <List.Item
+            title="Logout"
+            description="Sign out of your account"
+            left={(props) => <List.Icon {...props} icon="logout" color="#c41e3a" />}
+            onPress={handleLogout}
+            titleStyle={{ color: '#c41e3a' }}
+          />
         </Card.Content>
       </Card>
 
@@ -243,6 +293,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 22,
     color: '#666',
+  },
+  userInfo: {
+    fontSize: 14,
+    lineHeight: 24,
+    color: '#666',
+    marginBottom: 8,
   },
   bold: {
     fontWeight: 'bold',

@@ -1,249 +1,244 @@
-# Poker Training Pro 🃏
+# 🎮 Poker Training Pro - React Native App
 
-Eine rigorose, GTO-basierte Poker-Trainings-App für No-Limit Hold'em, entwickelt als React Native App.
+A gamified poker training application with adaptive learning, spaced repetition, and comprehensive analytics. Learn poker strategy the smart way!
 
-## 📋 Überblick
+## ✨ Features
 
-Diese App implementiert die strategische Analyse aus dem Dokument "Rigorose Bewertung und strategische Neukonstruktion eines intensiven einwöchigen Poker-Trainingsplans".
+### 🎯 Core Learning Systems
+- **Spaced Repetition (SM-2)**: Scientifically-proven flashcard system for long-term retention
+- **Adaptive Difficulty Engine**: Automatically adjusts to your skill level
+- **Gamification**: XP, levels, achievements, and daily streaks
+- **Multiple Game Modes**: Quizzes, speed drills, range trainer, push/fold charts
 
-### Hauptfunktionen
+### 📚 Content Areas
+- **NLH Cash Games**: Preflop ranges, postflop play, exploitative strategies
+- **PLO Training**: 25+ questions covering Omaha-specific concepts
+- **MTT Strategy**: 67+ questions on tournament play (early, middle, late, bubble, FT)
+- **Exploitative Play**: Player type identification and adjustment strategies
 
-1. **Zwei spezialisierte Trainingspfade**
-   - **Pfad A**: 6-Max Cash Game Spezialist (100bb Deep Stack)
-   - **Pfad B**: MTT (Tournament) Spezialist (Variable Stack-Tiefen)
+### 📊 Analytics & Tracking
+- **Performance Dashboard**: Charts showing progress over time
+- **Weak Area Identification**: Focus on categories needing improvement
+- **Study Time Tracking**: Monitor your learning investment
+- **Achievement System**: Unlock badges and milestones
 
-2. **40-Stunden Trainingsplan-Tracker**
-   - 7-Tage strukturierter Plan
-   - Fortschrittsverfolgung für jeden Tag
-   - Module: Drills, Videos, Live Play, Reviews
+### 🔄 Advanced Features
+- **Cloud Sync**: Backup progress across devices
+- **Hand History Upload**: Analyze your poker hands
+- **Onboarding Flow**: Interactive tutorial for new users
+- **Offline Support**: Study without internet connection
 
-3. **Range Trainer**
-   - GTO-basierte Preflop-Ranges für alle Positionen
-   - RFI (Raise First In) Ranges
-   - 3-Bet Ranges (Linear vs Polarisiert)
-   - Cold-Call Ranges
+## 🚀 Getting Started
 
-4. **Push/Fold Charts**
-   - Nash Equilibrium-basierte Charts für 20bb, 15bb, 10bb
-   - Open-Shove Ranges für alle Positionen
-   - Re-Shove Defense Ranges
-   - ICM Guidelines für Bubble & Final Table
+### Prerequisites
 
-5. **Exploitative Strategy Guide**
-   - Die 5 häufigsten Hobbyspieler-Leaks
-   - Spezifische Exploits mit erwarteten Win-Rates
-   - 10x Rule für Set Mining
-   - C-Bet Strategy Matrix (HU vs MW)
-
-## 🚀 Installation & Setup
-
-### Voraussetzungen
-
-- Node.js (v14 oder höher)
-- npm oder yarn
-- Expo CLI (wird automatisch installiert)
+- Node.js 16+ installed
+- Expo CLI installed globally: `npm install -g expo-cli`
+- iOS Simulator (Mac) or Android Studio (all platforms)
 
 ### Installation
 
 ```bash
-# Dependencies installieren
+# Clone the repository
+git clone https://github.com/Jonathangadeaharder/Poker.git
+cd Poker
+
+# Install dependencies
 npm install
 
-# Oder mit yarn
-yarn install
-```
-
-### App starten
-
-```bash
-# Development Server starten
+# Start the development server
 npm start
 
-# Oder
-expo start
-
-# Auf Android
-npm run android
-
-# Auf iOS (nur macOS)
+# Run on iOS (Mac only)
 npm run ios
 
-# Im Web-Browser
+# Run on Android
+npm run android
+
+# Run on web
 npm run web
 ```
 
-## 📱 App-Struktur
+### Quick Start
+
+1. Install dependencies: `npm install`
+2. Start Expo: `npm start`
+3. Open Expo Go app on your phone
+4. Scan QR code from terminal
+5. Start learning!
+
+## 📁 Project Structure
 
 ```
 Poker/
-├── App.js                          # Haupteinstiegspunkt & Navigation
 ├── src/
-│   ├── data/
-│   │   ├── pokerRanges.js         # GTO Preflop-Ranges
-│   │   ├── pushFoldCharts.js      # MTT Push/Fold Charts
-│   │   ├── exploitativeStrategies.js  # Exploits & Leaks
-│   │   └── trainingPlan.js        # 40h Trainingsplan
-│   └── screens/
-│       ├── HomeScreen.js          # Startseite & Pfad-Auswahl
-│       ├── TrainingPlanScreen.js  # 7-Tage Trainingsplan
-│       ├── RangeTrainerScreen.js  # Range Training
-│       ├── PushFoldScreen.js      # Push/Fold Charts
-│       └── ExploitativeGuideScreen.js  # Exploits Guide
-├── package.json
-└── README.md
+│   ├── core/                 # Core systems
+│   │   ├── gamification.js   # XP, levels, achievements
+│   │   ├── spacedRepetition.js  # SM-2 algorithm
+│   │   ├── adaptiveEngine.js    # Difficulty adjustment
+│   │   └── soundManager.js      # Audio feedback
+│   ├── data/                 # Static content
+│   │   ├── ploQuestions.js   # PLO training content
+│   │   ├── nlheMttQuestions.js  # MTT strategy
+│   │   ├── exploitativeStrategies.js
+│   │   └── ...
+│   ├── screens/              # UI screens
+│   │   ├── HomeScreen.js
+│   │   ├── QuizGameScreen.js
+│   │   ├── PLOTrainingScreen.js
+│   │   ├── AnalyticsScreen.js
+│   │   └── ...
+│   ├── components/           # Reusable components
+│   │   ├── XPBar.js
+│   │   ├── ErrorBoundary.js  # NEW
+│   │   ├── LoadingSpinner.js # NEW
+│   │   └── ...
+│   ├── services/             # API & services
+│   │   ├── apiClient.js      # Backend communication
+│   │   └── syncService.js    # Cloud sync
+│   ├── hooks/                # Custom hooks
+│   │   ├── useAsyncData.js   # NEW
+│   │   └── useSyncService.js # NEW
+│   └── utils/                # Utilities
+│       ├── validation.js     # NEW
+│       └── secureStorage.js  # NEW
+├── __tests__/                # Unit tests
+├── docs/                     # Documentation
+│   ├── USER_GUIDE.md
+│   ├── DEVELOPER_GUIDE.md
+│   └── CODE_REVIEW_FINDINGS.md
+├── App.js                    # Root component
+└── package.json
 ```
 
-## 🎯 Verwendung
+## 🧪 Testing
 
-### 1. Pfad wählen
+```bash
+# Run unit tests
+npm test
 
-Beim Start der App wählen Sie einen der beiden Trainingspfade:
+# Run with coverage
+npm run test:coverage
 
-- **Pfad A (Cash Game)**: Schwerer, aber breiteres Skill-Set. Fokus auf Postflop-Spiel.
-- **Pfad B (MTT)**: Einfacher, schnellere Lernkurve. Fokus auf Push/Fold und Stack-Management.
+# Watch mode
+npm test -- --watch
 
-### 2. 40-Stunden Trainingsplan
-
-Folgen Sie dem strukturierten 7-Tage-Plan:
-- **Tag 1-2**: Grundlagen (RFI Ranges, Postflop-Basics)
-- **Tag 3-4**: Kernstrategie (Exploits, Push/Fold)
-- **Tag 5-6**: Fortgeschritten (3-Bet Ranges, ICM)
-- **Tag 7**: Integration & Assessment
-
-### 3. Range Trainer nutzen
-
-- Lernen Sie GTO-konforme Preflop-Ranges
-- Verstehen Sie positionsabhängige Anpassungen
-- Studieren Sie 3-Bet-Strategien (Linear vs Polar)
-
-### 4. Push/Fold Charts studieren
-
-- Meistern Sie Short-Stack-Spiel für Turniere
-- Lernen Sie Stack-Größen-spezifische Ranges
-- Verstehen Sie ICM-Adjustments
-
-### 5. Exploitative Strategien anwenden
-
-- Identifizieren Sie häufige Gegner-Leaks
-- Wenden Sie profitable Exploits an
-- Tracken Sie Expected Win-Rates
-
-## ⚠️ Wichtiger Hinweis
-
-Diese App ist ein **Lern- und Referenz-Tool**. Für maximale Trainingseffizienz wird empfohlen, zusätzlich professionelle GTO-Trainer zu nutzen:
-
-- **GTO Wizard** ($29-49/mo) - Umfassendste Lösung
-- **DTO Poker** ($25-40/mo) - Fokus auf MTTs
-- **PokerCoaching.com** ($49/mo) - Videos + Training
-
-Diese professionellen Tools bieten:
-- KI-Gegner für Live-Training
-- Hand-History-Analyse
-- Kontextbezogenes Feedback
-- GTO Solver-Integration
-
-## 🎨 Assets
-
-Die App benötigt folgende Asset-Dateien (erstellen Sie diese oder verwenden Sie Platzhalter):
-
-```
-assets/
-├── icon.png              # 1024x1024 App-Icon
-├── splash.png            # 1242x2436 Splash-Screen
-├── adaptive-icon.png     # 1024x1024 Android Adaptive Icon
-└── favicon.png           # 48x48 Web-Favicon
+# Run specific test file
+npm test gamification.test.js
 ```
 
-**Temporär**: Die App funktioniert auch ohne diese Assets (mit Standard Expo-Icons).
+## 🛠 Development
 
-## 🧪 Features in der App
+### Adding New Questions
 
-### Trainingsplan-Tracker
-- ✅ Fortschrittsverfolgung pro Modul
-- ✅ Persistente Speicherung (AsyncStorage)
-- ✅ Visual Progress Bar
-- ✅ Reset-Funktion
+1. Create or edit question file in `src/data/`
+2. Follow the question format:
+```javascript
+{
+  id: 'unique_id',
+  category: 'category_name',
+  difficulty: 'medium',
+  question: 'Your question?',
+  answers: ['Option 1', 'Option 2', 'Option 3', 'Option 4'],
+  correctAnswer: 'Option 2',
+  explanation: 'Why this is correct...',
+  points: 15,
+}
+```
+3. Import in relevant screen
+4. Test the new questions
 
-### Range Trainer
-- ✅ Alle 6 Positionen (UTG bis BB)
-- ✅ Prozentsätze & Beschreibungen
-- ✅ Vollständige Hand-Listen
-- ✅ 3-Bet Ranges (Linear & Polar)
-- ✅ Cold-Call Guidelines
+### Code Style
 
-### Push/Fold Charts
-- ✅ 3 Stack-Größen (20bb, 15bb, 10bb)
-- ✅ Open-Shove Ranges (alle Positionen)
-- ✅ Re-Shove Defense Ranges
-- ✅ ICM Guidelines (Bubble & Final Table)
+- Follow Airbnb React/JSX style guide
+- Use ESLint: `npm run lint`
+- Format with Prettier: `npm run format`
 
-### Exploitative Guide
-- ✅ 5 häufigste Leaks dokumentiert
-- ✅ Spezifische Exploits mit Win-Rates
-- ✅ Quick Reference Matrix
-- ✅ 10x Rule Calculator
-- ✅ C-Bet Strategy Matrix
+### Commit Messages
 
-## 🔄 Daten-Updates
+```
+feat: Add PLO training screen
+fix: Resolve streak calculation bug
+docs: Update developer guide
+test: Add tests for adaptive engine
+```
 
-Alle strategischen Daten befinden sich in `/src/data/`:
-- Passen Sie Ranges nach Bedarf an
-- Fügen Sie neue Exploits hinzu
-- Erweitern Sie den Trainingsplan
+## 📖 Documentation
 
-## 📚 Theoretische Grundlage
+- **[User Guide](docs/USER_GUIDE.md)**: How to use the app
+- **[Developer Guide](docs/DEVELOPER_GUIDE.md)**: Technical documentation
+- **[Code Review](CODE_REVIEW_FINDINGS.md)**: Improvement roadmap
 
-Die App basiert auf:
-- **GTO (Game Theory Optimal)** Prinzipien
-- **Nash Equilibrium** für Push/Fold
-- **ICM (Independent Chip Model)** für Turniere
-- **Exploitative Theorie** gegen Common Leaks
+## 🔒 Security
 
-### Kernkonzepte
+- Tokens stored in expo-secure-store (encrypted)
+- Input validation on all forms
+- Session timeout after 15 minutes
+- No sensitive data in logs
 
-1. **Range-Morphologie**: Linear, Polarisiert, Kondensiert, Gemerged
-2. **Blocker-Effekte**: A5s blockt AA/AK (50% weniger Combos)
-3. **Implied Odds**: 10x Rule für Set Mining
-4. **ICM**: Non-linearer Chip-Wert in Turnieren
+## 🐛 Known Issues
 
-## 🐛 Bekannte Einschränkungen
+See [CODE_REVIEW_FINDINGS.md](CODE_REVIEW_FINDINGS.md) for complete list
 
-- Keine Live-GTO-Solver-Integration (nur Daten)
-- Kein Hand-History-Upload/-Analyse
-- Keine KI-Gegner zum Üben
-- Keine Community/Social Features
+Critical fixes applied:
+- ✅ Added ErrorBoundary for crash prevention
+- ✅ Created secure token storage
+- ✅ Added input validation utilities
+- ✅ Implemented loading/error states
+- ✅ Fixed memory leaks in sync service
 
-→ Diese Features sind bewusst ausgelassen, da professionelle Tools diese besser bieten.
+## 🗺 Roadmap
 
-## 📖 Weiterführende Ressourcen
+### Phase 1: Critical Fixes (Complete)
+- [x] Fix critical bugs
+- [x] Add error boundaries
+- [x] Secure token storage
+- [x] Input validation
 
-- **Bücher**: "Modern Poker Theory" (Acevedo), "Applications of NLHE" (Janda)
-- **Software**: PioSolver, GTO Wizard, DTO Poker
-- **Communities**: TwoPlusTwo, RunItOnce, PokerCoaching
-- **Tracker**: PokerTracker 4, Hold'em Manager 3
+### Phase 2: Authentication (In Progress)
+- [ ] Login screen
+- [ ] Registration screen
+- [ ] Password reset
+- [ ] Session management
 
-## 🤝 Beitragen
+### Phase 3: Monetization (Planned)
+- [ ] Payment integration
+- [ ] Premium features
+- [ ] Subscription management
 
-Dies ist ein Lern- und Referenzprojekt. Verbesserungsvorschläge:
-- Neue Exploits dokumentieren
-- Ranges aktualisieren (basierend auf Solver-Updates)
-- UI/UX-Verbesserungen
-- Zusätzliche Trainingsmodule
+### Phase 4: Social (Future)
+- [ ] Friends list
+- [ ] Challenges
+- [ ] Global leaderboards
+- [ ] Share achievements
 
-## 📄 Lizenz
+## 📄 License
 
-Dieses Projekt ist für Bildungszwecke erstellt.
+MIT License - See LICENSE file
 
-## 🎓 Credits
+## 🤝 Contributing
 
-Strategische Konzepte basierend auf:
-- GTO Wizard Research
-- Smart Poker Study (KISS Ranges)
-- Modern Poker Theory
-- Run It Once Training
+Contributions welcome! Please read CONTRIBUTING.md first.
+
+1. Fork the repository
+2. Create feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push to branch: `git push origin feature/amazing-feature`
+5. Open Pull Request
+
+## 📧 Support
+
+- **Issues**: [GitHub Issues](https://github.com/Jonathangadeaharder/Poker/issues)
+- **Email**: support@pokertraining.app
+
+## 🙏 Acknowledgments
+
+- SM-2 Algorithm by SuperMemo
+- GTO strategy resources from solvers
+- Community feedback and testing
 
 ---
 
-**Viel Erfolg beim Training! 🚀**
+**Built with** ❤️ **using React Native & Expo**
 
-*Remember: Poker is a skill game. Responsible gaming only. 18+*
+**Happy studying!** 🎓♠️♥️♣️♦️
