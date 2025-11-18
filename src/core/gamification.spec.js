@@ -10,7 +10,10 @@ describe('gamification', () => {
   it('should be defined', () => {
     const gamification = require('./gamification');
     expect(gamification).toBeDefined();
-    expect(gamification.GamificationSystem).toBeDefined();
+    expect(gamification.StreakManager).toBeDefined();
+    expect(gamification.AchievementManager).toBeDefined();
+    expect(gamification.MilestoneTracker).toBeDefined();
+    expect(gamification.Leaderboard).toBeDefined();
   });
 
   // Comprehensive tests are in __tests__/gamification.test.js

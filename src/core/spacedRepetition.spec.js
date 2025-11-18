@@ -10,7 +10,10 @@ describe('spacedRepetition', () => {
   it('should be defined', () => {
     const spacedRepetition = require('./spacedRepetition');
     expect(spacedRepetition).toBeDefined();
-    expect(spacedRepetition.SpacedRepetitionSystem).toBeDefined();
+    expect(spacedRepetition.Card).toBeDefined();
+    expect(spacedRepetition.Deck).toBeDefined();
+    expect(spacedRepetition.createPokerDecks).toBeDefined();
+    expect(spacedRepetition.StudySession).toBeDefined();
   });
 
   // Comprehensive tests are in __tests__/spacedRepetition.test.js
