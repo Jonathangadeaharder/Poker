@@ -10,8 +10,9 @@ This is a React Native Expo application that provides a gamified poker training 
 - **Language**: JavaScript (ES6+)
 - **UI Library**: React Native Paper 5.10.0
 - **Navigation**: React Navigation 6.x (Bottom Tabs + Stack)
-- **State Management**: React Hooks + AsyncStorage (NO Redux/Context API currently)
+- **State Management**: React Hooks + Context API (AuthContext) + AsyncStorage (NO Redux)
 - **Storage**: AsyncStorage 1.18.2 for local persistence
+- **Secure Storage**: expo-secure-store with AsyncStorage fallback
 - **Audio/Haptics**: Expo AV 13.4.1, Expo Haptics 12.4.0
 - **Testing**: Jest
 - **Icons**: Material Community Icons
@@ -49,6 +50,8 @@ This is a React Native Expo application that provides a gamified poker training 
 │   │   ├── AchievementBadge.js
 │   │   ├── ErrorBoundary.js
 │   │   └── LoadingSpinner.js
+│   ├── context/              # React Context providers
+│   │   └── AuthContext.js    # Authentication state management
 │   ├── services/             # API & services
 │   │   ├── apiClient.js
 │   │   └── syncService.js
@@ -57,7 +60,8 @@ This is a React Native Expo application that provides a gamified poker training 
 │   │   └── useSyncService.js
 │   └── utils/                # Utility functions
 │       ├── validation.js
-│       └── secureStorage.js
+│       ├── secureStorage.js
+│       └── sessionManager.js
 ├── __tests__/                # Unit tests
 ├── docs/                     # Documentation
 ├── App.js                    # Root component & navigation setup
@@ -91,8 +95,9 @@ This is a React Native Expo application that provides a gamified poker training 
    - Use `useState` for local component state
    - Use `useEffect` for side effects
    - Use AsyncStorage for persistent data
+   - Use AuthContext (via `useAuth()` hook) for authentication state
    - Clean up effects properly (return cleanup functions)
-   - Avoid prop drilling (consider Context API for deeply nested state)
+   - Consider creating new Context providers for other global state needs
 
 ### Specific Patterns
 
@@ -152,14 +157,35 @@ This is a React Native Expo application that provides a gamified poker training 
    - Use Stack navigator for hierarchical screens
    - Use Tab navigator for main sections
 
+5. **Authentication Context**
+   - Use the `useAuth()` hook to access authentication state
+   - Available from `src/context/AuthContext.js`
+   - Provides: `user`, `loading`, `isAuthenticated`, `login`, `register`, `logout`, `refreshUser`, `updateProfile`
+   - Example:
+   ```javascript
+   import { useAuth } from '../context/AuthContext';
+   
+   function MyScreen() {
+     const { user, isAuthenticated, login, logout } = useAuth();
+     
+     if (!isAuthenticated) {
+       // Show login screen
+     }
+     
+     // Use user data
+     return <Text>Welcome {user?.username}</Text>;
+   }
+   ```
+
 ## Security Best Practices
 
 ### Critical Security Requirements
 
 1. **Token Storage**
-   - NEVER store authentication tokens in memory or AsyncStorage plain
-   - Use `expo-secure-store` for sensitive data
-   - Implement session timeout (15 minutes recommended)
+   - NEVER store authentication tokens in plain memory
+   - Use the `secureStorage` utility (`src/utils/secureStorage.js`) for sensitive data
+   - This utility uses `expo-secure-store` when available, with AsyncStorage fallback
+   - Session timeout is implemented via `sessionManager` (15 minutes)
 
 2. **Input Validation**
    - Validate all user inputs before processing
@@ -351,8 +377,8 @@ This is a React Native Expo application that provides a gamified poker training 
    - Don't silently fail
 
 4. **Insecure Storage** ❌
-   - Don't store tokens in AsyncStorage or memory
-   - Use expo-secure-store for sensitive data
+   - Don't store tokens in plain memory or unencrypted storage
+   - Use the `secureStorage` utility for sensitive data (handles expo-secure-store with fallback)
 
 5. **Missing Validation** ❌
    - Always validate user input
@@ -361,17 +387,19 @@ This is a React Native Expo application that provides a gamified poker training 
 
 ## Key Architectural Decisions
 
-1. **No Backend Yet**: All data is stored locally in AsyncStorage. API client exists but is not fully integrated.
+1. **Backend Integration in Progress**: API client exists (`src/services/apiClient.js`) with authentication system (`AuthContext`). Some data is still stored locally in AsyncStorage, backend integration ongoing.
 
 2. **No TypeScript**: Project uses JavaScript. When adding new code, follow existing JavaScript patterns.
 
-3. **Simple State Management**: Uses React hooks + AsyncStorage. No Redux or complex state management (by design).
+3. **Simple State Management**: Uses React hooks + Context API (AuthContext for auth) + AsyncStorage. No Redux (by design).
 
 4. **Expo Managed Workflow**: Using Expo managed workflow for easy development and deployment.
 
 5. **Gamification First**: The gamification system (XP, levels, achievements, streaks) is core to the app. All features should integrate with it.
 
 6. **Learning Science**: Spaced repetition (SM-2 algorithm) and adaptive difficulty are fundamental to the learning experience.
+
+7. **Secure Storage**: Uses expo-secure-store when available with AsyncStorage fallback for cross-platform compatibility.
 
 ## Documentation
 
