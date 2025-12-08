@@ -1,0 +1,45 @@
+name: Update Repomix Output
+
+on:
+  push:
+    branches: [ '**' ]
+    paths-ignore:
+      - 'repomix-output.txt'
+  workflow_dispatch:
+
+jobs:
+  update-repomix:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Generate repomix output
+      run: |
+        echo "Generating repomix output..."
+        npx repomix --style plain -o repomix-output.txt
+
+    - name: Configure Git
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Commit and push if changed
+      run: |
+        git add repomix-output.txt
+        if git diff --staged --quiet; then
+          echo "No changes to repomix output"
+        else
+          git commit --amend --no-edit
+          git push -f origin ${{ github.ref_name }}
+          echo "Repomix output updated and amended to last commit"
+        fi
