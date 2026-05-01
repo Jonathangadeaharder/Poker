@@ -60,7 +60,7 @@ describe('Gamification System', () => {
     });
 
     it('should return correct streak status', () => {
-      const status = StreakManager.getStreakStatus(7);
+      const status = StreakManager.getStreakStatus(6);
       expect(status.emoji).toBe('🔥');
       expect(status.message).toContain('Heiß');
     });
@@ -110,7 +110,7 @@ describe('Gamification System', () => {
 
     it('should calculate achievement progress', () => {
       const stats = {
-        sessionsCompleted: 5,
+        sessions_completed: 5,
       };
 
       const progress = manager.getProgress('DEDICATED_LEARNER', stats);
