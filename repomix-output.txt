@@ -65,7 +65,21 @@ __tests__/
   dependabot.yml
 assets/
   README.md
+Design/
+  screens/
+    home.jsx
+    lesson.jsx
+    onboarding.jsx
+    results.jsx
+  components.jsx
+  ios-frame.jsx
+  styles.css
+  Tilt.html
+  tweaks-panel.jsx
 docs/
+  superpowers/
+    specs/
+      2026-05-01-sveltekit-tilt-port-design.md
   ACCESSIBILITY_GUIDE.md
   BETA_TESTING.md
   CICD_SETUP.md
@@ -140,6 +154,60 @@ src/
     sessionManager.spec.js
     validation.js
     validation.spec.js
+tilt-app/
+  .vscode/
+    extensions.json
+  src/
+    lib/
+      assets/
+        favicon.svg
+      components/
+        BottomNav.svelte
+        Button.svelte
+        Chip.svelte
+        Confetti.svelte
+        index.ts
+        Pill.svelte
+        PlayingCard.svelte
+        ProgressRing.svelte
+        Screen.svelte
+        StreakBadge.svelte
+        ThemePicker.svelte
+        TopBar.svelte
+      stores/
+        auth.svelte.ts
+        theme.ts
+      index.ts
+      supabase.ts
+    routes/
+      (auth)/
+        login/
+          +page.svelte
+        register/
+          +page.svelte
+        +layout.svelte
+      onboarding/
+        +page.svelte
+      +layout.svelte
+      +page.svelte
+    app.css
+    app.d.ts
+    app.html
+  static/
+    robots.txt
+  supabase/
+    schema.sql
+  .env.example
+  .gitignore
+  .npmrc
+  biome.json
+  package.json
+  playwright.config.ts
+  README.md
+  svelte.config.js
+  tsconfig.json
+  vite.config.ts
+  vitest.config.ts
 .gitignore
 .structurelint.md
 .structurelint.yml
@@ -161,6 +229,235 @@ START_HERE.md
 ================================================================
 Files
 ================================================================
+
+================
+File: docs/superpowers/specs/2026-05-01-sveltekit-tilt-port-design.md
+================
+# Tilt — SvelteKit Poker Training Port Design
+
+## Summary
+
+Full rewrite of the React Native Poker Training Pro app into modern SvelteKit 2 + Svelte 5, fused with the Tilt design system (source of truth: `Design/` folder). All existing features ported and restyled. Supabase for auth + DB + realtime.
+
+## Architecture
+
+**Stack**: SvelteKit 2, Svelte 5 (runes), TailwindCSS 4, Supabase (auth + Postgres + Realtime), Vitest, Playwright, Biome
+
+**Source of truth**: `Design/` folder — its visual language, component styling, screen layouts, and UX patterns override the existing React Native UI.
+
+### Routing
+
+```
+src/routes/
+├── +layout.svelte              # Auth guard, theme, global shell
+├── +page.svelte                # redirect → /onboarding or /home
+├── onboarding/
+│   └── +page.svelte            # 3-step wizard → personalized plan
+├── home/
+│   └── +page.svelte            # Dashboard (daily XP, hand of day, mood picker, skill tree)
+├── lesson/
+│   └── [id]/
+│       └── +page.svelte        # Interactive hand simulation (tell meter, confidence, reveal)
+├── results/
+│   └── [sessionId]/
+│       └── +page.svelte        # Session stats, confetti, achievement, insight
+├── learn/
+│   ├── ranges/
+│   │   └── +page.svelte        # GTO range trainer (RFI, 3-bet, cold call)
+│   ├── pushfold/
+│   │   └── +page.svelte        # Push/fold chart explorer
+│   ├── exploits/
+│   │   └── +page.svelte        # Exploitative strategy guide
+│   └── plan/
+│       └── +page.svelte        # 40-hour training plan tracker
+├── practice/
+│   ├── quiz/
+│   │   └── +page.svelte        # Interactive quiz game
+│   └── srs/
+│       └── +page.svelte        # Spaced repetition flashcards
+└── profile/
+    └── +page.svelte            # Stats, achievements, settings
+```
+
+### State Management
+
+Svelte 5 runes throughout. No external state library.
+
+- `$state` — component-level reactive state
+- `$derived` — computed values (XP progress, streak status, card stats)
+- `$effect` — side effects (Supabase sync, animations, sound triggers)
+- Shared stores in `src/lib/stores/` as Svelte 5 module-level state (user profile, settings, SRS decks)
+
+### Data Layer
+
+```
+src/lib/
+├── supabase.ts                 # Client init, typed DB schema
+├── stores/
+│   ├── auth.svelte.ts          # User session, auth state
+│   ├── profile.svelte.ts       # XP, level, streak, achievements
+│   ├── settings.svelte.ts      # Sound, haptics, theme, card style
+│   └── srs.svelte.ts           # Decks, cards, study sessions
+├── core/
+│   ├── gamification.ts         # XP rewards, levels, achievements, streaks
+│   ├── spacedRepetition.ts     # SM-2 algorithm, Card/Deck/StudySession classes
+│   ├── soundManager.ts         # Web Audio API + vibration
+│   └── adaptiveEngine.ts       # Difficulty adjustment
+├── data/
+│   ├── pokerRanges.ts          # GTO preflop ranges
+│   ├── pushFoldCharts.ts       # MTT push/fold charts
+│   ├── exploitativeStrategies.ts
+│   ├── trainingPlan.ts         # 40-hour plan
+│   ├── miniGames.ts            # Quiz generators
+│   ├── ploQuestions.ts         # PLO quiz bank
+│   └── nlheMttQuestions.ts     # NLHE MTT quiz bank
+└── components/
+    ├── ui/                     # Design system primitives
+    │   ├── PlayingCard.svelte
+    │   ├── TopBar.svelte
+    │   ├── StreakBadge.svelte
+    │   ├── ProgressRing.svelte
+    │   ├── Confetti.svelte
+    │   ├── Button.svelte
+    │   ├── Pill.svelte
+    │   └── Chip.svelte
+    ├── layout/                 # Page shells
+    │   ├── BottomNav.svelte
+    │   └── Screen.svelte
+    └── gamification/           # XP bar, achievements, streak flame
+        ├── XPBar.svelte
+        ├── StreakFlame.svelte
+        └── AchievementBadge.svelte
+```
+
+### Supabase Schema
+
+```sql
+-- Auth: Supabase Auth (email + password + magic link)
+
+-- Profiles
+profiles (
+  id UUID PK REFERENCES auth.users,
+  total_xp INT DEFAULT 0,
+  current_streak INT DEFAULT 0,
+  longest_streak INT DEFAULT 0,
+  last_active_date DATE,
+  total_sessions INT DEFAULT 0,
+  perfect_quizzes INT DEFAULT 0,
+  onboarding_goal TEXT,
+  onboarding_level TEXT,
+  onboarding_time INT,
+  created_at TIMESTAMPTZ
+)
+
+-- Achievements
+user_achievements (
+  id UUID PK,
+  user_id UUID REFERENCES profiles,
+  achievement_key TEXT,
+  unlocked_at TIMESTAMPTZ
+)
+
+-- Training progress
+training_progress (
+  id UUID PK,
+  user_id UUID REFERENCES profiles,
+  path_key TEXT,        -- 'CASH_GAME' | 'MTT'
+  completed_modules INT[],
+  updated_at TIMESTAMPTZ
+)
+
+-- SRS cards
+srs_cards (
+  id UUID PK,
+  user_id UUID REFERENCES profiles,
+  deck_key TEXT,
+  front TEXT,
+  back TEXT,
+  category TEXT,
+  tags TEXT[],
+  n INT DEFAULT 0,
+  ef REAL DEFAULT 2.5,
+  interval_days INT DEFAULT 0,
+  next_review DATE,
+  last_reviewed DATE,
+  total_reviews INT DEFAULT 0,
+  correct_reviews INT DEFAULT 0,
+  streak_correct INT DEFAULT 0
+)
+
+-- Session history
+sessions (
+  id UUID PK,
+  user_id UUID REFERENCES profiles,
+  type TEXT,             -- 'quiz' | 'srs' | 'lesson'
+  duration_seconds INT,
+  accuracy REAL,
+  xp_earned INT,
+  cards_studied INT,
+  metadata JSONB,
+  created_at TIMESTAMPTZ
+)
+
+-- Settings
+user_settings (
+  user_id UUID PK REFERENCES profiles,
+  sound_enabled BOOLEAN DEFAULT true,
+  haptics_enabled BOOLEAN DEFAULT true,
+  theme TEXT DEFAULT 'felt',
+  card_style TEXT DEFAULT 'classic'
+)
+```
+
+### Design System (from Design/ folder)
+
+**Color tokens** (CSS custom properties):
+- `--felt`: #0e2a20 (primary background)
+- `--cream`: #f5e9d4 (primary text)
+- `--coral`: #ff5b48 (CTA, accents)
+- `--gold`: #e9b949 (progress, rewards)
+- Theme variants: felt, midnight, clay, paper
+
+**Typography**:
+- Display/headlines: Instrument Serif
+- Body: Geist
+- Monospace/data: JetBrains Mono
+
+**Key components from Design/**:
+- `PlayingCard` — 3 treatments (classic, minimal, luxury), 4 sizes, face-down state, deal animation
+- `TopBar` — back button, center title, right slot
+- `StreakBadge` — fire emoji + count pill
+- `ProgressRing` — SVG circular progress
+- `Confetti` — celebration animation
+- `Button` variants: btn-primary (coral 3D), btn-ghost, btn-cream
+- `Pill` — metadata badge
+- `Chip` — poker chip visual
+
+**Novel UX from Design/ (not in existing app)**:
+- **Tell meter**: animated progress bar during hand reading phase
+- **Confidence slider**: scales XP reward/penalty based on player confidence
+- **Mood picker**: 2x2 grid (quick drill, easy wins, hard mode, replay)
+- **Hand of the Day**: daily featured hand scenario
+- **Skill tree**: visual path progress (mastered/in-progress/locked)
+- **Session insights**: post-session analytics ("You bluff-catch too rarely on the river")
+- **Onboarding wizard**: 3 questions → personalized daily plan
+
+## Epics (8)
+
+1. **Project Scaffold & Design System** — SvelteKit project, Tailwind config, Tilt tokens, base components
+2. **Auth & Onboarding** — Supabase auth, onboarding wizard (3-step + plan reveal)
+3. **Core Engines** — Gamification (XP/levels/achievements/streaks), SM-2 spaced repetition, sound/haptics
+4. **Home Dashboard** — Daily progress, hand of the day, mood picker, skill tree, bottom nav
+5. **Interactive Lesson** — Hand simulation screen (tell meter, confidence slider, reveal, XP calc)
+6. **Learning Tools** — Range trainer, push/fold charts, exploitative guide, training plan (all restyled)
+7. **Practice Modes** — Quiz game, SRS flashcards, results screen
+8. **Profile & Settings** — User stats, achievement gallery, theme picker, settings
+
+## Testing
+
+- Vitest for unit tests (core engines, stores)
+- Playwright for E2E (full flows)
+- Branch coverage ≥90%
 
 ================
 File: __mocks__/@react-native-async-storage/async-storage.js
@@ -377,368 +674,6 @@ describe('Adaptive Learning Engine', () => {
 
       engine.getRecommendedDifficulty();
       expect(engine.difficultyHistory.length).toBeGreaterThan(0);
-    });
-  });
-});
-
-================
-File: __tests__/gamification.test.js
-================
-/**
- * Tests for Gamification System
- */
-
-import {
-  XP_REWARDS,
-  LEVELS,
-  calculateLevel,
-  StreakManager,
-  getDailyGoalProgress,
-  AchievementManager,
-  MilestoneTracker,
-} from '../src/core/gamification';
-
-describe('Gamification System', () => {
-  describe('calculateLevel', () => {
-    it('should return level 1 for 0 XP', () => {
-      const result = calculateLevel(0);
-      expect(result.level).toBe(1);
-      expect(result.levelData.title).toBe('Poker Novice');
-    });
-
-    it('should return correct level for 1000 XP', () => {
-      const result = calculateLevel(1000);
-      expect(result.level).toBe(5);
-    });
-
-    it('should calculate progress correctly', () => {
-      const result = calculateLevel(150);
-      expect(result.level).toBe(2);
-      expect(result.progress).toBeGreaterThan(0);
-      expect(result.progress).toBeLessThan(1);
-    });
-  });
-
-  describe('StreakManager', () => {
-    it('should calculate streak correctly for consecutive days', () => {
-      const today = new Date();
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-
-      const diff = StreakManager.calculateStreak(yesterday, today);
-      expect(diff).toBe(1);
-    });
-
-    it('should identify active streak', () => {
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-
-      const isActive = StreakManager.isStreakActive(yesterday);
-      expect(isActive).toBe(true);
-    });
-
-    it('should identify broken streak', () => {
-      const threeDaysAgo = new Date();
-      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-
-      const isActive = StreakManager.isStreakActive(threeDaysAgo);
-      expect(isActive).toBe(false);
-    });
-
-    it('should return correct streak status', () => {
-      const status = StreakManager.getStreakStatus(7);
-      expect(status.emoji).toBe('🔥');
-      expect(status.message).toContain('Heiß');
-    });
-  });
-
-  describe('getDailyGoalProgress', () => {
-    it('should calculate progress correctly', () => {
-      const result = getDailyGoalProgress(50, 100);
-      expect(result.progress).toBe(0.5);
-      expect(result.achieved).toBe(false);
-      expect(result.remaining).toBe(50);
-    });
-
-    it('should mark goal as achieved when met', () => {
-      const result = getDailyGoalProgress(150, 100);
-      expect(result.achieved).toBe(true);
-      expect(result.remaining).toBe(0);
-    });
-  });
-
-  describe('AchievementManager', () => {
-    let manager;
-
-    beforeEach(() => {
-      manager = new AchievementManager();
-    });
-
-    it('should unlock achievement when requirement met', () => {
-      const stats = {
-        sessionsCompleted: 1,
-      };
-
-      const unlocked = manager.checkAchievements(stats);
-      expect(unlocked.length).toBeGreaterThan(0);
-      expect(unlocked[0].id).toBe('first_steps');
-    });
-
-    it('should not unlock same achievement twice', () => {
-      const stats = {
-        sessionsCompleted: 1,
-      };
-
-      manager.checkAchievements(stats);
-      const secondCheck = manager.checkAchievements(stats);
-      expect(secondCheck.length).toBe(0);
-    });
-
-    it('should calculate achievement progress', () => {
-      const stats = {
-        sessionsCompleted: 5,
-      };
-
-      const progress = manager.getProgress('DEDICATED_LEARNER', stats);
-      expect(progress.current).toBe(5);
-      expect(progress.required).toBe(10);
-      expect(progress.percentage).toBe(50);
-    });
-  });
-
-  describe('MilestoneTracker', () => {
-    let tracker;
-
-    beforeEach(() => {
-      tracker = new MilestoneTracker();
-    });
-
-    it('should detect XP milestone', () => {
-      const stats = {
-        totalXP: 1000,
-        questionsAnswered: 0,
-        perfectScores: 0,
-      };
-
-      const milestones = tracker.checkMilestones(stats);
-      expect(milestones.length).toBeGreaterThan(0);
-      expect(milestones[0].type).toBe('xp');
-    });
-
-    it('should get next milestones', () => {
-      const stats = {
-        totalXP: 500,
-        questionsAnswered: 50,
-        perfectScores: 2,
-      };
-
-      const next = tracker.getNextMilestones(stats);
-      expect(next.length).toBeGreaterThan(0);
-      expect(next[0].progress).toBeGreaterThan(0);
-    });
-  });
-});
-
-================
-File: __tests__/spacedRepetition.test.js
-================
-/**
- * Tests for Spaced Repetition System
- */
-
-import {
-  DIFFICULTY_RATINGS,
-  Card,
-  Deck,
-  StudySession,
-} from '../src/core/spacedRepetition';
-
-describe('Spaced Repetition System', () => {
-  describe('Card', () => {
-    let card;
-
-    beforeEach(() => {
-      card = new Card(
-        'test_1',
-        'What is the UTG RFI range?',
-        '15%: AA-77, AK-AJ...',
-        'ranges',
-        ['rfi', 'utg']
-      );
-    });
-
-    it('should initialize with correct defaults', () => {
-      expect(card.n).toBe(0);
-      expect(card.ef).toBe(2.5);
-      expect(card.interval).toBe(0);
-      expect(card.totalReviews).toBe(0);
-    });
-
-    it('should update on GOOD review', () => {
-      const result = card.review(DIFFICULTY_RATINGS.GOOD);
-      expect(result.success).toBe(true);
-      expect(card.n).toBe(1);
-      expect(card.interval).toBe(1); // First review = 1 day
-      expect(card.totalReviews).toBe(1);
-      expect(card.correctReviews).toBe(1);
-    });
-
-    it('should reset on AGAIN review', () => {
-      card.review(DIFFICULTY_RATINGS.GOOD);
-      card.review(DIFFICULTY_RATINGS.GOOD);
-      expect(card.n).toBe(2);
-
-      const result = card.review(DIFFICULTY_RATINGS.AGAIN);
-      expect(result.success).toBe(false);
-      expect(card.n).toBe(0);
-      expect(card.interval).toBe(0);
-      expect(card.streakCorrect).toBe(0);
-    });
-
-    it('should calculate intervals correctly', () => {
-      card.review(DIFFICULTY_RATINGS.GOOD); // n=1, interval=1
-      card.review(DIFFICULTY_RATINGS.GOOD); // n=2, interval=6
-      expect(card.interval).toBe(6);
-
-      card.review(DIFFICULTY_RATINGS.GOOD); // n=3, interval=6*EF
-      expect(card.interval).toBeGreaterThan(6);
-    });
-
-    it('should adjust EF based on difficulty', () => {
-      const initialEF = card.ef;
-      card.review(DIFFICULTY_RATINGS.EASY);
-      expect(card.ef).toBeGreaterThan(initialEF);
-
-      card.review(DIFFICULTY_RATINGS.HARD);
-      const afterHard = card.ef;
-      expect(afterHard).toBeLessThan(card.ef);
-    });
-
-    it('should maintain minimum EF of 1.3', () => {
-      // Review with HARD many times
-      for (let i = 0; i < 20; i++) {
-        card.review(DIFFICULTY_RATINGS.HARD);
-      }
-      expect(card.ef).toBeGreaterThanOrEqual(1.3);
-    });
-
-    it('should determine if card is due', () => {
-      expect(card.isDue()).toBe(true); // New card
-
-      card.review(DIFFICULTY_RATINGS.GOOD);
-      expect(card.isDue()).toBe(false); // Due tomorrow
-    });
-
-    it('should calculate retention rate', () => {
-      card.review(DIFFICULTY_RATINGS.GOOD);
-      card.review(DIFFICULTY_RATINGS.GOOD);
-      card.review(DIFFICULTY_RATINGS.AGAIN);
-
-      const rate = card.getRetentionRate();
-      expect(rate).toBeCloseTo(0.667, 2);
-    });
-  });
-
-  describe('Deck', () => {
-    let deck;
-
-    beforeEach(() => {
-      deck = new Deck('Test Deck', 'Test deck for unit tests');
-    });
-
-    it('should initialize empty', () => {
-      expect(deck.cards.length).toBe(0);
-    });
-
-    it('should add cards', () => {
-      const card = new Card('1', 'Q', 'A', 'test');
-      deck.addCard(card);
-      expect(deck.cards.length).toBe(1);
-    });
-
-    it('should get new cards', () => {
-      const card1 = new Card('1', 'Q1', 'A1', 'test');
-      const card2 = new Card('2', 'Q2', 'A2', 'test');
-      deck.addCard(card1);
-      deck.addCard(card2);
-
-      const newCards = deck.getNewCards();
-      expect(newCards.length).toBe(2);
-    });
-
-    it('should get due cards', () => {
-      const card = new Card('1', 'Q', 'A', 'test');
-      deck.addCard(card);
-
-      const dueCards = deck.getDueCards();
-      expect(dueCards.length).toBe(1);
-    });
-
-    it('should get learning cards', () => {
-      const card = new Card('1', 'Q', 'A', 'test');
-      deck.addCard(card);
-      card.review(DIFFICULTY_RATINGS.GOOD); // Now it's a learning card
-
-      const learningCards = deck.getLearningCards();
-      expect(learningCards.length).toBe(1);
-    });
-
-    it('should calculate stats correctly', () => {
-      const card1 = new Card('1', 'Q1', 'A1', 'test');
-      const card2 = new Card('2', 'Q2', 'A2', 'test');
-      deck.addCard(card1);
-      deck.addCard(card2);
-
-      card1.review(DIFFICULTY_RATINGS.GOOD);
-      card1.review(DIFFICULTY_RATINGS.GOOD);
-      card2.review(DIFFICULTY_RATINGS.AGAIN);
-
-      const stats = deck.getStats();
-      expect(stats.total).toBe(2);
-      expect(stats.due).toBe(1); // card2 is due (failed)
-      expect(stats.learning).toBe(1); // card1 is learning
-      expect(stats.avgRetention).toBeLessThan(100);
-    });
-  });
-
-  describe('StudySession', () => {
-    let deck, session;
-
-    beforeEach(() => {
-      deck = new Deck('Test', 'Test');
-      for (let i = 0; i < 15; i++) {
-        deck.addCard(new Card(`${i}`, `Q${i}`, `A${i}`, 'test'));
-      }
-      session = new StudySession(deck, 5, 10);
-    });
-
-    it('should start session with correct card count', () => {
-      const result = session.startSession();
-      expect(result.totalCards).toBeGreaterThan(0);
-      expect(result.newCards).toBeLessThanOrEqual(5);
-    });
-
-    it('should get current card', () => {
-      session.startSession();
-      const card = session.getCurrentCard();
-      expect(card).not.toBeNull();
-    });
-
-    it('should submit answer and move to next', () => {
-      session.startSession();
-      const result = session.submitAnswer(DIFFICULTY_RATINGS.GOOD);
-      expect(result.success).toBe(true);
-      expect(session.sessionStats.correct).toBe(1);
-    });
-
-    it('should complete session', () => {
-      session.startSession();
-      while (session.getCurrentCard()) {
-        session.submitAnswer(DIFFICULTY_RATINGS.GOOD);
-      }
-      const summary = session.getSessionSummary();
-      expect(summary.duration).toBeGreaterThanOrEqual(0);
-      expect(summary.accuracy).toBeGreaterThan(0);
     });
   });
 });
@@ -1647,6 +1582,1823 @@ Um eigene Icons zu erstellen:
 # Mit ImageMagick können Sie schnell Platzhalter erstellen:
 convert -size 1024x1024 xc:#2d5f3f -pointsize 200 -fill white -gravity center -annotate +0+0 "♠♥" icon.png
 ```
+
+================
+File: Design/screens/home.jsx
+================
+/* global React */
+function HomeScreen({ onStart, onLesson, picks, tweaks }) {
+  const xpToday = 65;
+  const dailyGoal = 100;
+  const streak = 7;
+  const level = 4;
+  const levelTitle = 'Reading the Felt';
+
+  return (
+    <div className="screen felt-bg" style={{ background: 'var(--felt)', overflowY: 'auto', overflowX: 'hidden' }}>
+      <TopBar
+        left={<div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 999, background: 'linear-gradient(135deg, #ff5b48, #e9b949)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14, color: '#2a0a05' }}>R</div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600 }}>Hey, Rae</div>
+            <div className="mono" style={{ fontSize: 10, color: 'var(--cream-dim)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Lvl {level} · {levelTitle}</div>
+          </div>
+        </div>}
+        right={<StreakBadge count={streak} />}
+      />
+
+      <div style={{ padding: '8px 20px 100px' }}>
+        {/* Daily progress hero */}
+        <div style={{ marginTop: 12, padding: 22, borderRadius: 24, background: 'linear-gradient(180deg, rgba(255,91,72,0.18), rgba(255,91,72,0.04))', border: '1px solid rgba(255,91,72,0.3)', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,91,72,0.25), transparent 70%)' }} />
+          <div className="eyebrow">Today</div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 8 }}>
+            <div>
+              <div className="serif" style={{ fontSize: 44, lineHeight: 1, color: 'var(--cream)' }}>
+                {xpToday}<span style={{ color: 'var(--cream-dim)', fontSize: 22 }}>/{dailyGoal} xp</span>
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--cream-dim)', marginTop: 4 }}>Keep the streak hot 🔥</div>
+            </div>
+            <ProgressRing value={(xpToday/dailyGoal)*100} size={64} label={`${Math.round((xpToday/dailyGoal)*100)}%`} />
+          </div>
+          <button className="btn btn-primary" style={{ width: '100%', marginTop: 16 }} onClick={onLesson}>
+            Continue session · 35 xp left
+          </button>
+        </div>
+
+        {/* Hand of the Day */}
+        <div style={{ marginTop: 24 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
+            <div className="eyebrow">Hand of the Day</div>
+            <div className="mono" style={{ fontSize: 10, color: 'var(--gold)' }}>2,847 PLAYING</div>
+          </div>
+          <div onClick={onLesson} className="tap" style={{ borderRadius: 22, overflow: 'hidden', position: 'relative', background: 'linear-gradient(135deg, #1a3d2e 0%, #0e2a20 100%)', border: '1px solid var(--hairline-strong)', padding: 22, height: 180 }}>
+            {/* hand of cards */}
+            <div style={{ position: 'absolute', right: 14, top: 18, display: 'flex', gap: -20 }}>
+              <div style={{ transform: 'rotate(-8deg)' }}><PlayingCard rank="Q" suit="♥" size="md" treatment={tweaks.cardStyle} /></div>
+              <div style={{ transform: 'rotate(8deg) translateX(-12px)' }}><PlayingCard rank="J" suit="♥" size="md" treatment={tweaks.cardStyle} delay={100} /></div>
+            </div>
+            <div className="eyebrow" style={{ color: 'var(--gold)' }}>WED · #284</div>
+            <div className="serif" style={{ fontSize: 28, lineHeight: 1.05, marginTop: 8, maxWidth: 200 }}>
+              QJ suited on a wet board. Hero or zero?
+            </div>
+            <div style={{ position: 'absolute', bottom: 18, left: 22, right: 22, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: 6 }}>
+                {['🟢','🟢','🟢','🟡','⚪'].map((d,i) => <span key={i} style={{ fontSize: 8 }}>{d}</span>)}
+              </div>
+              <div className="mono" style={{ fontSize: 11, color: 'var(--cream-dim)' }}>3 MIN · +50 XP</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Mood picker — novel feature */}
+        <div style={{ marginTop: 28 }}>
+          <div className="eyebrow" style={{ marginBottom: 12 }}>What's the mood?</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            {[
+              { e: '⚡', t: 'Just 5 min', s: 'Quick drill', c: 'rgba(255,91,72,0.12)', bc: 'rgba(255,91,72,0.3)' },
+              { e: '🧠', t: 'Feel smart', s: 'Easy wins', c: 'rgba(233,185,73,0.12)', bc: 'rgba(233,185,73,0.3)' },
+              { e: '🔥', t: 'Challenge', s: 'Hard mode', c: 'rgba(178,76,228,0.12)', bc: 'rgba(178,76,228,0.3)' },
+              { e: '🎬', t: 'Replay', s: 'Last session', c: 'rgba(72,180,255,0.12)', bc: 'rgba(72,180,255,0.3)' },
+            ].map(m => (
+              <button key={m.t} onClick={onLesson} style={{ background: m.c, border: `1px solid ${m.bc}`, borderRadius: 16, padding: 14, color: 'var(--cream)', cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit' }}>
+                <div style={{ fontSize: 22, marginBottom: 6 }}>{m.e}</div>
+                <div style={{ fontSize: 14, fontWeight: 600 }}>{m.t}</div>
+                <div style={{ fontSize: 11, color: 'var(--cream-dim)' }}>{m.s}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Skill tree teaser */}
+        <div style={{ marginTop: 28 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
+            <div className="eyebrow">Your path</div>
+            <div className="mono" style={{ fontSize: 10, color: 'var(--cream-dim)' }}>3 / 18 MASTERED</div>
+          </div>
+          <div style={{ background: 'rgba(245,233,212,0.04)', borderRadius: 22, border: '1px solid var(--hairline)', overflow: 'hidden' }}>
+            {[
+              { t: 'Preflop ranges', p: 100, m: 'Mastered', c: 'var(--gold)' },
+              { t: 'Continuation betting', p: 65, m: 'In progress', c: 'var(--coral)' },
+              { t: 'River decisions', p: 0, m: 'Locked · Lvl 5', c: 'var(--cream-dim)', locked: true },
+            ].map((s,i) => (
+              <div key={s.t} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderTop: i ? '1px solid var(--hairline)' : 'none', opacity: s.locked ? 0.5 : 1 }}>
+                <div style={{ width: 8, height: 40, borderRadius: 4, background: s.c }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 15, fontWeight: 600 }}>{s.t}</div>
+                  <div className="mono" style={{ fontSize: 10, color: 'var(--cream-dim)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{s.m}</div>
+                </div>
+                <div style={{ width: 50, height: 4, borderRadius: 2, background: 'rgba(245,233,212,0.1)', overflow: 'hidden' }}>
+                  <div style={{ width: `${s.p}%`, height: '100%', background: s.c }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom nav */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '12px 20px 28px', background: 'linear-gradient(180deg, transparent, rgba(0,0,0,0.5) 30%)', display: 'flex', justifyContent: 'space-around' }}>
+        {[
+          { i: '◆', l: 'Today', a: true },
+          { i: '○', l: 'Practice' },
+          { i: '◇', l: 'Replay' },
+          { i: '△', l: 'You' },
+        ].map(t => (
+          <button key={t.l} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, color: t.a ? 'var(--coral)' : 'var(--cream-dim)', cursor: 'pointer', padding: '8px 12px', fontFamily: 'inherit' }}>
+            <span style={{ fontSize: 20 }}>{t.i}</span>
+            <span className="mono" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t.l}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+window.HomeScreen = HomeScreen;
+
+================
+File: Design/screens/lesson.jsx
+================
+/* global React */
+function LessonScreen({ onComplete, onBack, tweaks }) {
+  const [phase, setPhase] = React.useState('setup'); // setup -> read -> decide -> reveal
+  const [confidence, setConfidence] = React.useState(60);
+  const [choice, setChoice] = React.useState(null);
+  const [tellMeter, setTellMeter] = React.useState(0);
+
+  // animate tell meter during read phase
+  React.useEffect(() => {
+    if (phase !== 'read') return;
+    let v = 0;
+    const id = setInterval(() => {
+      v = Math.min(100, v + 4);
+      setTellMeter(v);
+      if (v >= 100) clearInterval(id);
+    }, 60);
+    return () => clearInterval(id);
+  }, [phase]);
+
+  React.useEffect(() => {
+    if (phase === 'setup') {
+      const t = setTimeout(() => setPhase('read'), 1400);
+      return () => clearTimeout(t);
+    }
+  }, [phase]);
+
+  const choose = (c) => { setChoice(c); setPhase('reveal'); };
+  const correct = choice === 'raise';
+
+  return (
+    <div className="screen felt-bg" style={{ background: 'var(--felt)' }}>
+      <TopBar
+        onBack={onBack}
+        center="Hand 3 of 5"
+        right={<div className="pill"><span style={{color:'var(--gold)'}}>●</span> +20 XP</div>}
+      />
+
+      {/* Scenario context */}
+      <div style={{ padding: '4px 24px 0' }}>
+        <div className="eyebrow" style={{ color: 'var(--gold)' }}>UTG · 100BB · $1/$2 NLHE</div>
+        <div className="serif" style={{ fontSize: 26, lineHeight: 1.1, marginTop: 6 }}>
+          {phase === 'setup' && 'Folded to you on the button.'}
+          {phase === 'read' && 'Villain just min-raised. Quickly.'}
+          {phase === 'decide' && 'What\'s your move?'}
+          {phase === 'reveal' && (correct ? 'Nice read.' : <>Hmm. <em style={{color:'var(--coral-soft)'}}>Re-deal that one.</em></>)}
+        </div>
+      </div>
+
+      {/* Table felt */}
+      <div style={{ flex: 1, position: 'relative', margin: '20px 16px 0', borderRadius: 32, background: 'radial-gradient(ellipse at center, var(--felt-3) 0%, var(--felt) 70%)', border: '1px solid var(--hairline-strong)', boxShadow: 'inset 0 0 60px rgba(0,0,0,0.4)', overflow: 'hidden' }}>
+        {/* opponent zone */}
+        <div style={{ position: 'absolute', top: 24, left: 0, right: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ width: 56, height: 56, borderRadius: 999, background: '#2a1a14', border: '2px solid var(--hairline-strong)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>🎩</div>
+          <div className="mono" style={{ fontSize: 11, marginTop: 6, color: 'var(--cream-dim)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Villain · UTG</div>
+          {/* Tell meter — novel */}
+          {(phase === 'read' || phase === 'decide') && (
+            <div style={{ marginTop: 10, padding: '6px 12px', background: 'rgba(0,0,0,0.5)', borderRadius: 999, display: 'flex', alignItems: 'center', gap: 8, border: '1px solid rgba(255,91,72,0.3)' }}>
+              <span style={{ fontSize: 10 }}>👁</span>
+              <div style={{ width: 80, height: 4, borderRadius: 2, background: 'rgba(245,233,212,0.15)', overflow: 'hidden' }}>
+                <div style={{ width: `${tellMeter}%`, height: '100%', background: 'linear-gradient(90deg, var(--gold), var(--coral))', transition: 'width 100ms linear' }} />
+              </div>
+              <span className="mono" style={{ fontSize: 10, color: 'var(--gold)' }}>TELL</span>
+            </div>
+          )}
+        </div>
+
+        {/* opponent cards face down */}
+        <div style={{ position: 'absolute', top: 100, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 4 }}>
+          <PlayingCard faceDown size="sm" treatment={tweaks.cardStyle} />
+          <PlayingCard faceDown size="sm" treatment={tweaks.cardStyle} delay={80} />
+        </div>
+
+        {/* pot */}
+        <div style={{ position: 'absolute', top: '46%', left: 0, right: 0, textAlign: 'center' }}>
+          <div className="eyebrow">Pot</div>
+          <div className="mono" style={{ fontSize: 22, fontWeight: 700, color: 'var(--gold)' }}>$7</div>
+          <div style={{ display: 'inline-flex', gap: 2, marginTop: 4 }}>
+            <span className="chip" style={{ width: 22, height: 22, fontSize: 9 }}>$1</span>
+            <span className="chip" style={{ width: 22, height: 22, fontSize: 9 }}>$2</span>
+          </div>
+        </div>
+
+        {/* hero cards */}
+        <div style={{ position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6 }}>
+          <PlayingCard rank="A" suit="♠" size="lg" treatment={tweaks.cardStyle} />
+          <PlayingCard rank="K" suit="♠" size="lg" treatment={tweaks.cardStyle} delay={120} />
+        </div>
+      </div>
+
+      {/* Decision panel */}
+      <div style={{ padding: '20px 20px 28px' }}>
+        {phase === 'read' && (
+          <div className="anim-float" style={{ textAlign: 'center', padding: 12 }}>
+            <div className="eyebrow">Reading...</div>
+            <div style={{ fontSize: 14, color: 'var(--cream-dim)', marginTop: 6 }}>Quick min-raise after a long pause = uncertainty.<br/>Often a hand he wishes was bigger.</div>
+            <button className="btn btn-primary" style={{ width: '100%', marginTop: 14 }} onClick={() => setPhase('decide')}>
+              Got it →
+            </button>
+          </div>
+        )}
+
+        {phase === 'decide' && (
+          <div className="anim-float">
+            {/* Confidence slider — novel */}
+            <div style={{ padding: '0 4px 16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <span className="eyebrow">Confidence</span>
+                <span className="mono" style={{ fontSize: 12, fontWeight: 700, color: 'var(--coral)' }}>{confidence}%</span>
+              </div>
+              <input type="range" min="20" max="100" value={confidence} onChange={e => setConfidence(+e.target.value)}
+                style={{ width: '100%', accentColor: 'var(--coral)' }} />
+              <div style={{ fontSize: 11, color: 'var(--cream-dim)', textAlign: 'center', marginTop: 4 }}>
+                Right + bold = bigger XP. Wrong + bold = bigger lesson.
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+              <button onClick={() => choose('fold')} style={{ background: 'rgba(245,233,212,0.06)', border: '1.5px solid var(--hairline-strong)', borderRadius: 14, padding: '14px 8px', color: 'var(--cream)', cursor: 'pointer', fontFamily: 'inherit' }}>
+                <div style={{ fontSize: 18, marginBottom: 4 }}>🗑️</div>
+                <div style={{ fontSize: 13, fontWeight: 600 }}>Fold</div>
+              </button>
+              <button onClick={() => choose('call')} style={{ background: 'rgba(233,185,73,0.1)', border: '1.5px solid rgba(233,185,73,0.4)', borderRadius: 14, padding: '14px 8px', color: 'var(--gold-soft)', cursor: 'pointer', fontFamily: 'inherit' }}>
+                <div style={{ fontSize: 18, marginBottom: 4 }}>➡️</div>
+                <div style={{ fontSize: 13, fontWeight: 600 }}>Call $4</div>
+              </button>
+              <button onClick={() => choose('raise')} style={{ background: 'var(--coral)', border: '1.5px solid var(--coral)', borderRadius: 14, padding: '14px 8px', color: '#2a0a05', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 0 #b03d30' }}>
+                <div style={{ fontSize: 18, marginBottom: 4 }}>🔥</div>
+                <div style={{ fontSize: 13, fontWeight: 700 }}>3-bet $14</div>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {phase === 'reveal' && (
+          <div className="anim-float" style={{ borderRadius: 18, padding: 18, background: correct ? 'rgba(72,200,120,0.12)' : 'rgba(255,91,72,0.12)', border: `1px solid ${correct ? 'rgba(72,200,120,0.4)' : 'rgba(255,91,72,0.4)'}` }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
+              <div className="eyebrow" style={{ color: correct ? '#7adb9c' : 'var(--coral-soft)' }}>{correct ? '✓ Correct' : '✗ Not quite'}</div>
+              <div className="mono" style={{ fontSize: 14, fontWeight: 700, color: correct ? '#7adb9c' : 'var(--coral-soft)' }}>{correct ? `+${Math.round(20 * confidence/60)} XP` : `-${Math.round(5 * confidence/60)} XP`}</div>
+            </div>
+            <div style={{ fontSize: 14, lineHeight: 1.4 }}>
+              AKs vs an UTG min-raiser is a <em className="serif" style={{color:'var(--coral-soft)'}}>premium 3-bet</em>. You either fold out his marginal stuff or build a pot you'll often win.
+            </div>
+            <button className="btn btn-cream" style={{ width: '100%', marginTop: 14 }} onClick={onComplete}>
+              Next hand →
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+window.LessonScreen = LessonScreen;
+
+================
+File: Design/screens/onboarding.jsx
+================
+/* global React */
+const { useState: useStateO, useEffect: useEffectO } = React;
+
+function OnboardingScreen({ onDone, tweaks }) {
+  const [step, setStep] = useStateO(0);
+  const [picks, setPicks] = useStateO({ goal: null, time: null, level: null });
+
+  const slides = [
+    {
+      kind: 'hero',
+    },
+    {
+      kind: 'q',
+      eyebrow: 'Question 1 of 3',
+      q: 'What brings you to the table?',
+      key: 'goal',
+      opts: [
+        { v: 'win', label: 'Win money from friends', emoji: '💰' },
+        { v: 'pro', label: 'Take poker seriously', emoji: '🎯' },
+        { v: 'fun', label: 'Just enjoy the game more', emoji: '✨' },
+        { v: 'crush', label: 'Crush online cash games', emoji: '🔥' },
+      ],
+    },
+    {
+      kind: 'q',
+      eyebrow: 'Question 2 of 3',
+      q: 'How honest are we being about your game?',
+      key: 'level',
+      opts: [
+        { v: 'new', label: "I know what a flush is. Mostly.", sub: 'Brand new' },
+        { v: 'casual', label: "I lose more than I'd like to admit", sub: 'Casual' },
+        { v: 'mid', label: "I know GTO but I freeze on the river", sub: 'Improving' },
+        { v: 'shark', label: "I'm a shark sharpening teeth", sub: 'Advanced' },
+      ],
+    },
+    {
+      kind: 'q',
+      eyebrow: 'Question 3 of 3',
+      q: 'How much time can you steal each day?',
+      key: 'time',
+      opts: [
+        { v: 5, label: '5 min', sub: 'Coffee break' },
+        { v: 10, label: '10 min', sub: 'Commute' },
+        { v: 20, label: '20 min', sub: 'Serious' },
+        { v: 30, label: '30+ min', sub: 'All in' },
+      ],
+    },
+    {
+      kind: 'plan',
+    },
+  ];
+
+  const slide = slides[step];
+
+  const advance = (key, value) => {
+    if (key) setPicks(p => ({ ...p, [key]: value }));
+    setTimeout(() => setStep(s => s + 1), 240);
+  };
+
+  return (
+    <div className="screen felt-bg" style={{ background: 'var(--felt)' }}>
+      {/* progress dots */}
+      {step > 0 && step < slides.length - 1 && (
+        <div style={{ position: 'absolute', top: 60, left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 6, zIndex: 10 }}>
+          {[1,2,3].map(i => (
+            <div key={i} style={{
+              width: i === step ? 28 : 6,
+              height: 6,
+              borderRadius: 999,
+              background: i <= step ? 'var(--coral)' : 'rgba(245,233,212,0.2)',
+              transition: 'all 300ms ease',
+            }} />
+          ))}
+        </div>
+      )}
+
+      {slide.kind === 'hero' && (
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '60px 28px 40px', position: 'relative' }}>
+          {/* Floating cards background */}
+          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: '12%', right: '-20px', transform: 'rotate(18deg)', opacity: 0.5 }}>
+              <PlayingCard rank="A" suit="♠" size="lg" treatment={tweaks.cardStyle} />
+            </div>
+            <div style={{ position: 'absolute', top: '22%', right: '40px', transform: 'rotate(-8deg)' }}>
+              <PlayingCard rank="K" suit="♥" size="xl" treatment={tweaks.cardStyle} delay={150} />
+            </div>
+            <div style={{ position: 'absolute', top: '8%', left: '-30px', transform: 'rotate(-22deg)', opacity: 0.4 }}>
+              <PlayingCard faceDown size="lg" treatment={tweaks.cardStyle} delay={300} />
+            </div>
+          </div>
+
+          <div style={{ marginTop: 80, position: 'relative', zIndex: 2 }}>
+            <div className="eyebrow" style={{ marginBottom: 12 }}>◆ Tilt</div>
+          </div>
+
+          <div style={{ position: 'relative', zIndex: 2 }}>
+            <h1 className="h-display" style={{ fontSize: 64 }}>
+              Poker is<br/>
+              reading <em className="serif" style={{ color: 'var(--coral-soft)', fontStyle: 'italic' }}>minds.</em>
+            </h1>
+            <p style={{ fontSize: 18, color: 'var(--cream-dim)', marginTop: 16, lineHeight: 1.4, maxWidth: 280 }}>
+              We'll teach you how. Five minutes a day. No theory dumps.
+            </p>
+            <button className="btn btn-primary" style={{ width: '100%', marginTop: 28 }} onClick={() => setStep(1)}>
+              Deal me in →
+            </button>
+            <button className="btn btn-ghost" style={{ width: '100%', marginTop: 10, padding: '12px' }} onClick={() => onDone({ goal: 'fun', level: 'casual', time: 10 })}>
+              I have an account
+            </button>
+          </div>
+        </div>
+      )}
+
+      {slide.kind === 'q' && (
+        <div key={step} style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '90px 24px 28px' }}>
+          <div className="eyebrow anim-float">{slide.eyebrow}</div>
+          <h2 className="h-1 anim-float" style={{ marginTop: 8, fontSize: 30, animationDelay: '60ms' }}>{slide.q}</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 28 }}>
+            {slide.opts.map((opt, i) => (
+              <button key={opt.v} className="anim-float" onClick={() => advance(slide.key, opt.v)}
+                style={{
+                  animationDelay: `${120 + i * 60}ms`,
+                  background: 'rgba(245,233,212,0.05)',
+                  border: '1.5px solid var(--hairline-strong)',
+                  borderRadius: 16,
+                  padding: '16px 18px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 14,
+                  color: 'var(--cream)',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'all 180ms ease',
+                  fontFamily: 'var(--sans)',
+                }}
+                onMouseDown={e => e.currentTarget.style.background = 'rgba(255,91,72,0.12)'}>
+                {opt.emoji && <span style={{ fontSize: 22 }}>{opt.emoji}</span>}
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 16, fontWeight: 600 }}>{opt.label}</div>
+                  {opt.sub && <div style={{ fontSize: 12, color: 'var(--cream-dim)', marginTop: 2 }}>{opt.sub}</div>}
+                </div>
+                <span style={{ color: 'var(--cream-dim)' }}>›</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {slide.kind === 'plan' && (
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '80px 28px 40px' }}>
+          <div className="eyebrow anim-float">Your plan</div>
+          <h2 className="h-1 anim-float" style={{ marginTop: 8, fontSize: 30, animationDelay: '80ms', maxWidth: 300 }}>
+            Built for <em className="serif" style={{ color: 'var(--coral-soft)' }}>you</em>, dealer.
+          </h2>
+
+          <div className="anim-float" style={{ marginTop: 32, padding: 22, borderRadius: 22, background: 'linear-gradient(180deg, rgba(255,91,72,0.12), rgba(233,185,73,0.08))', border: '1px solid rgba(255,91,72,0.25)', animationDelay: '160ms' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+              <div className="eyebrow">Daily session</div>
+              <div className="mono" style={{ fontSize: 11, color: 'var(--gold)' }}>~{picks.time || 10} MIN</div>
+            </div>
+            {[
+              { e: '🃏', t: 'Hand of the Day', s: 'A new tricky spot, every morning' },
+              { e: '🧠', t: 'Pattern Drills', s: 'Repetition that actually sticks' },
+              { e: '👁️', t: 'The Read', s: 'Spot tells in <3 seconds' },
+              { e: '🎬', t: 'Replay Theater', s: 'Watch your last session, narrated' },
+            ].map(item => (
+              <div key={item.t} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '10px 0', borderTop: '1px solid var(--hairline)' }}>
+                <span style={{ fontSize: 18 }}>{item.e}</span>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600 }}>{item.t}</div>
+                  <div style={{ fontSize: 12, color: 'var(--cream-dim)' }}>{item.s}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ flex: 1 }} />
+
+          <button className="btn btn-primary anim-float" style={{ width: '100%', animationDelay: '300ms' }} onClick={() => onDone(picks)}>
+            Start your first hand →
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+window.OnboardingScreen = OnboardingScreen;
+
+================
+File: Design/screens/results.jsx
+================
+/* global React */
+function ResultsScreen({ onDone, onHome, tweaks }) {
+  const [showConfetti, setShowConfetti] = React.useState(false);
+  React.useEffect(() => {
+    const t = setTimeout(() => setShowConfetti(true), 400);
+    return () => clearTimeout(t);
+  }, []);
+
+  const stats = [
+    { l: 'XP earned', v: '+85', c: 'var(--coral)' },
+    { l: 'Accuracy', v: '4/5', c: 'var(--gold)' },
+    { l: 'Streak', v: '8 🔥', c: 'var(--coral-soft)' },
+    { l: 'Time', v: '4:12', c: 'var(--cream)' },
+  ];
+
+  return (
+    <div className="screen felt-bg" style={{ background: 'var(--felt)', overflowY: 'auto' }}>
+      <Confetti active={showConfetti} />
+
+      <div style={{ padding: '70px 28px 32px', textAlign: 'center', position: 'relative' }}>
+        <div className="anim-pop" style={{ fontSize: 64, animation: 'pop 600ms cubic-bezier(.34,1.56,.64,1) both' }}>🃏</div>
+        <div className="eyebrow anim-float" style={{ marginTop: 12, color: 'var(--gold)', animationDelay: '200ms' }}>Session complete</div>
+        <h1 className="h-display anim-float" style={{ marginTop: 8, fontSize: 56, animationDelay: '300ms' }}>
+          <em className="serif" style={{color:'var(--coral-soft)'}}>Sharp</em><br/>play, dealer.
+        </h1>
+        <p className="anim-float" style={{ fontSize: 15, color: 'var(--cream-dim)', marginTop: 12, animationDelay: '400ms' }}>
+          You're calibrated 18% better than yesterday.
+        </p>
+      </div>
+
+      {/* Stats grid */}
+      <div style={{ padding: '0 20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        {stats.map((s, i) => (
+          <div key={s.l} className="anim-float" style={{ animationDelay: `${500 + i*80}ms`, padding: 18, background: 'rgba(245,233,212,0.04)', border: '1px solid var(--hairline)', borderRadius: 18 }}>
+            <div className="eyebrow">{s.l}</div>
+            <div className="serif" style={{ fontSize: 32, marginTop: 4, color: s.c, lineHeight: 1 }}>{s.v}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Insight card */}
+      <div className="anim-float" style={{ margin: '20px 20px 0', padding: 22, borderRadius: 22, background: 'linear-gradient(180deg, rgba(233,185,73,0.12), rgba(233,185,73,0.03))', border: '1px solid rgba(233,185,73,0.3)', animationDelay: '900ms' }}>
+        <div className="eyebrow" style={{ color: 'var(--gold)' }}>The Read · Insight</div>
+        <div className="serif" style={{ fontSize: 22, marginTop: 6, lineHeight: 1.15 }}>
+          You bluff-catch <em style={{color:'var(--gold-soft)'}}>too rarely</em> on the river.
+        </div>
+        <div style={{ fontSize: 13, color: 'var(--cream-dim)', marginTop: 8 }}>
+          When opponents over-bet rivers, you fold 78% of the time. The math says 55% is closer to optimal.
+        </div>
+        <button className="btn btn-ghost" style={{ width: '100%', marginTop: 14, fontSize: 14, padding: '12px' }} onClick={onHome}>
+          Drill this tomorrow →
+        </button>
+      </div>
+
+      {/* Achievement */}
+      <div className="anim-float" style={{ margin: '14px 20px 0', padding: 16, borderRadius: 18, background: 'rgba(255,91,72,0.1)', border: '1px solid rgba(255,91,72,0.3)', display: 'flex', alignItems: 'center', gap: 14, animationDelay: '1100ms' }}>
+        <div style={{ width: 48, height: 48, borderRadius: 14, background: 'linear-gradient(135deg, var(--coral), var(--gold))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>🏅</div>
+        <div style={{ flex: 1 }}>
+          <div className="eyebrow" style={{ color: 'var(--coral-soft)' }}>Achievement unlocked</div>
+          <div style={{ fontSize: 15, fontWeight: 600, marginTop: 2 }}>Week One Wonder</div>
+          <div style={{ fontSize: 12, color: 'var(--cream-dim)' }}>7-day streak. Keep going.</div>
+        </div>
+        <div className="mono" style={{ fontSize: 13, color: 'var(--coral-soft)', fontWeight: 700 }}>+25 XP</div>
+      </div>
+
+      <div style={{ padding: '20px 20px 32px' }}>
+        <button className="btn btn-primary" style={{ width: '100%' }} onClick={onHome}>
+          Done · See you tomorrow
+        </button>
+        <button className="btn btn-ghost" style={{ width: '100%', marginTop: 8, padding: '12px' }} onClick={onDone}>
+          Share session
+        </button>
+      </div>
+    </div>
+  );
+}
+
+window.ResultsScreen = ResultsScreen;
+
+================
+File: Design/components.jsx
+================
+/* global React */
+const { useState, useEffect, useRef, useMemo } = React;
+
+// === Playing Card component ===
+function PlayingCard({ rank, suit, faceDown, treatment = 'classic', size = 'md', delay = 0, style }) {
+  const isRed = suit === '♥' || suit === '♦';
+  const sizes = {
+    sm: { w: 44, h: 62, rank: 18, suit: 14 },
+    md: { w: 64, h: 90, rank: 26, suit: 22 },
+    lg: { w: 88, h: 124, rank: 36, suit: 30 },
+    xl: { w: 120, h: 168, rank: 52, suit: 42 },
+  };
+  const s = sizes[size];
+
+  if (faceDown) {
+    return <div className="card face-down anim-deal" style={{ width: s.w, height: s.h, animationDelay: `${delay}ms`, ...style }} />;
+  }
+
+  // Treatments
+  if (treatment === 'minimal') {
+    return (
+      <div className={`card ${isRed ? 'red' : ''} anim-deal`} style={{ width: s.w, height: s.h, animationDelay: `${delay}ms`, padding: 0, justifyContent: 'center', alignItems: 'center', ...style }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
+          <span style={{ fontSize: s.rank * 1.1, fontWeight: 800, letterSpacing: '-0.06em' }}>{rank}</span>
+          <span style={{ fontSize: s.suit * 0.7 }}>{suit}</span>
+        </div>
+      </div>
+    );
+  }
+  if (treatment === 'luxury') {
+    return (
+      <div className={`card ${isRed ? 'red' : ''} anim-deal`} style={{ width: s.w, height: s.h, animationDelay: `${delay}ms`, background: 'linear-gradient(135deg, #f5e9d4, #ede0c7)', boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.15), inset 0 0 24px rgba(180,140,80,0.15), 0 8px 16px -4px rgba(0,0,0,0.5)', ...style }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+          <span style={{ fontSize: s.rank, fontWeight: 700, letterSpacing: '-0.04em' }}>{rank}</span>
+          <span style={{ fontSize: s.suit }}>{suit}</span>
+        </div>
+        <div style={{ alignSelf: 'center', fontSize: s.rank * 1.5, opacity: 0.18 }}>{suit}</div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', transform: 'rotate(180deg)' }}>
+          <span style={{ fontSize: s.rank, fontWeight: 700, letterSpacing: '-0.04em' }}>{rank}</span>
+          <span style={{ fontSize: s.suit }}>{suit}</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Classic (default)
+  return (
+    <div className={`card ${isRed ? 'red' : ''} anim-deal`} style={{ width: s.w, height: s.h, animationDelay: `${delay}ms`, ...style }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
+        <span className="rank" style={{ fontSize: s.rank }}>{rank}</span>
+        <span className="suit" style={{ fontSize: s.suit, marginTop: 2 }}>{suit}</span>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', transform: 'rotate(180deg)', lineHeight: 1 }}>
+        <span className="rank" style={{ fontSize: s.rank }}>{rank}</span>
+        <span className="suit" style={{ fontSize: s.suit, marginTop: 2 }}>{suit}</span>
+      </div>
+    </div>
+  );
+}
+
+// === Top Bar ===
+function TopBar({ left, center, right, onBack }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px 8px', position: 'relative', zIndex: 5 }}>
+      <div style={{ minWidth: 40 }}>
+        {onBack && (
+          <button onClick={onBack} style={{ background: 'rgba(245,233,212,0.08)', border: '1px solid var(--hairline)', borderRadius: 999, width: 36, height: 36, color: 'var(--cream)', cursor: 'pointer', fontSize: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>‹</button>
+        )}
+        {left}
+      </div>
+      <div style={{ flex: 1, textAlign: 'center', fontSize: 13, fontFamily: 'var(--mono)', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--cream-dim)' }}>{center}</div>
+      <div style={{ minWidth: 40, textAlign: 'right' }}>{right}</div>
+    </div>
+  );
+}
+
+// === Streak Flame ===
+function StreakBadge({ count }) {
+  return (
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: 'rgba(255,91,72,0.12)', border: '1px solid rgba(255,91,72,0.3)', borderRadius: 999 }}>
+      <span style={{ fontSize: 14 }}>🔥</span>
+      <span className="mono" style={{ fontSize: 13, fontWeight: 700, color: 'var(--coral-soft)' }}>{count}</span>
+    </div>
+  );
+}
+
+// === Progress Ring ===
+function ProgressRing({ value, size = 64, stroke = 6, label, sublabel }) {
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const offset = c - (value / 100) * c;
+  return (
+    <div style={{ position: 'relative', width: size, height: size }}>
+      <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+        <circle className="ring-track" cx={size/2} cy={size/2} r={r} fill="none" strokeWidth={stroke} />
+        <circle className="ring-fill" cx={size/2} cy={size/2} r={r} fill="none" strokeWidth={stroke} strokeDasharray={c} strokeDashoffset={offset} strokeLinecap="round" />
+      </svg>
+      {label && (
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <span className="mono" style={{ fontSize: 16, fontWeight: 700 }}>{label}</span>
+          {sublabel && <span style={{ fontSize: 10, color: 'var(--cream-dim)' }}>{sublabel}</span>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// === Confetti ===
+function Confetti({ active }) {
+  if (!active) return null;
+  const pieces = Array.from({ length: 28 });
+  const colors = ['#ff5b48', '#e9b949', '#f5e9d4', '#ff8674'];
+  return (
+    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 30 }}>
+      {pieces.map((_, i) => {
+        const left = Math.random() * 100;
+        const delay = Math.random() * 200;
+        const dur = 1200 + Math.random() * 800;
+        const rot = Math.random() * 720;
+        const color = colors[i % colors.length];
+        return (
+          <div key={i} className="confetti-piece" style={{
+            left: `${left}%`,
+            top: -20,
+            background: color,
+            animation: `confetti-fall ${dur}ms ease-out ${delay}ms forwards`,
+            transform: `rotate(${rot}deg)`,
+            borderRadius: i % 3 === 0 ? '50%' : 2,
+          }} />
+        );
+      })}
+      <style>{`
+        @keyframes confetti-fall {
+          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(800px) rotate(720deg); opacity: 0; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+Object.assign(window, { PlayingCard, TopBar, StreakBadge, ProgressRing, Confetti });
+
+================
+File: Design/ios-frame.jsx
+================
+// iOS.jsx — Simplified iOS 26 (Liquid Glass) device frame
+// Based on the iOS 26 UI Kit + Figma status bar spec. No assets, no deps.
+// Exports: IOSDevice, IOSStatusBar, IOSNavBar, IOSGlassPill, IOSList, IOSListRow, IOSKeyboard
+
+// ─────────────────────────────────────────────────────────────
+// Status bar
+// ─────────────────────────────────────────────────────────────
+function IOSStatusBar({ dark = false, time = '9:41' }) {
+  const c = dark ? '#fff' : '#000';
+  return (
+    <div style={{
+      display: 'flex', gap: 154, alignItems: 'center', justifyContent: 'center',
+      padding: '21px 24px 19px', boxSizing: 'border-box',
+      position: 'relative', zIndex: 20, width: '100%',
+    }}>
+      <div style={{ flex: 1, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: 1.5 }}>
+        <span style={{
+          fontFamily: '-apple-system, "SF Pro", system-ui', fontWeight: 590,
+          fontSize: 17, lineHeight: '22px', color: c,
+        }}>{time}</span>
+      </div>
+      <div style={{ flex: 1, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, paddingTop: 1, paddingRight: 1 }}>
+        <svg width="19" height="12" viewBox="0 0 19 12">
+          <rect x="0" y="7.5" width="3.2" height="4.5" rx="0.7" fill={c}/>
+          <rect x="4.8" y="5" width="3.2" height="7" rx="0.7" fill={c}/>
+          <rect x="9.6" y="2.5" width="3.2" height="9.5" rx="0.7" fill={c}/>
+          <rect x="14.4" y="0" width="3.2" height="12" rx="0.7" fill={c}/>
+        </svg>
+        <svg width="17" height="12" viewBox="0 0 17 12">
+          <path d="M8.5 3.2C10.8 3.2 12.9 4.1 14.4 5.6L15.5 4.5C13.7 2.7 11.2 1.5 8.5 1.5C5.8 1.5 3.3 2.7 1.5 4.5L2.6 5.6C4.1 4.1 6.2 3.2 8.5 3.2Z" fill={c}/>
+          <path d="M8.5 6.8C9.9 6.8 11.1 7.3 12 8.2L13.1 7.1C11.8 5.9 10.2 5.1 8.5 5.1C6.8 5.1 5.2 5.9 3.9 7.1L5 8.2C5.9 7.3 7.1 6.8 8.5 6.8Z" fill={c}/>
+          <circle cx="8.5" cy="10.5" r="1.5" fill={c}/>
+        </svg>
+        <svg width="27" height="13" viewBox="0 0 27 13">
+          <rect x="0.5" y="0.5" width="23" height="12" rx="3.5" stroke={c} strokeOpacity="0.35" fill="none"/>
+          <rect x="2" y="2" width="20" height="9" rx="2" fill={c}/>
+          <path d="M25 4.5V8.5C25.8 8.2 26.5 7.2 26.5 6.5C26.5 5.8 25.8 4.8 25 4.5Z" fill={c} fillOpacity="0.4"/>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Liquid glass pill — blur + tint + shine
+// ─────────────────────────────────────────────────────────────
+function IOSGlassPill({ children, dark = false, style = {} }) {
+  return (
+    <div style={{
+      height: 44, minWidth: 44, borderRadius: 9999,
+      position: 'relative', overflow: 'hidden',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      boxShadow: dark
+        ? '0 2px 6px rgba(0,0,0,0.35), 0 6px 16px rgba(0,0,0,0.2)'
+        : '0 1px 3px rgba(0,0,0,0.07), 0 3px 10px rgba(0,0,0,0.06)',
+      ...style,
+    }}>
+      {/* blur + tint */}
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 9999,
+        backdropFilter: 'blur(12px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+        background: dark ? 'rgba(120,120,128,0.28)' : 'rgba(255,255,255,0.5)',
+      }} />
+      {/* shine */}
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 9999,
+        boxShadow: dark
+          ? 'inset 1.5px 1.5px 1px rgba(255,255,255,0.15), inset -1px -1px 1px rgba(255,255,255,0.08)'
+          : 'inset 1.5px 1.5px 1px rgba(255,255,255,0.7), inset -1px -1px 1px rgba(255,255,255,0.4)',
+        border: dark ? '0.5px solid rgba(255,255,255,0.15)' : '0.5px solid rgba(0,0,0,0.06)',
+      }} />
+      <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', padding: '0 4px' }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Navigation bar — glass pills + large title
+// ─────────────────────────────────────────────────────────────
+function IOSNavBar({ title = 'Title', dark = false, trailingIcon = true }) {
+  const muted = dark ? 'rgba(255,255,255,0.6)' : '#404040';
+  const text = dark ? '#fff' : '#000';
+  const pillIcon = (content) => (
+    <IOSGlassPill dark={dark}>
+      <div style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {content}
+      </div>
+    </IOSGlassPill>
+  );
+  return (
+    <div style={{
+      display: 'flex', flexDirection: 'column', gap: 10,
+      paddingTop: 62, paddingBottom: 10, position: 'relative', zIndex: 5,
+    }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 16px',
+      }}>
+        {/* back chevron */}
+        {pillIcon(
+          <svg width="12" height="20" viewBox="0 0 12 20" fill="none" style={{ marginLeft: -1 }}>
+            <path d="M10 2L2 10l8 8" stroke={muted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        )}
+        {/* trailing ellipsis */}
+        {trailingIcon && pillIcon(
+          <svg width="22" height="6" viewBox="0 0 22 6">
+            <circle cx="3" cy="3" r="2.5" fill={muted}/>
+            <circle cx="11" cy="3" r="2.5" fill={muted}/>
+            <circle cx="19" cy="3" r="2.5" fill={muted}/>
+          </svg>
+        )}
+      </div>
+      {/* large title */}
+      <div style={{
+        padding: '0 16px',
+        fontFamily: '-apple-system, system-ui',
+        fontSize: 34, fontWeight: 700, lineHeight: '41px',
+        color: text, letterSpacing: 0.4,
+      }}>{title}</div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Grouped list (inset card, r:26) + row (52px)
+// ─────────────────────────────────────────────────────────────
+function IOSListRow({ title, detail, icon, chevron = true, isLast = false, dark = false }) {
+  const text = dark ? '#fff' : '#000';
+  const sec = dark ? 'rgba(235,235,245,0.6)' : 'rgba(60,60,67,0.6)';
+  const ter = dark ? 'rgba(235,235,245,0.3)' : 'rgba(60,60,67,0.3)';
+  const sep = dark ? 'rgba(84,84,88,0.65)' : 'rgba(60,60,67,0.12)';
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', minHeight: 52,
+      padding: '0 16px', position: 'relative',
+      fontFamily: '-apple-system, system-ui', fontSize: 17,
+      letterSpacing: -0.43,
+    }}>
+      {icon && (
+        <div style={{
+          width: 30, height: 30, borderRadius: 7, background: icon,
+          marginRight: 12, flexShrink: 0,
+        }} />
+      )}
+      <div style={{ flex: 1, color: text }}>{title}</div>
+      {detail && <span style={{ color: sec, marginRight: 6 }}>{detail}</span>}
+      {chevron && (
+        <svg width="8" height="14" viewBox="0 0 8 14" style={{ flexShrink: 0 }}>
+          <path d="M1 1l6 6-6 6" stroke={ter} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      )}
+      {!isLast && (
+        <div style={{
+          position: 'absolute', bottom: 0, right: 0,
+          left: icon ? 58 : 16, height: 0.5, background: sep,
+        }} />
+      )}
+    </div>
+  );
+}
+
+function IOSList({ header, children, dark = false }) {
+  const hc = dark ? 'rgba(235,235,245,0.6)' : 'rgba(60,60,67,0.6)';
+  const bg = dark ? '#1C1C1E' : '#fff';
+  return (
+    <div>
+      {header && (
+        <div style={{
+          fontFamily: '-apple-system, system-ui', fontSize: 13,
+          color: hc, textTransform: 'uppercase',
+          padding: '8px 36px 6px', letterSpacing: -0.08,
+        }}>{header}</div>
+      )}
+      <div style={{
+        background: bg, borderRadius: 26,
+        margin: '0 16px', overflow: 'hidden',
+      }}>{children}</div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Device frame
+// ─────────────────────────────────────────────────────────────
+function IOSDevice({
+  children, width = 402, height = 874, dark = false,
+  title, keyboard = false,
+}) {
+  return (
+    <div style={{
+      width, height, borderRadius: 48, overflow: 'hidden',
+      position: 'relative', background: dark ? '#000' : '#F2F2F7',
+      boxShadow: '0 40px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.12)',
+      fontFamily: '-apple-system, system-ui, sans-serif',
+      WebkitFontSmoothing: 'antialiased',
+    }}>
+      {/* dynamic island */}
+      <div style={{
+        position: 'absolute', top: 11, left: '50%', transform: 'translateX(-50%)',
+        width: 126, height: 37, borderRadius: 24, background: '#000', zIndex: 50,
+      }} />
+      {/* status bar (absolute) */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 }}>
+        <IOSStatusBar dark={dark} />
+      </div>
+      {/* nav + content */}
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        {title !== undefined && <IOSNavBar title={title} dark={dark} />}
+        <div style={{ flex: 1, overflow: 'auto' }}>{children}</div>
+        {keyboard && <IOSKeyboard dark={dark} />}
+      </div>
+      {/* home indicator — always on top */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 60,
+        height: 34, display: 'flex', justifyContent: 'center', alignItems: 'flex-end',
+        paddingBottom: 8, pointerEvents: 'none',
+      }}>
+        <div style={{
+          width: 139, height: 5, borderRadius: 100,
+          background: dark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.25)',
+        }} />
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Keyboard — iOS 26 liquid glass
+// ─────────────────────────────────────────────────────────────
+function IOSKeyboard({ dark = false }) {
+  const glyph = dark ? 'rgba(255,255,255,0.7)' : '#595959';
+  const sugg = dark ? 'rgba(255,255,255,0.6)' : '#333';
+  const keyBg = dark ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.85)';
+
+  // special-key icons
+  const icons = {
+    shift: <svg width="19" height="17" viewBox="0 0 19 17"><path d="M9.5 1L1 9.5h4.5V16h8V9.5H18L9.5 1z" fill={glyph}/></svg>,
+    del: <svg width="23" height="17" viewBox="0 0 23 17"><path d="M7 1h13a2 2 0 012 2v11a2 2 0 01-2 2H7l-6-7.5L7 1z" fill="none" stroke={glyph} strokeWidth="1.6" strokeLinejoin="round"/><path d="M10 5l7 7M17 5l-7 7" stroke={glyph} strokeWidth="1.6" strokeLinecap="round"/></svg>,
+    ret: <svg width="20" height="14" viewBox="0 0 20 14"><path d="M18 1v6H4m0 0l4-4M4 7l4 4" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  };
+
+  const key = (content, { w, flex, ret, fs = 25, k } = {}) => (
+    <div key={k} style={{
+      height: 42, borderRadius: 8.5,
+      flex: flex ? 1 : undefined, width: w, minWidth: 0,
+      background: ret ? '#08f' : keyBg,
+      boxShadow: '0 1px 0 rgba(0,0,0,0.075)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontFamily: '-apple-system, "SF Compact", system-ui',
+      fontSize: fs, fontWeight: 458, color: ret ? '#fff' : glyph,
+    }}>{content}</div>
+  );
+
+  const row = (keys, pad = 0) => (
+    <div style={{ display: 'flex', gap: 6.5, justifyContent: 'center', padding: `0 ${pad}px` }}>
+      {keys.map(l => key(l, { flex: true, k: l }))}
+    </div>
+  );
+
+  return (
+    <div style={{
+      position: 'relative', zIndex: 15, borderRadius: 27, overflow: 'hidden',
+      padding: '11px 0 2px',
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      boxShadow: dark
+        ? '0 -2px 20px rgba(0,0,0,0.09)'
+        : '0 -1px 6px rgba(0,0,0,0.018), 0 -3px 20px rgba(0,0,0,0.012)',
+    }}>
+      {/* liquid glass bg — same recipe as nav pills */}
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 27,
+        backdropFilter: 'blur(12px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+        background: dark ? 'rgba(120,120,128,0.14)' : 'rgba(255,255,255,0.25)',
+      }} />
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 27,
+        boxShadow: dark
+          ? 'inset 1.5px 1.5px 1px rgba(255,255,255,0.15)'
+          : 'inset 1.5px 1.5px 1px rgba(255,255,255,0.7), inset -1px -1px 1px rgba(255,255,255,0.4)',
+        border: dark ? '0.5px solid rgba(255,255,255,0.15)' : '0.5px solid rgba(0,0,0,0.06)',
+        pointerEvents: 'none',
+      }} />
+
+      {/* autocorrect bar */}
+      <div style={{
+        display: 'flex', gap: 20, alignItems: 'center',
+        padding: '8px 22px 13px', width: '100%', boxSizing: 'border-box',
+        position: 'relative',
+      }}>
+        {['"The"', 'the', 'to'].map((w, i) => (
+          <React.Fragment key={i}>
+            {i > 0 && <div style={{ width: 1, height: 25, background: '#ccc', opacity: 0.3 }} />}
+            <div style={{
+              flex: 1, textAlign: 'center',
+              fontFamily: '-apple-system, system-ui', fontSize: 17,
+              color: sugg, letterSpacing: -0.43, lineHeight: '22px',
+            }}>{w}</div>
+          </React.Fragment>
+        ))}
+      </div>
+
+      {/* key layout */}
+      <div style={{
+        display: 'flex', flexDirection: 'column', gap: 13,
+        padding: '0 6.5px', width: '100%', boxSizing: 'border-box',
+        position: 'relative',
+      }}>
+        {row(['q','w','e','r','t','y','u','i','o','p'])}
+        {row(['a','s','d','f','g','h','j','k','l'], 20)}
+        <div style={{ display: 'flex', gap: 14.25, alignItems: 'center' }}>
+          {key(icons.shift, { w: 45, k: 'shift' })}
+          <div style={{ display: 'flex', gap: 6.5, flex: 1 }}>
+            {['z','x','c','v','b','n','m'].map(l => key(l, { flex: true, k: l }))}
+          </div>
+          {key(icons.del, { w: 45, k: 'del' })}
+        </div>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          {key('ABC', { w: 92.25, fs: 18, k: 'abc' })}
+          {key('', { flex: true, k: 'space' })}
+          {key(icons.ret, { w: 92.25, ret: true, k: 'ret' })}
+        </div>
+      </div>
+
+      {/* bottom spacer (emoji+mic area, icons omitted) */}
+      <div style={{ height: 56, width: '100%', position: 'relative' }} />
+    </div>
+  );
+}
+
+Object.assign(window, {
+  IOSDevice, IOSStatusBar, IOSNavBar, IOSGlassPill, IOSList, IOSListRow, IOSKeyboard,
+});
+
+================
+File: Design/styles.css
+================
+/* Tilt — design system */
+:root {
+  --felt: #0e2a20;
+  --felt-2: #143628;
+  --felt-3: #1d4a36;
+  --cream: #f5e9d4;
+  --cream-soft: #ede0c7;
+  --cream-dim: #c9b896;
+  --coral: #ff5b48;
+  --coral-soft: #ff8674;
+  --gold: #e9b949;
+  --gold-soft: #f5d27a;
+  --ink: #0a1d15;
+  --ink-soft: #1a2e24;
+  --hairline: rgba(245, 233, 212, 0.12);
+  --hairline-strong: rgba(245, 233, 212, 0.22);
+
+  --serif: 'Instrument Serif', 'Cormorant Garamond', serif;
+  --sans: 'Geist', 'Inter', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', 'Geist Mono', ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: var(--sans);
+  background: #000;
+  color: var(--cream);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* utility */
+.mono { font-family: var(--mono); font-feature-settings: "tnum" 1; }
+.serif { font-family: var(--serif); font-style: italic; letter-spacing: -0.01em; }
+
+/* Screen base */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--felt);
+  color: var(--cream);
+  overflow: hidden;
+}
+
+/* Felt texture overlay (subtle) */
+.felt-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(255,255,255,0.04), transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(0,0,0,0.3), transparent 50%);
+  pointer-events: none;
+}
+
+/* Buttons */
+.btn {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  border: none;
+  border-radius: 999px;
+  padding: 16px 24px;
+  cursor: pointer;
+  transition: transform 120ms ease, background 200ms ease, box-shadow 200ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary {
+  background: var(--coral);
+  color: #2a0a05;
+  box-shadow: 0 6px 0 #b03d30, 0 12px 24px -8px rgba(255,91,72,0.5);
+}
+.btn-primary:active { box-shadow: 0 2px 0 #b03d30, 0 4px 12px -4px rgba(255,91,72,0.5); transform: translateY(4px) scale(0.98); }
+.btn-primary:disabled { background: rgba(245,233,212,0.15); color: rgba(245,233,212,0.4); box-shadow: none; cursor: not-allowed; }
+.btn-ghost {
+  background: transparent;
+  color: var(--cream);
+  border: 1.5px solid var(--hairline-strong);
+}
+.btn-ghost:hover { background: rgba(245,233,212,0.06); }
+.btn-cream {
+  background: var(--cream);
+  color: var(--ink);
+  box-shadow: 0 6px 0 rgba(0,0,0,0.3), 0 12px 24px -8px rgba(0,0,0,0.4);
+}
+.btn-cream:active { box-shadow: 0 2px 0 rgba(0,0,0,0.3); transform: translateY(4px) scale(0.98); }
+
+/* Headers */
+.h-display { font-family: var(--serif); font-size: 56px; line-height: 0.95; letter-spacing: -0.02em; color: var(--cream); }
+.h-1 { font-size: 32px; font-weight: 600; line-height: 1.05; letter-spacing: -0.025em; }
+.h-2 { font-size: 22px; font-weight: 600; line-height: 1.15; letter-spacing: -0.02em; }
+.eyebrow {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 11px;
+  color: var(--cream-dim);
+}
+
+/* Card visuals — "Tilt deck" */
+.card {
+  position: relative;
+  background: var(--cream);
+  border-radius: 12px;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px 10px;
+  font-family: var(--mono);
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,0.08),
+    0 1px 0 rgba(255,255,255,0.6),
+    0 8px 16px -4px rgba(0,0,0,0.4),
+    0 16px 32px -8px rgba(0,0,0,0.3);
+  user-select: none;
+}
+.card.red { color: var(--coral); }
+.card .rank { font-size: 26px; font-weight: 700; line-height: 1; letter-spacing: -0.04em; }
+.card .suit { font-size: 22px; line-height: 1; }
+.card .corner-bottom { transform: rotate(180deg); align-self: flex-end; }
+.card.face-down {
+  background: linear-gradient(135deg, #2a0a05 0%, #5a1a10 100%);
+  color: var(--coral);
+}
+.card.face-down::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255, 91, 72, 0.35);
+  background:
+    repeating-linear-gradient(45deg, transparent 0 6px, rgba(255,91,72,0.08) 6px 7px);
+}
+
+/* Chip */
+.chip {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, var(--coral-soft), var(--coral) 60%, #c43a2a);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cream);
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 11px;
+  box-shadow: 0 4px 8px -2px rgba(0,0,0,0.4), inset 0 -2px 4px rgba(0,0,0,0.2);
+}
+.chip::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(255,255,255,0.4);
+}
+
+/* Pill */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(245,233,212,0.08);
+  border: 1px solid var(--hairline);
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--cream-dim);
+}
+
+/* Progress ring */
+.ring-track { stroke: rgba(245,233,212,0.15); }
+.ring-fill { stroke: var(--coral); transition: stroke-dashoffset 600ms cubic-bezier(.4,0,.2,1); }
+
+/* Status bar adjustments — make iOS chrome readable on green */
+.ios-status-bar { color: var(--cream) !important; }
+
+/* Animations */
+@keyframes float-up { 0% { opacity:0; transform: translateY(8px) } 100% {opacity:1; transform:none } }
+@keyframes pop { 0%{transform:scale(0.85)} 60%{transform:scale(1.08)} 100%{transform:scale(1)} }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+@keyframes sparkle { 0%,100% { opacity: 0.3; transform: scale(0.8) } 50% { opacity:1; transform: scale(1.2) } }
+@keyframes deal { 0% { transform: translate(40px, -60px) rotate(20deg); opacity: 0 } 100% { transform: none; opacity: 1 } }
+@keyframes flip-in { 0% { transform: rotateY(180deg); opacity: 0 } 100% { transform: none; opacity: 1 } }
+@keyframes pulse-glow { 0%,100% { box-shadow: 0 0 0 0 rgba(255,91,72,0.5) } 50% { box-shadow: 0 0 0 12px rgba(255,91,72,0) } }
+
+.anim-float { animation: float-up 500ms ease both; }
+.anim-pop { animation: pop 400ms cubic-bezier(.34,1.56,.64,1) both; }
+.anim-shake { animation: shake 320ms ease; }
+.anim-deal { animation: deal 500ms cubic-bezier(.4,1.4,.5,1) both; }
+
+/* Scrollbar */
+::-webkit-scrollbar { display: none; }
+
+/* Tap target */
+.tap { cursor: pointer; }
+
+/* Confetti */
+.confetti-piece {
+  position: absolute;
+  width: 8px; height: 12px;
+  pointer-events: none;
+}
+
+================
+File: Design/Tilt.html
+================
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tilt — Poker training</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+<style>
+  html, body { height: 100%; }
+  body { background: #07140e; display: grid; place-items: center; }
+  #root { width: 100%; height: 100%; }
+  .stage { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 16px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="components.jsx"></script>
+<script type="text/babel" src="screens/onboarding.jsx"></script>
+<script type="text/babel" src="screens/home.jsx"></script>
+<script type="text/babel" src="screens/lesson.jsx"></script>
+<script type="text/babel" src="screens/results.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+const { useState, useEffect } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "screen": "onboarding",
+  "cardStyle": "classic",
+  "theme": "felt",
+  "density": "cozy",
+  "gamificationLoudness": "balanced",
+  "homeLayout": "stacked",
+  "typography": "serif-display"
+}/*EDITMODE-END*/;
+
+function App() {
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [screen, setScreen] = useState(tweaks.screen || 'onboarding');
+  const [picks, setPicks] = useState(null);
+
+  useEffect(() => { setScreen(tweaks.screen); }, [tweaks.screen]);
+
+  // Theme application
+  useEffect(() => {
+    const root = document.documentElement;
+    const themes = {
+      felt:    { felt: '#0e2a20', felt2: '#143628', felt3: '#1d4a36', cream: '#f5e9d4', coral: '#ff5b48', gold: '#e9b949' },
+      midnight:{ felt: '#0a0e27', felt2: '#141a3a', felt3: '#1d2752', cream: '#e8eaff', coral: '#a78bfa', gold: '#22d3ee' },
+      clay:    { felt: '#2a1810', felt2: '#3a2418', felt3: '#4a3020', cream: '#f4ede0', coral: '#ff7849', gold: '#e9b949' },
+      paper:   { felt: '#f4ede0', felt2: '#ede4d2', felt3: '#e2d5b8', cream: '#1a1a1a', coral: '#dc2626', gold: '#b8860b' },
+    };
+    const t = themes[tweaks.theme] || themes.felt;
+    root.style.setProperty('--felt', t.felt);
+    root.style.setProperty('--felt-2', t.felt2);
+    root.style.setProperty('--felt-3', t.felt3);
+    root.style.setProperty('--cream', t.cream);
+    root.style.setProperty('--coral', t.coral);
+    root.style.setProperty('--gold', t.gold);
+  }, [tweaks.theme]);
+
+  const goto = (s) => { setScreen(s); setTweak('screen', s); };
+
+  let content;
+  if (screen === 'onboarding') content = <OnboardingScreen tweaks={tweaks} onDone={(p) => { setPicks(p); goto('home'); }} />;
+  else if (screen === 'home') content = <HomeScreen tweaks={tweaks} picks={picks} onLesson={() => goto('lesson')} />;
+  else if (screen === 'lesson') content = <LessonScreen tweaks={tweaks} onBack={() => goto('home')} onComplete={() => goto('results')} />;
+  else if (screen === 'results') content = <ResultsScreen tweaks={tweaks} onHome={() => goto('home')} onDone={() => goto('home')} />;
+
+  return (
+    <div className="stage">
+      <IOSDevice statusBarStyle="light">
+        {content}
+      </IOSDevice>
+      <TweaksPanel title="Tweaks">
+        <TweakSection title="Flow">
+          <TweakSelect label="Screen" value={tweaks.screen} options={[
+            { value: 'onboarding', label: 'Onboarding' },
+            { value: 'home', label: 'Home' },
+            { value: 'lesson', label: 'Lesson' },
+            { value: 'results', label: 'Results' },
+          ]} onChange={v => setTweak('screen', v)} />
+        </TweakSection>
+        <TweakSection title="Theme">
+          <TweakRadio label="Color" value={tweaks.theme} options={[
+            { value: 'felt', label: 'Felt' },
+            { value: 'midnight', label: 'Midnight' },
+            { value: 'clay', label: 'Clay' },
+            { value: 'paper', label: 'Paper' },
+          ]} onChange={v => setTweak('theme', v)} />
+          <TweakRadio label="Cards" value={tweaks.cardStyle} options={[
+            { value: 'classic', label: 'Classic' },
+            { value: 'minimal', label: 'Minimal' },
+            { value: 'luxury', label: 'Luxury' },
+          ]} onChange={v => setTweak('cardStyle', v)} />
+        </TweakSection>
+      </TweaksPanel>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
+
+================
+File: Design/tweaks-panel.jsx
+================
+// tweaks-panel.jsx
+// Reusable Tweaks shell + form-control helpers.
+//
+// Owns the host protocol (listens for __activate_edit_mode / __deactivate_edit_mode,
+// posts __edit_mode_available / __edit_mode_set_keys / __edit_mode_dismissed) so
+// individual prototypes don't re-roll it. Ships a consistent set of controls so you
+// don't hand-draw <input type="range">, segmented radios, steppers, etc.
+//
+// Usage (in an HTML file that loads React + Babel):
+//
+//   const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+//     "primaryColor": "#D97757",
+//     "fontSize": 16,
+//     "density": "regular",
+//     "dark": false
+//   }/*EDITMODE-END*/;
+//
+//   function App() {
+//     const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+//     return (
+//       <div style={{ fontSize: t.fontSize, color: t.primaryColor }}>
+//         Hello
+//         <TweaksPanel>
+//           <TweakSection label="Typography" />
+//           <TweakSlider label="Font size" value={t.fontSize} min={10} max={32} unit="px"
+//                        onChange={(v) => setTweak('fontSize', v)} />
+//           <TweakRadio  label="Density" value={t.density}
+//                        options={['compact', 'regular', 'comfy']}
+//                        onChange={(v) => setTweak('density', v)} />
+//           <TweakSection label="Theme" />
+//           <TweakColor  label="Primary" value={t.primaryColor}
+//                        onChange={(v) => setTweak('primaryColor', v)} />
+//           <TweakToggle label="Dark mode" value={t.dark}
+//                        onChange={(v) => setTweak('dark', v)} />
+//         </TweaksPanel>
+//       </div>
+//     );
+//   }
+//
+// ─────────────────────────────────────────────────────────────────────────────
+
+const __TWEAKS_STYLE = `
+  .twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;
+    max-height:calc(100vh - 32px);display:flex;flex-direction:column;
+    transform:scale(var(--dc-inv-zoom,1));transform-origin:bottom right;
+    background:rgba(250,249,247,.78);color:#29261b;
+    -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);
+    border:.5px solid rgba(255,255,255,.6);border-radius:14px;
+    box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 40px rgba(0,0,0,.18);
+    font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
+  .twk-hd{display:flex;align-items:center;justify-content:space-between;
+    padding:10px 8px 10px 14px;cursor:move;user-select:none}
+  .twk-hd b{font-size:12px;font-weight:600;letter-spacing:.01em}
+  .twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);
+    width:22px;height:22px;border-radius:6px;cursor:default;font-size:13px;line-height:1}
+  .twk-x:hover{background:rgba(0,0,0,.06);color:#29261b}
+  .twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;
+    overflow-y:auto;overflow-x:hidden;min-height:0;
+    scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.15) transparent}
+  .twk-body::-webkit-scrollbar{width:8px}
+  .twk-body::-webkit-scrollbar-track{background:transparent;margin:2px}
+  .twk-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:4px;
+    border:2px solid transparent;background-clip:content-box}
+  .twk-body::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.25);
+    border:2px solid transparent;background-clip:content-box}
+  .twk-row{display:flex;flex-direction:column;gap:5px}
+  .twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .twk-lbl{display:flex;justify-content:space-between;align-items:baseline;
+    color:rgba(41,38,27,.72)}
+  .twk-lbl>span:first-child{font-weight:500}
+  .twk-val{color:rgba(41,38,27,.5);font-variant-numeric:tabular-nums}
+
+  .twk-sect{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:rgba(41,38,27,.45);padding:10px 0 0}
+  .twk-sect:first-child{padding-top:0}
+
+  .twk-field{appearance:none;width:100%;height:26px;padding:0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;
+    background:rgba(255,255,255,.6);color:inherit;font:inherit;outline:none}
+  .twk-field:focus{border-color:rgba(0,0,0,.25);background:rgba(255,255,255,.85)}
+  select.twk-field{padding-right:22px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='rgba(0,0,0,.5)' d='M0 0h10L5 6z'/></svg>");
+    background-repeat:no-repeat;background-position:right 8px center}
+
+  .twk-slider{appearance:none;-webkit-appearance:none;width:100%;height:4px;margin:6px 0;
+    border-radius:999px;background:rgba(0,0,0,.12);outline:none}
+  .twk-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:14px;height:14px;border-radius:50%;background:#fff;
+    border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+  .twk-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
+    background:#fff;border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+
+  .twk-seg{position:relative;display:flex;padding:2px;border-radius:8px;
+    background:rgba(0,0,0,.06);user-select:none}
+  .twk-seg-thumb{position:absolute;top:2px;bottom:2px;border-radius:6px;
+    background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.12);
+    transition:left .15s cubic-bezier(.3,.7,.4,1),width .15s}
+  .twk-seg.dragging .twk-seg-thumb{transition:none}
+  .twk-seg button{appearance:none;position:relative;z-index:1;flex:1;border:0;
+    background:transparent;color:inherit;font:inherit;font-weight:500;min-height:22px;
+    border-radius:6px;cursor:default;padding:4px 6px;line-height:1.2;
+    overflow-wrap:anywhere}
+
+  .twk-toggle{position:relative;width:32px;height:18px;border:0;border-radius:999px;
+    background:rgba(0,0,0,.15);transition:background .15s;cursor:default;padding:0}
+  .twk-toggle[data-on="1"]{background:#34c759}
+  .twk-toggle i{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+  .twk-toggle[data-on="1"] i{transform:translateX(14px)}
+
+  .twk-num{display:flex;align-items:center;height:26px;padding:0 0 0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;background:rgba(255,255,255,.6)}
+  .twk-num-lbl{font-weight:500;color:rgba(41,38,27,.6);cursor:ew-resize;
+    user-select:none;padding-right:8px}
+  .twk-num input{flex:1;min-width:0;height:100%;border:0;background:transparent;
+    font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:0 8px 0 0;
+    outline:none;color:inherit;-moz-appearance:textfield}
+  .twk-num input::-webkit-inner-spin-button,.twk-num input::-webkit-outer-spin-button{
+    -webkit-appearance:none;margin:0}
+  .twk-num-unit{padding-right:8px;color:rgba(41,38,27,.45)}
+
+  .twk-btn{appearance:none;height:26px;padding:0 12px;border:0;border-radius:7px;
+    background:rgba(0,0,0,.78);color:#fff;font:inherit;font-weight:500;cursor:default}
+  .twk-btn:hover{background:rgba(0,0,0,.88)}
+  .twk-btn.secondary{background:rgba(0,0,0,.06);color:inherit}
+  .twk-btn.secondary:hover{background:rgba(0,0,0,.1)}
+
+  .twk-swatch{appearance:none;-webkit-appearance:none;width:56px;height:22px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:6px;padding:0;cursor:default;
+    background:transparent;flex-shrink:0}
+  .twk-swatch::-webkit-color-swatch-wrapper{padding:0}
+  .twk-swatch::-webkit-color-swatch{border:0;border-radius:5.5px}
+  .twk-swatch::-moz-color-swatch{border:0;border-radius:5.5px}
+`;
+
+// ── useTweaks ───────────────────────────────────────────────────────────────
+// Single source of truth for tweak values. setTweak persists via the host
+// (__edit_mode_set_keys → host rewrites the EDITMODE block on disk).
+function useTweaks(defaults) {
+  const [values, setValues] = React.useState(defaults);
+  // Accepts either setTweak('key', value) or setTweak({ key: value, ... }) so a
+  // useState-style call doesn't write a "[object Object]" key into the persisted
+  // JSON block.
+  const setTweak = React.useCallback((keyOrEdits, val) => {
+    const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null
+      ? keyOrEdits : { [keyOrEdits]: val };
+    setValues((prev) => ({ ...prev, ...edits }));
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits }, '*');
+  }, []);
+  return [values, setTweak];
+}
+
+// ── TweaksPanel ─────────────────────────────────────────────────────────────
+// Floating shell. Registers the protocol listener BEFORE announcing
+// availability — if the announce ran first, the host's activate could land
+// before our handler exists and the toolbar toggle would silently no-op.
+// The close button posts __edit_mode_dismissed so the host's toolbar toggle
+// flips off in lockstep; the host echoes __deactivate_edit_mode back which
+// is what actually hides the panel.
+function TweaksPanel({ title = 'Tweaks', children }) {
+  const [open, setOpen] = React.useState(false);
+  const dragRef = React.useRef(null);
+  const offsetRef = React.useRef({ x: 16, y: 16 });
+  const PAD = 16;
+
+  const clampToViewport = React.useCallback(() => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const w = panel.offsetWidth, h = panel.offsetHeight;
+    const maxRight = Math.max(PAD, window.innerWidth - w - PAD);
+    const maxBottom = Math.max(PAD, window.innerHeight - h - PAD);
+    offsetRef.current = {
+      x: Math.min(maxRight, Math.max(PAD, offsetRef.current.x)),
+      y: Math.min(maxBottom, Math.max(PAD, offsetRef.current.y)),
+    };
+    panel.style.right = offsetRef.current.x + 'px';
+    panel.style.bottom = offsetRef.current.y + 'px';
+  }, []);
+
+  React.useEffect(() => {
+    if (!open) return;
+    clampToViewport();
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', clampToViewport);
+      return () => window.removeEventListener('resize', clampToViewport);
+    }
+    const ro = new ResizeObserver(clampToViewport);
+    ro.observe(document.documentElement);
+    return () => ro.disconnect();
+  }, [open, clampToViewport]);
+
+  React.useEffect(() => {
+    const onMsg = (e) => {
+      const t = e?.data?.type;
+      if (t === '__activate_edit_mode') setOpen(true);
+      else if (t === '__deactivate_edit_mode') setOpen(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  const dismiss = () => {
+    setOpen(false);
+    window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*');
+  };
+
+  const onDragStart = (e) => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const r = panel.getBoundingClientRect();
+    const sx = e.clientX, sy = e.clientY;
+    const startRight = window.innerWidth - r.right;
+    const startBottom = window.innerHeight - r.bottom;
+    const move = (ev) => {
+      offsetRef.current = {
+        x: startRight - (ev.clientX - sx),
+        y: startBottom - (ev.clientY - sy),
+      };
+      clampToViewport();
+    };
+    const up = () => {
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', up);
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+  };
+
+  if (!open) return null;
+  return (
+    <>
+      <style>{__TWEAKS_STYLE}</style>
+      <div ref={dragRef} className="twk-panel" data-noncommentable=""
+           style={{ right: offsetRef.current.x, bottom: offsetRef.current.y }}>
+        <div className="twk-hd" onMouseDown={onDragStart}>
+          <b>{title}</b>
+          <button className="twk-x" aria-label="Close tweaks"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={dismiss}>✕</button>
+        </div>
+        <div className="twk-body">{children}</div>
+      </div>
+    </>
+  );
+}
+
+// ── Layout helpers ──────────────────────────────────────────────────────────
+
+function TweakSection({ label, children }) {
+  return (
+    <>
+      <div className="twk-sect">{label}</div>
+      {children}
+    </>
+  );
+}
+
+function TweakRow({ label, value, children, inline = false }) {
+  return (
+    <div className={inline ? 'twk-row twk-row-h' : 'twk-row'}>
+      <div className="twk-lbl">
+        <span>{label}</span>
+        {value != null && <span className="twk-val">{value}</span>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+// ── Controls ────────────────────────────────────────────────────────────────
+
+function TweakSlider({ label, value, min = 0, max = 100, step = 1, unit = '', onChange }) {
+  return (
+    <TweakRow label={label} value={`${value}${unit}`}>
+      <input type="range" className="twk-slider" min={min} max={max} step={step}
+             value={value} onChange={(e) => onChange(Number(e.target.value))} />
+    </TweakRow>
+  );
+}
+
+function TweakToggle({ label, value, onChange }) {
+  return (
+    <div className="twk-row twk-row-h">
+      <div className="twk-lbl"><span>{label}</span></div>
+      <button type="button" className="twk-toggle" data-on={value ? '1' : '0'}
+              role="switch" aria-checked={!!value}
+              onClick={() => onChange(!value)}><i /></button>
+    </div>
+  );
+}
+
+function TweakRadio({ label, value, options, onChange }) {
+  const trackRef = React.useRef(null);
+  const [dragging, setDragging] = React.useState(false);
+  const opts = options.map((o) => (typeof o === 'object' ? o : { value: o, label: o }));
+  const idx = Math.max(0, opts.findIndex((o) => o.value === value));
+  const n = opts.length;
+
+  // The active value is read by pointer-move handlers attached for the lifetime
+  // of a drag — ref it so a stale closure doesn't fire onChange for every move.
+  const valueRef = React.useRef(value);
+  valueRef.current = value;
+
+  const segAt = (clientX) => {
+    const r = trackRef.current.getBoundingClientRect();
+    const inner = r.width - 4;
+    const i = Math.floor(((clientX - r.left - 2) / inner) * n);
+    return opts[Math.max(0, Math.min(n - 1, i))].value;
+  };
+
+  const onPointerDown = (e) => {
+    setDragging(true);
+    const v0 = segAt(e.clientX);
+    if (v0 !== valueRef.current) onChange(v0);
+    const move = (ev) => {
+      if (!trackRef.current) return;
+      const v = segAt(ev.clientX);
+      if (v !== valueRef.current) onChange(v);
+    };
+    const up = () => {
+      setDragging(false);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+
+  return (
+    <TweakRow label={label}>
+      <div ref={trackRef} role="radiogroup" onPointerDown={onPointerDown}
+           className={dragging ? 'twk-seg dragging' : 'twk-seg'}>
+        <div className="twk-seg-thumb"
+             style={{ left: `calc(2px + ${idx} * (100% - 4px) / ${n})`,
+                      width: `calc((100% - 4px) / ${n})` }} />
+        {opts.map((o) => (
+          <button key={o.value} type="button" role="radio" aria-checked={o.value === value}>
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </TweakRow>
+  );
+}
+
+function TweakSelect({ label, value, options, onChange }) {
+  return (
+    <TweakRow label={label}>
+      <select className="twk-field" value={value} onChange={(e) => onChange(e.target.value)}>
+        {options.map((o) => {
+          const v = typeof o === 'object' ? o.value : o;
+          const l = typeof o === 'object' ? o.label : o;
+          return <option key={v} value={v}>{l}</option>;
+        })}
+      </select>
+    </TweakRow>
+  );
+}
+
+function TweakText({ label, value, placeholder, onChange }) {
+  return (
+    <TweakRow label={label}>
+      <input className="twk-field" type="text" value={value} placeholder={placeholder}
+             onChange={(e) => onChange(e.target.value)} />
+    </TweakRow>
+  );
+}
+
+function TweakNumber({ label, value, min, max, step = 1, unit = '', onChange }) {
+  const clamp = (n) => {
+    if (min != null && n < min) return min;
+    if (max != null && n > max) return max;
+    return n;
+  };
+  const startRef = React.useRef({ x: 0, val: 0 });
+  const onScrubStart = (e) => {
+    e.preventDefault();
+    startRef.current = { x: e.clientX, val: value };
+    const decimals = (String(step).split('.')[1] || '').length;
+    const move = (ev) => {
+      const dx = ev.clientX - startRef.current.x;
+      const raw = startRef.current.val + dx * step;
+      const snapped = Math.round(raw / step) * step;
+      onChange(clamp(Number(snapped.toFixed(decimals))));
+    };
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+  return (
+    <div className="twk-num">
+      <span className="twk-num-lbl" onPointerDown={onScrubStart}>{label}</span>
+      <input type="number" value={value} min={min} max={max} step={step}
+             onChange={(e) => onChange(clamp(Number(e.target.value)))} />
+      {unit && <span className="twk-num-unit">{unit}</span>}
+    </div>
+  );
+}
+
+function TweakColor({ label, value, onChange }) {
+  return (
+    <div className="twk-row twk-row-h">
+      <div className="twk-lbl"><span>{label}</span></div>
+      <input type="color" className="twk-swatch" value={value}
+             onChange={(e) => onChange(e.target.value)} />
+    </div>
+  );
+}
+
+function TweakButton({ label, onClick, secondary = false }) {
+  return (
+    <button type="button" className={secondary ? 'twk-btn secondary' : 'twk-btn'}
+            onClick={onClick}>{label}</button>
+  );
+}
+
+Object.assign(window, {
+  useTweaks, TweaksPanel, TweakSection, TweakRow,
+  TweakSlider, TweakToggle, TweakRadio, TweakSelect,
+  TweakText, TweakNumber, TweakColor, TweakButton,
+});
 
 ================
 File: docs/ACCESSIBILITY_GUIDE.md
@@ -19698,6 +21450,1027 @@ describe('validation', () => {
 });
 
 ================
+File: tilt-app/.vscode/extensions.json
+================
+{
+	"recommendations": ["svelte.svelte-vscode"]
+}
+
+================
+File: tilt-app/src/lib/assets/favicon.svg
+================
+<svg xmlns="http://www.w3.org/2000/svg" width="107" height="128" viewBox="0 0 107 128"><title>svelte-logo</title><path d="M94.157 22.819c-10.4-14.885-30.94-19.297-45.792-9.835L22.282 29.608A29.92 29.92 0 0 0 8.764 49.65a31.5 31.5 0 0 0 3.108 20.231 30 30 0 0 0-4.477 11.183 31.9 31.9 0 0 0 5.448 24.116c10.402 14.887 30.942 19.297 45.791 9.835l26.083-16.624A29.92 29.92 0 0 0 98.235 78.35a31.53 31.53 0 0 0-3.105-20.232 30 30 0 0 0 4.474-11.182 31.88 31.88 0 0 0-5.447-24.116" style="fill:#ff3e00"/><path d="M45.817 106.582a20.72 20.72 0 0 1-22.237-8.243 19.17 19.17 0 0 1-3.277-14.503 18 18 0 0 1 .624-2.435l.49-1.498 1.337.981a33.6 33.6 0 0 0 10.203 5.098l.97.294-.09.968a5.85 5.85 0 0 0 1.052 3.878 6.24 6.24 0 0 0 6.695 2.485 5.8 5.8 0 0 0 1.603-.704L69.27 76.28a5.43 5.43 0 0 0 2.45-3.631 5.8 5.8 0 0 0-.987-4.371 6.24 6.24 0 0 0-6.698-2.487 5.7 5.7 0 0 0-1.6.704l-9.953 6.345a19 19 0 0 1-5.296 2.326 20.72 20.72 0 0 1-22.237-8.243 19.17 19.17 0 0 1-3.277-14.502 17.99 17.99 0 0 1 8.13-12.052l26.081-16.623a19 19 0 0 1 5.3-2.329 20.72 20.72 0 0 1 22.237 8.243 19.17 19.17 0 0 1 3.277 14.503 18 18 0 0 1-.624 2.435l-.49 1.498-1.337-.98a33.6 33.6 0 0 0-10.203-5.1l-.97-.294.09-.968a5.86 5.86 0 0 0-1.052-3.878 6.24 6.24 0 0 0-6.696-2.485 5.8 5.8 0 0 0-1.602.704L37.73 51.72a5.42 5.42 0 0 0-2.449 3.63 5.79 5.79 0 0 0 .986 4.372 6.24 6.24 0 0 0 6.698 2.486 5.8 5.8 0 0 0 1.602-.704l9.952-6.342a19 19 0 0 1 5.295-2.328 20.72 20.72 0 0 1 22.237 8.242 19.17 19.17 0 0 1 3.277 14.503 18 18 0 0 1-8.13 12.053l-26.081 16.622a19 19 0 0 1-5.3 2.328" style="fill:#fff"/></svg>
+
+================
+File: tilt-app/src/lib/components/BottomNav.svelte
+================
+<script lang="ts">
+interface Tab {
+	id: string;
+	label: string;
+	icon: string;
+}
+
+interface Props {
+	tabs?: Tab[];
+	active?: string;
+	onNavigate?: (id: string) => void;
+}
+
+let {
+	tabs = [
+		{ id: 'today', label: 'Today', icon: '📅' },
+		{ id: 'practice', label: 'Practice', icon: '🎯' },
+		{ id: 'replay', label: 'Replay', icon: '🔄' },
+		{ id: 'you', label: 'You', icon: '👤' }
+	],
+	active = 'today',
+	onNavigate
+}: Props = $props();
+</script>
+
+<nav
+	style="position: fixed; bottom: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-around; padding: 8px 0 calc(8px + env(safe-area-inset-bottom)); background: var(--ink); border-top: 1px solid var(--hairline); z-index: 20;"
+>
+	{#each tabs as tab}
+		{@const isActive = tab.id === active}
+		<button
+			onclick={() => onNavigate?.(tab.id)}
+			style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 16px; background: none; border: none; cursor: pointer; color: {isActive
+				? 'var(--coral)'
+				: 'var(--cream-dim)'}; font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;"
+		>
+			<span style="font-size: 20px;">{tab.icon}</span>
+			<span>{tab.label}</span>
+		</button>
+	{/each}
+</nav>
+
+================
+File: tilt-app/src/lib/components/Button.svelte
+================
+<script lang="ts">
+import type { Snippet } from 'svelte';
+
+interface Props {
+	variant?: 'primary' | 'ghost' | 'cream';
+	disabled?: boolean;
+	onclick?: () => void;
+	class?: string;
+	children: Snippet;
+}
+
+let {
+	variant = 'primary',
+	disabled = false,
+	onclick,
+	class: className = '',
+	children
+}: Props = $props();
+</script>
+
+<button
+	class="btn btn-{variant} {className}"
+	{disabled}
+	{onclick}
+>
+	{@render children()}
+</button>
+
+================
+File: tilt-app/src/lib/components/Chip.svelte
+================
+<script lang="ts">
+interface Props {
+	label?: string;
+	class?: string;
+}
+
+let { label = '', class: className = '' }: Props = $props();
+</script>
+
+<span class="chip {className}">
+	{label}
+</span>
+
+================
+File: tilt-app/src/lib/components/Confetti.svelte
+================
+<script lang="ts">
+interface Props {
+	active: boolean;
+}
+
+let { active }: Props = $props();
+
+const colors = ['#ff5b48', '#e9b949', '#f5e9d4', '#ff8674'];
+</script>
+
+{#if active}
+	<div
+		style="position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 30;"
+	>
+		{#each { length: 28 } as _, i}
+			{@const left = Math.random() * 100}
+			{@const delay = Math.random() * 200}
+			{@const dur = 1200 + Math.random() * 800}
+			{@const rot = Math.random() * 720}
+			{@const color = colors[i % colors.length]}
+			<div
+				class="confetti-piece"
+				style="left: {left}%; top: -20px; background: {color}; animation: confetti-fall {dur}ms ease-out {delay}ms forwards; transform: rotate({rot}deg); border-radius: {i % 3 === 0
+					? '50%'
+					: '2px'};"
+			></div>
+		{/each}
+	</div>
+{/if}
+
+================
+File: tilt-app/src/lib/components/index.ts
+================
+export { default as BottomNav } from './BottomNav.svelte';
+export { default as Button } from './Button.svelte';
+export { default as Chip } from './Chip.svelte';
+export { default as Confetti } from './Confetti.svelte';
+export { default as Pill } from './Pill.svelte';
+export { default as PlayingCard } from './PlayingCard.svelte';
+export { default as ProgressRing } from './ProgressRing.svelte';
+export { default as Screen } from './Screen.svelte';
+export { default as StreakBadge } from './StreakBadge.svelte';
+export { default as ThemePicker } from './ThemePicker.svelte';
+export { default as TopBar } from './TopBar.svelte';
+
+================
+File: tilt-app/src/lib/components/Pill.svelte
+================
+<script lang="ts">
+import type { Snippet } from 'svelte';
+
+interface Props {
+	class?: string;
+	children: Snippet;
+}
+
+let { class: className = '', children }: Props = $props();
+</script>
+
+<span class="pill {className}">
+	{@render children()}
+</span>
+
+================
+File: tilt-app/src/lib/components/Screen.svelte
+================
+<script lang="ts">
+import type { Snippet } from 'svelte';
+
+interface Props {
+	class?: string;
+	children: Snippet;
+}
+
+let { class: className = '', children }: Props = $props();
+</script>
+
+<div class="screen felt-bg {className}">
+	{@render children()}
+</div>
+
+================
+File: tilt-app/src/lib/components/StreakBadge.svelte
+================
+<script lang="ts">
+interface Props {
+	count: number;
+}
+
+let { count }: Props = $props();
+</script>
+
+<div
+	style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(255,91,72,0.12); border: 1px solid rgba(255,91,72,0.3); border-radius: 999px;"
+>
+	<span style="font-size: 14px;">🔥</span>
+	<span class="mono" style="font-size: 13px; font-weight: 700; color: var(--coral-soft);"
+		>{count}</span
+	>
+</div>
+
+================
+File: tilt-app/src/lib/stores/theme.ts
+================
+export interface ThemeColors {
+	felt: string;
+	felt2: string;
+	felt3: string;
+	cream: string;
+	coral: string;
+	gold: string;
+}
+
+export type ThemeName = 'felt' | 'midnight' | 'clay' | 'paper';
+
+export const themes: Record<ThemeName, ThemeColors> = {
+	felt: {
+		felt: '#0e2a20',
+		felt2: '#143628',
+		felt3: '#1d4a36',
+		cream: '#f5e9d4',
+		coral: '#ff5b48',
+		gold: '#e9b949'
+	},
+	midnight: {
+		felt: '#0a0e27',
+		felt2: '#141a3a',
+		felt3: '#1d2752',
+		cream: '#e8eaff',
+		coral: '#a78bfa',
+		gold: '#22d3ee'
+	},
+	clay: {
+		felt: '#2a1810',
+		felt2: '#3a2418',
+		felt3: '#4a3020',
+		cream: '#f4ede0',
+		coral: '#ff7849',
+		gold: '#e9b949'
+	},
+	paper: {
+		felt: '#f4ede0',
+		felt2: '#ede4d2',
+		felt3: '#e2d5b8',
+		cream: '#1a1a1a',
+		coral: '#dc2626',
+		gold: '#b8860b'
+	}
+};
+
+export function applyTheme(theme: ThemeName): void {
+	const t = themes[theme];
+	if (!t) return;
+	const root = document.documentElement;
+	root.style.setProperty('--felt', t.felt);
+	root.style.setProperty('--felt-2', t.felt2);
+	root.style.setProperty('--felt-3', t.felt3);
+	root.style.setProperty('--cream', t.cream);
+	root.style.setProperty('--coral', t.coral);
+	root.style.setProperty('--gold', t.gold);
+}
+
+================
+File: tilt-app/src/lib/index.ts
+================
+// place files you want to import through the `$lib` alias in this folder.
+
+================
+File: tilt-app/src/routes/(auth)/+layout.svelte
+================
+<script lang="ts">
+import { goto } from '$app/navigation';
+import { auth } from '$lib/stores/auth.svelte';
+
+let { children } = $props();
+
+$effect(() => {
+	if (!auth.loading && auth.isAuthenticated) {
+		goto('/');
+	}
+});
+</script>
+
+{#if auth.loading}
+	<div class="loading-screen">
+		<div class="spinner"></div>
+	</div>
+{:else if !auth.isAuthenticated}
+	{@render children()}
+{/if}
+
+<style>
+	.loading-screen {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 100vh;
+		background: var(--felt);
+	}
+
+	.spinner {
+		width: 32px;
+		height: 32px;
+		border: 3px solid var(--hairline);
+		border-top-color: var(--coral);
+		border-radius: 50%;
+		animation: spin 0.8s linear infinite;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+</style>
+
+================
+File: tilt-app/src/routes/+page.svelte
+================
+<h1>Welcome to SvelteKit</h1>
+<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+
+================
+File: tilt-app/src/app.css
+================
+@import 'tailwindcss';
+
+/* Tilt — Design System Tokens */
+:root {
+	--felt: #0e2a20;
+	--felt-2: #143628;
+	--felt-3: #1d4a36;
+	--cream: #f5e9d4;
+	--cream-soft: #ede0c7;
+	--cream-dim: #c9b896;
+	--coral: #ff5b48;
+	--coral-soft: #ff8674;
+	--gold: #e9b949;
+	--gold-soft: #f5d27a;
+	--ink: #0a1d15;
+	--ink-soft: #1a2e24;
+	--hairline: rgba(245, 233, 212, 0.12);
+	--hairline-strong: rgba(245, 233, 212, 0.22);
+
+	--serif: 'Instrument Serif', 'Cormorant Garamond', serif;
+	--sans: 'Geist', 'Inter', system-ui, sans-serif;
+	--mono: 'JetBrains Mono', 'Geist Mono', ui-monospace, monospace;
+}
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	-webkit-tap-highlight-color: transparent;
+}
+
+body {
+	font-family: var(--sans);
+	background: #000;
+	color: var(--cream);
+	overflow: hidden;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* Utility */
+.mono {
+	font-family: var(--mono);
+	font-feature-settings: 'tnum' 1;
+}
+
+.serif {
+	font-family: var(--serif);
+	font-style: italic;
+	letter-spacing: -0.01em;
+}
+
+/* Screen base */
+.screen {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	flex-direction: column;
+	background: var(--felt);
+	color: var(--cream);
+	overflow: hidden;
+}
+
+.felt-bg::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background:
+		radial-gradient(ellipse at 20% 0%, rgba(255, 255, 255, 0.04), transparent 50%),
+		radial-gradient(ellipse at 80% 100%, rgba(0, 0, 0, 0.3), transparent 50%);
+	pointer-events: none;
+}
+
+/* Buttons */
+.btn {
+	font-family: var(--sans);
+	font-weight: 600;
+	font-size: 16px;
+	letter-spacing: -0.01em;
+	border: none;
+	border-radius: 999px;
+	padding: 16px 24px;
+	cursor: pointer;
+	transition: transform 120ms ease, background 200ms ease, box-shadow 200ms ease;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+}
+
+.btn:active {
+	transform: scale(0.97);
+}
+
+.btn-primary {
+	background: var(--coral);
+	color: #2a0a05;
+	box-shadow: 0 6px 0 #b03d30, 0 12px 24px -8px rgba(255, 91, 72, 0.5);
+}
+
+.btn-primary:active {
+	box-shadow: 0 2px 0 #b03d30, 0 4px 12px -4px rgba(255, 91, 72, 0.5);
+	transform: translateY(4px) scale(0.98);
+}
+
+.btn-primary:disabled {
+	background: rgba(245, 233, 212, 0.15);
+	color: rgba(245, 233, 212, 0.4);
+	box-shadow: none;
+	cursor: not-allowed;
+}
+
+.btn-ghost {
+	background: transparent;
+	color: var(--cream);
+	border: 1.5px solid var(--hairline-strong);
+}
+
+.btn-ghost:hover {
+	background: rgba(245, 233, 212, 0.06);
+}
+
+.btn-cream {
+	background: var(--cream);
+	color: var(--ink);
+	box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3), 0 12px 24px -8px rgba(0, 0, 0, 0.4);
+}
+
+.btn-cream:active {
+	box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+	transform: translateY(4px) scale(0.98);
+}
+
+/* Headers */
+.h-display {
+	font-family: var(--serif);
+	font-size: 56px;
+	line-height: 0.95;
+	letter-spacing: -0.02em;
+	color: var(--cream);
+}
+
+.h-1 {
+	font-size: 32px;
+	font-weight: 600;
+	line-height: 1.05;
+	letter-spacing: -0.025em;
+}
+
+.h-2 {
+	font-size: 22px;
+	font-weight: 600;
+	line-height: 1.15;
+	letter-spacing: -0.02em;
+}
+
+.eyebrow {
+	font-family: var(--mono);
+	text-transform: uppercase;
+	letter-spacing: 0.16em;
+	font-size: 11px;
+	color: var(--cream-dim);
+}
+
+/* Card visuals */
+.card {
+	position: relative;
+	background: var(--cream);
+	border-radius: 12px;
+	color: var(--ink);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	padding: 8px 10px;
+	font-family: var(--mono);
+	box-shadow:
+		inset 0 0 0 1px rgba(0, 0, 0, 0.08),
+		0 1px 0 rgba(255, 255, 255, 0.6),
+		0 8px 16px -4px rgba(0, 0, 0, 0.4),
+		0 16px 32px -8px rgba(0, 0, 0, 0.3);
+	user-select: none;
+}
+
+.card.red {
+	color: var(--coral);
+}
+
+.card .rank {
+	font-size: 26px;
+	font-weight: 700;
+	line-height: 1;
+	letter-spacing: -0.04em;
+}
+
+.card .suit {
+	font-size: 22px;
+	line-height: 1;
+}
+
+.card .corner-bottom {
+	transform: rotate(180deg);
+	align-self: flex-end;
+}
+
+.card.face-down {
+	background: linear-gradient(135deg, #2a0a05 0%, #5a1a10 100%);
+	color: var(--coral);
+}
+
+.card.face-down::before {
+	content: '';
+	position: absolute;
+	inset: 6px;
+	border-radius: 8px;
+	border: 1.5px solid rgba(255, 91, 72, 0.35);
+	background: repeating-linear-gradient(
+		45deg,
+		transparent 0 6px,
+		rgba(255, 91, 72, 0.08) 6px 7px
+	);
+}
+
+/* Chip */
+.chip {
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	background: radial-gradient(
+		circle at 30% 30%,
+		var(--coral-soft),
+		var(--coral) 60%,
+		#c43a2a
+	);
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--cream);
+	font-family: var(--mono);
+	font-weight: 700;
+	font-size: 11px;
+	box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.4), inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.chip::before {
+	content: '';
+	position: absolute;
+	inset: 4px;
+	border-radius: 50%;
+	border: 1.5px dashed rgba(255, 255, 255, 0.4);
+}
+
+/* Pill */
+.pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 12px;
+	border-radius: 999px;
+	background: rgba(245, 233, 212, 0.08);
+	border: 1px solid var(--hairline);
+	font-size: 12px;
+	font-family: var(--mono);
+	color: var(--cream-dim);
+}
+
+/* Progress ring */
+.ring-track {
+	stroke: rgba(245, 233, 212, 0.15);
+}
+
+.ring-fill {
+	stroke: var(--coral);
+	transition: stroke-dashoffset 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Animations */
+@keyframes float-up {
+	0% {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	100% {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@keyframes pop {
+	0% {
+		transform: scale(0.85);
+	}
+	60% {
+		transform: scale(1.08);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+@keyframes shake {
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	25% {
+		transform: translateX(-4px);
+	}
+	75% {
+		transform: translateX(4px);
+	}
+}
+
+@keyframes sparkle {
+	0%,
+	100% {
+		opacity: 0.3;
+		transform: scale(0.8);
+	}
+	50% {
+		opacity: 1;
+		transform: scale(1.2);
+	}
+}
+
+@keyframes deal {
+	0% {
+		transform: translate(40px, -60px) rotate(20deg);
+		opacity: 0;
+	}
+	100% {
+		transform: none;
+		opacity: 1;
+	}
+}
+
+@keyframes flip-in {
+	0% {
+		transform: rotateY(180deg);
+		opacity: 0;
+	}
+	100% {
+		transform: none;
+		opacity: 1;
+	}
+}
+
+@keyframes pulse-glow {
+	0%,
+	100% {
+		box-shadow: 0 0 0 0 rgba(255, 91, 72, 0.5);
+	}
+	50% {
+		box-shadow: 0 0 0 12px rgba(255, 91, 72, 0);
+	}
+}
+
+@keyframes confetti-fall {
+	0% {
+		transform: translateY(0) rotate(0deg);
+		opacity: 1;
+	}
+	100% {
+		transform: translateY(800px) rotate(720deg);
+		opacity: 0;
+	}
+}
+
+.anim-float {
+	animation: float-up 500ms ease both;
+}
+
+.anim-pop {
+	animation: pop 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.anim-shake {
+	animation: shake 320ms ease;
+}
+
+.anim-deal {
+	animation: deal 500ms cubic-bezier(0.4, 1.4, 0.5, 1) both;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+	display: none;
+}
+
+/* Tap target */
+.tap {
+	cursor: pointer;
+}
+
+/* Confetti */
+.confetti-piece {
+	position: absolute;
+	width: 8px;
+	height: 12px;
+	pointer-events: none;
+}
+
+================
+File: tilt-app/src/app.d.ts
+================
+// See https://svelte.dev/docs/kit/types#app.d.ts
+// for information about these interfaces
+declare global {
+	namespace App {
+		// interface Error {}
+		// interface Locals {}
+		// interface PageData {}
+		// interface PageState {}
+		// interface Platform {}
+	}
+}
+
+export {};
+
+================
+File: tilt-app/src/app.html
+================
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="text-scale" content="scale" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Geist:wght@400;500;600;700;800&display=swap"
+			rel="stylesheet"
+		/>
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>
+
+================
+File: tilt-app/static/robots.txt
+================
+# allow crawling everything by default
+User-agent: *
+Disallow:
+
+================
+File: tilt-app/.env.example
+================
+PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+
+================
+File: tilt-app/.gitignore
+================
+node_modules
+
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+================
+File: tilt-app/.npmrc
+================
+engine-strict=true
+
+================
+File: tilt-app/biome.json
+================
+{
+	"$schema": "https://biomejs.dev/schemas/2.4.13/schema.json",
+	"files": {
+		"includes": ["src/**/*.ts", "src/**/*.svelte", "src/**/*.js"]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"indentWidth": 2,
+		"lineWidth": 100
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"style": {
+				"noNonNullAssertion": "warn"
+			},
+			"suspicious": {
+				"noExplicitAny": "warn"
+			},
+			"correctness": {
+				"noUnusedVariables": "off"
+			}
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "single",
+			"trailingCommas": "none"
+		}
+	},
+	"overrides": [
+		{
+			"includes": ["**/*.svelte"],
+			"linter": {
+				"rules": {
+					"correctness": {
+						"noUnusedVariables": "off",
+						"noUnusedImports": "warn"
+					}
+				}
+			}
+		}
+	]
+}
+
+================
+File: tilt-app/playwright.config.ts
+================
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+	testDir: 'e2e',
+	fullyParallel: true,
+	forbidOnly: !!process.env.CI,
+	retries: process.env.CI ? 2 : 0,
+	workers: process.env.CI ? 1 : undefined,
+	reporter: 'html',
+	use: {
+		baseURL: 'http://localhost:4173'
+	},
+	projects: [
+		{
+			name: 'chromium',
+			use: { ...devices['Desktop Chrome'] }
+		}
+	],
+	webServer: {
+		command: 'pnpm run build && pnpm run preview',
+		port: 4173,
+		reuseExistingServer: !process.env.CI
+	}
+});
+
+================
+File: tilt-app/README.md
+================
+# sv
+
+Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+
+## Creating a project
+
+If you're seeing this, you've probably already done this step. Congrats!
+
+```sh
+# create a new project
+npx sv create my-app
+```
+
+To recreate this project with the same configuration:
+
+```sh
+# recreate this project
+npx sv@0.15.2 create --template minimal --types ts --install npm tilt-app
+```
+
+## Developing
+
+Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+
+```sh
+npm run dev
+
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
+```
+
+## Building
+
+To create a production version of your app:
+
+```sh
+npm run build
+```
+
+You can preview the production build with `npm run preview`.
+
+> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+
+================
+File: tilt-app/svelte.config.js
+================
+import adapter from '@sveltejs/adapter-auto';
+
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
+	compilerOptions: {
+		// Force runes mode for the project, except for libraries. Can be removed in svelte 6.
+		runes: ({ filename }) => (filename.split(/[/\\]/).includes('node_modules') ? undefined : true)
+	},
+	kit: {
+		// adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
+		// If your environment is not supported, or you settled on a specific environment, switch out the adapter.
+		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
+		adapter: adapter()
+	}
+};
+
+export default config;
+
+================
+File: tilt-app/tsconfig.json
+================
+{
+	"extends": "./.svelte-kit/tsconfig.json",
+	"compilerOptions": {
+		"rewriteRelativeImportExtensions": true,
+		"allowJs": true,
+		"checkJs": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"sourceMap": true,
+		"strict": true,
+		"moduleResolution": "bundler"
+	}
+	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias
+	// except $lib which is handled by https://svelte.dev/docs/kit/configuration#files
+	//
+	// To make changes to top-level options such as include and exclude, we recommend extending
+	// the generated config; see https://svelte.dev/docs/kit/configuration#typescript
+}
+
+================
+File: tilt-app/vite.config.ts
+================
+import { sveltekit } from '@sveltejs/kit/vite';
+import tailwindcss from '@tailwindcss/vite';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+	plugins: [tailwindcss(), sveltekit()]
+});
+
+================
+File: tilt-app/vitest.config.ts
+================
+import { sveltekit } from '@sveltejs/kit/vite';
+import tailwindcss from '@tailwindcss/vite';
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+	plugins: [tailwindcss(), sveltekit()],
+	test: {
+		include: ['src/**/*.{test,spec}.{js,ts}'],
+		coverage: {
+			provider: 'v8',
+			reporter: ['text', 'html', 'clover'],
+			thresholds: {
+				branches: 90,
+				lines: 80,
+				functions: 90,
+				statements: 90
+			}
+		}
+	}
+});
+
+================
 File: .gitignore
 ================
 node_modules/
@@ -24316,6 +27089,1928 @@ You now have:
 **Happy coding! 🚀**
 
 Your codebase is well-organized and ready for expansion.
+
+================
+File: __tests__/gamification.test.js
+================
+/**
+ * Tests for Gamification System
+ */
+
+import {
+  XP_REWARDS,
+  LEVELS,
+  calculateLevel,
+  StreakManager,
+  getDailyGoalProgress,
+  AchievementManager,
+  MilestoneTracker,
+} from '../src/core/gamification';
+
+describe('Gamification System', () => {
+  describe('calculateLevel', () => {
+    it('should return level 1 for 0 XP', () => {
+      const result = calculateLevel(0);
+      expect(result.level).toBe(1);
+      expect(result.levelData.title).toBe('Poker Novice');
+    });
+
+    it('should return correct level for 1000 XP', () => {
+      const result = calculateLevel(1000);
+      expect(result.level).toBe(5);
+    });
+
+    it('should calculate progress correctly', () => {
+      const result = calculateLevel(150);
+      expect(result.level).toBe(2);
+      expect(result.progress).toBeGreaterThan(0);
+      expect(result.progress).toBeLessThan(1);
+    });
+  });
+
+  describe('StreakManager', () => {
+    it('should calculate streak correctly for consecutive days', () => {
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      const diff = StreakManager.calculateStreak(yesterday, today);
+      expect(diff).toBe(1);
+    });
+
+    it('should identify active streak', () => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      const isActive = StreakManager.isStreakActive(yesterday);
+      expect(isActive).toBe(true);
+    });
+
+    it('should identify broken streak', () => {
+      const threeDaysAgo = new Date();
+      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+      const isActive = StreakManager.isStreakActive(threeDaysAgo);
+      expect(isActive).toBe(false);
+    });
+
+    it('should return correct streak status', () => {
+      const status = StreakManager.getStreakStatus(6);
+      expect(status.emoji).toBe('🔥');
+      expect(status.message).toContain('Heiß');
+    });
+  });
+
+  describe('getDailyGoalProgress', () => {
+    it('should calculate progress correctly', () => {
+      const result = getDailyGoalProgress(50, 100);
+      expect(result.progress).toBe(0.5);
+      expect(result.achieved).toBe(false);
+      expect(result.remaining).toBe(50);
+    });
+
+    it('should mark goal as achieved when met', () => {
+      const result = getDailyGoalProgress(150, 100);
+      expect(result.achieved).toBe(true);
+      expect(result.remaining).toBe(0);
+    });
+  });
+
+  describe('AchievementManager', () => {
+    let manager;
+
+    beforeEach(() => {
+      manager = new AchievementManager();
+    });
+
+    it('should unlock achievement when requirement met', () => {
+      const stats = {
+        sessionsCompleted: 1,
+      };
+
+      const unlocked = manager.checkAchievements(stats);
+      expect(unlocked.length).toBeGreaterThan(0);
+      expect(unlocked[0].id).toBe('first_steps');
+    });
+
+    it('should not unlock same achievement twice', () => {
+      const stats = {
+        sessionsCompleted: 1,
+      };
+
+      manager.checkAchievements(stats);
+      const secondCheck = manager.checkAchievements(stats);
+      expect(secondCheck.length).toBe(0);
+    });
+
+    it('should calculate achievement progress', () => {
+      const stats = {
+        sessions_completed: 5,
+      };
+
+      const progress = manager.getProgress('DEDICATED_LEARNER', stats);
+      expect(progress.current).toBe(5);
+      expect(progress.required).toBe(10);
+      expect(progress.percentage).toBe(50);
+    });
+  });
+
+  describe('MilestoneTracker', () => {
+    let tracker;
+
+    beforeEach(() => {
+      tracker = new MilestoneTracker();
+    });
+
+    it('should detect XP milestone', () => {
+      const stats = {
+        totalXP: 1000,
+        questionsAnswered: 0,
+        perfectScores: 0,
+      };
+
+      const milestones = tracker.checkMilestones(stats);
+      expect(milestones.length).toBeGreaterThan(0);
+      expect(milestones[0].type).toBe('xp');
+    });
+
+    it('should get next milestones', () => {
+      const stats = {
+        totalXP: 500,
+        questionsAnswered: 50,
+        perfectScores: 2,
+      };
+
+      const next = tracker.getNextMilestones(stats);
+      expect(next.length).toBeGreaterThan(0);
+      expect(next[0].progress).toBeGreaterThan(0);
+    });
+  });
+});
+
+================
+File: __tests__/spacedRepetition.test.js
+================
+/**
+ * Tests for Spaced Repetition System
+ */
+
+import {
+  DIFFICULTY_RATINGS,
+  Card,
+  Deck,
+  StudySession,
+} from '../src/core/spacedRepetition';
+
+describe('Spaced Repetition System', () => {
+  describe('Card', () => {
+    let card;
+
+    beforeEach(() => {
+      card = new Card(
+        'test_1',
+        'What is the UTG RFI range?',
+        '15%: AA-77, AK-AJ...',
+        'ranges',
+        ['rfi', 'utg']
+      );
+    });
+
+    it('should initialize with correct defaults', () => {
+      expect(card.n).toBe(0);
+      expect(card.ef).toBe(2.5);
+      expect(card.interval).toBe(0);
+      expect(card.totalReviews).toBe(0);
+    });
+
+    it('should update on GOOD review', () => {
+      const result = card.review(DIFFICULTY_RATINGS.GOOD);
+      expect(result.success).toBe(true);
+      expect(card.n).toBe(1);
+      expect(card.interval).toBe(1); // First review = 1 day
+      expect(card.totalReviews).toBe(1);
+      expect(card.correctReviews).toBe(1);
+    });
+
+    it('should reset on AGAIN review', () => {
+      card.review(DIFFICULTY_RATINGS.GOOD);
+      card.review(DIFFICULTY_RATINGS.GOOD);
+      expect(card.n).toBe(2);
+
+      const result = card.review(DIFFICULTY_RATINGS.AGAIN);
+      expect(result.success).toBe(false);
+      expect(card.n).toBe(0);
+      expect(card.interval).toBe(0);
+      expect(card.streakCorrect).toBe(0);
+    });
+
+    it('should calculate intervals correctly', () => {
+      card.review(DIFFICULTY_RATINGS.GOOD); // n=1, interval=1
+      card.review(DIFFICULTY_RATINGS.GOOD); // n=2, interval=6
+      expect(card.interval).toBe(6);
+
+      card.review(DIFFICULTY_RATINGS.GOOD); // n=3, interval=6*EF
+      expect(card.interval).toBeGreaterThan(6);
+    });
+
+    it('should adjust EF based on difficulty', () => {
+      const initialEF = card.ef;
+      card.review(DIFFICULTY_RATINGS.EASY);
+      expect(card.ef).toBeGreaterThan(initialEF);
+
+      const beforeHard = card.ef;
+      card.review(DIFFICULTY_RATINGS.HARD);
+      expect(card.ef).toBeLessThan(beforeHard);
+    });
+
+    it('should maintain minimum EF of 1.3', () => {
+      // Review with HARD many times
+      for (let i = 0; i < 20; i++) {
+        card.review(DIFFICULTY_RATINGS.HARD);
+      }
+      expect(card.ef).toBeGreaterThanOrEqual(1.3);
+    });
+
+    it('should determine if card is due', () => {
+      expect(card.isDue()).toBe(true); // New card
+
+      card.review(DIFFICULTY_RATINGS.GOOD);
+      expect(card.isDue()).toBe(false); // Due tomorrow
+    });
+
+    it('should calculate retention rate', () => {
+      card.review(DIFFICULTY_RATINGS.GOOD);
+      card.review(DIFFICULTY_RATINGS.GOOD);
+      card.review(DIFFICULTY_RATINGS.AGAIN);
+
+      const rate = card.getRetentionRate();
+      expect(rate).toBeCloseTo(0.667, 2);
+    });
+  });
+
+  describe('Deck', () => {
+    let deck;
+
+    beforeEach(() => {
+      deck = new Deck('Test Deck', 'Test deck for unit tests');
+    });
+
+    it('should initialize empty', () => {
+      expect(deck.cards.length).toBe(0);
+    });
+
+    it('should add cards', () => {
+      const card = new Card('1', 'Q', 'A', 'test');
+      deck.addCard(card);
+      expect(deck.cards.length).toBe(1);
+    });
+
+    it('should get new cards', () => {
+      const card1 = new Card('1', 'Q1', 'A1', 'test');
+      const card2 = new Card('2', 'Q2', 'A2', 'test');
+      deck.addCard(card1);
+      deck.addCard(card2);
+
+      const newCards = deck.getNewCards();
+      expect(newCards.length).toBe(2);
+    });
+
+    it('should get due cards', () => {
+      const card = new Card('1', 'Q', 'A', 'test');
+      deck.addCard(card);
+
+      const dueCards = deck.getDueCards();
+      expect(dueCards.length).toBe(1);
+    });
+
+    it('should get learning cards', () => {
+      const card = new Card('1', 'Q', 'A', 'test');
+      deck.addCard(card);
+      card.review(DIFFICULTY_RATINGS.GOOD); // Now it's a learning card
+
+      const learningCards = deck.getLearningCards();
+      expect(learningCards.length).toBe(1);
+    });
+
+    it('should calculate stats correctly', () => {
+      const card1 = new Card('1', 'Q1', 'A1', 'test');
+      const card2 = new Card('2', 'Q2', 'A2', 'test');
+      deck.addCard(card1);
+      deck.addCard(card2);
+
+      card1.review(DIFFICULTY_RATINGS.GOOD);
+      card1.review(DIFFICULTY_RATINGS.GOOD);
+      card2.review(DIFFICULTY_RATINGS.AGAIN);
+
+      const stats = deck.getStats();
+      expect(stats.total).toBe(2);
+      expect(stats.due).toBe(1); // card2 is due (failed)
+      expect(stats.learning).toBe(1); // card1 is learning
+      expect(stats.avgRetention).toBeLessThan(100);
+    });
+  });
+
+  describe('StudySession', () => {
+    let deck, session;
+
+    beforeEach(() => {
+      deck = new Deck('Test', 'Test');
+      for (let i = 0; i < 15; i++) {
+        deck.addCard(new Card(`${i}`, `Q${i}`, `A${i}`, 'test'));
+      }
+      session = new StudySession(deck, 5, 10);
+    });
+
+    it('should start session with correct card count', () => {
+      const result = session.startSession();
+      expect(result.totalCards).toBeGreaterThan(0);
+      expect(result.newCards).toBeLessThanOrEqual(5);
+    });
+
+    it('should get current card', () => {
+      session.startSession();
+      const card = session.getCurrentCard();
+      expect(card).not.toBeNull();
+    });
+
+    it('should submit answer and move to next', () => {
+      session.startSession();
+      const result = session.submitAnswer(DIFFICULTY_RATINGS.GOOD);
+      expect(result.success).toBe(true);
+      expect(session.sessionStats.correct).toBe(1);
+    });
+
+    it('should complete session', () => {
+      session.startSession();
+      while (session.getCurrentCard()) {
+        session.submitAnswer(DIFFICULTY_RATINGS.GOOD);
+      }
+      const summary = session.getSessionSummary();
+      expect(summary.duration).toBeGreaterThanOrEqual(0);
+      expect(summary.accuracy).toBeGreaterThan(0);
+    });
+  });
+});
+
+================
+File: tilt-app/src/lib/components/PlayingCard.svelte
+================
+<script lang="ts">
+interface Props {
+	rank: string;
+	suit: string;
+	faceDown?: boolean;
+	treatment?: 'classic' | 'minimal' | 'luxury';
+	size?: 'sm' | 'md' | 'lg' | 'xl';
+	delay?: number;
+	class?: string;
+}
+
+let {
+	rank,
+	suit,
+	faceDown = false,
+	treatment = 'classic',
+	size = 'md',
+	delay = 0,
+	class: className = ''
+}: Props = $props();
+
+const isRed = $derived(suit === '♥' || suit === '♦');
+
+const sizes: Record<string, { w: number; h: number; rank: number; suit: number }> = {
+	sm: { w: 44, h: 62, rank: 18, suit: 14 },
+	md: { w: 64, h: 90, rank: 26, suit: 22 },
+	lg: { w: 88, h: 124, rank: 36, suit: 30 },
+	xl: { w: 120, h: 168, rank: 52, suit: 42 }
+};
+
+const s = $derived(sizes[size] ?? sizes.md);
+</script>
+
+{#if faceDown}
+	<div
+		class="card face-down anim-deal {className}"
+		style="width: {s.w}px; height: {s.h}px; animation-delay: {delay}ms;"
+	></div>
+{:else if treatment === 'minimal'}
+	<div
+		class="card {isRed ? 'red' : ''} anim-deal {className}"
+		style="width: {s.w}px; height: {s.h}px; animation-delay: {delay}ms; padding: 0; justify-content: center; align-items: center;"
+	>
+		<div style="display: flex; align-items: baseline; gap: 2px;">
+			<span style="font-size: {s.rank * 1.1}px; font-weight: 800; letter-spacing: -0.06em;"
+				>{rank}</span
+			>
+			<span style="font-size: {s.suit * 0.7}px;">{suit}</span>
+		</div>
+	</div>
+{:else if treatment === 'luxury'}
+	<div
+		class="card {isRed ? 'red' : ''} anim-deal {className}"
+		style="width: {s.w}px; height: {s.h}px; animation-delay: {delay}ms; background: linear-gradient(135deg, #f5e9d4, #ede0c7); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15), inset 0 0 24px rgba(180,140,80,0.15), 0 8px 16px -4px rgba(0,0,0,0.5);"
+	>
+		<div style="display: flex; flex-direction: column; align-items: flex-start;">
+			<span style="font-size: {s.rank}px; font-weight: 700; letter-spacing: -0.04em;">{rank}</span
+			>
+			<span style="font-size: {s.suit}px;">{suit}</span>
+		</div>
+		<div style="align-self: center; font-size: {s.rank * 1.5}px; opacity: 0.18;">{suit}</div>
+		<div
+			style="display: flex; flex-direction: column; align-items: flex-end; transform: rotate(180deg);"
+		>
+			<span style="font-size: {s.rank}px; font-weight: 700; letter-spacing: -0.04em;">{rank}</span
+			>
+			<span style="font-size: {s.suit}px;">{suit}</span>
+		</div>
+	</div>
+{:else}
+	<div
+		class="card {isRed ? 'red' : ''} anim-deal {className}"
+		style="width: {s.w}px; height: {s.h}px; animation-delay: {delay}ms;"
+	>
+		<div style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1;">
+			<span class="rank" style="font-size: {s.rank}px;">{rank}</span>
+			<span class="suit" style="font-size: {s.suit}px; margin-top: 2px;">{suit}</span>
+		</div>
+		<div
+			style="display: flex; flex-direction: column; align-items: flex-end; transform: rotate(180deg); line-height: 1;"
+		>
+			<span class="rank" style="font-size: {s.rank}px;">{rank}</span>
+			<span class="suit" style="font-size: {s.suit}px; margin-top: 2px;">{suit}</span>
+		</div>
+	</div>
+{/if}
+
+================
+File: tilt-app/src/lib/components/ProgressRing.svelte
+================
+<script lang="ts">
+interface Props {
+	value: number;
+	size?: number;
+	stroke?: number;
+	label?: string;
+	sublabel?: string;
+}
+
+let { value, size = 64, stroke = 6, label, sublabel }: Props = $props();
+
+const r = $derived((size - stroke) / 2);
+const c = $derived(2 * Math.PI * r);
+const clamped = $derived(Math.max(0, Math.min(100, value)));
+const offset = $derived(c - (clamped / 100) * c);
+</script>
+
+<div style="position: relative; width: {size}px; height: {size}px;">
+	<svg width={size} height={size} style="transform: rotate(-90deg);">
+		<circle class="ring-track" cx={size / 2} cy={size / 2} r={r} fill="none" stroke-width={stroke}
+		></circle>
+		<circle
+			class="ring-fill"
+			cx={size / 2}
+			cy={size / 2}
+			r={r}
+			fill="none"
+			stroke-width={stroke}
+			stroke-dasharray={c}
+			stroke-dashoffset={offset}
+			stroke-linecap="round"
+		></circle>
+	</svg>
+	{#if label}
+		<div
+			style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;"
+		>
+			<span class="mono" style="font-size: 16px; font-weight: 700;">{label}</span>
+			{#if sublabel}
+				<span style="font-size: 10px; color: var(--cream-dim);">{sublabel}</span>
+			{/if}
+		</div>
+	{/if}
+</div>
+
+================
+File: tilt-app/src/lib/components/ThemePicker.svelte
+================
+<script lang="ts">
+// biome-ignore lint/correctness/noUnusedImports: ThemeName used in template
+import { applyTheme, type ThemeName, themes } from '$lib/stores/theme';
+
+interface Props {
+	value?: ThemeName;
+	onChange?: (theme: ThemeName) => void;
+}
+
+let { value = 'felt', onChange }: Props = $props();
+
+function select(theme: ThemeName) {
+	value = theme;
+	applyTheme(theme);
+	onChange?.(theme);
+}
+</script>
+
+<div style="display: flex; gap: 8px;">
+	{#each Object.keys(themes) as name}
+		{@const themeName = name as ThemeName}
+		{@const t = themes[themeName]}
+		<button
+			type="button"
+			onclick={() => select(themeName)}
+			style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 12px; background: {value === themeName
+				? 'rgba(245,233,212,0.12)'
+				: 'transparent'}; border: 1.5px solid {value === themeName
+				? 'var(--coral)'
+				: 'var(--hairline)'}; border-radius: 12px; cursor: pointer; color: var(--cream);"
+		>
+			<div
+				style="width: 24px; height: 24px; border-radius: 50%; background: {t.felt}; border: 2px solid {t.coral};"
+			></div>
+			<span style="font-family: var(--mono); font-size: 10px; text-transform: capitalize;"
+				>{themeName}</span
+			>
+		</button>
+	{/each}
+</div>
+
+================
+File: tilt-app/src/lib/components/TopBar.svelte
+================
+<script lang="ts">
+import type { Snippet } from 'svelte';
+
+interface Props {
+	left?: Snippet;
+	center?: string;
+	right?: Snippet;
+	onBack?: () => void;
+}
+
+let { left, center, right, onBack }: Props = $props();
+</script>
+
+<div
+	style="display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 8px; position: relative; z-index: 5;"
+>
+	<div style="min-width: 40px;">
+		{#if onBack}
+			<button
+				type="button"
+				aria-label="Back"
+				onclick={onBack}
+				style="background: rgba(245,233,212,0.08); border: 1px solid var(--hairline); border-radius: 999px; width: 36px; height: 36px; color: var(--cream); cursor: pointer; font-size: 18px; display: inline-flex; align-items: center; justify-content: center;"
+				>‹</button
+			>
+		{/if}
+		{#if left}
+			{@render left()}
+		{/if}
+	</div>
+	<div
+		style="flex: 1; text-align: center; font-size: 13px; font-family: var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--cream-dim);"
+	>
+		{center ?? ''}
+	</div>
+	<div style="min-width: 40px; text-align: right;">
+		{#if right}
+			{@render right()}
+		{/if}
+	</div>
+</div>
+
+================
+File: tilt-app/src/lib/stores/auth.svelte.ts
+================
+import type { Session, User } from '@supabase/supabase-js';
+import { createClient } from '$lib/supabase';
+
+function createAuthStore() {
+	let session = $state<Session | null>(null);
+	let user = $state<User | null>(null);
+	let loading = $state(true);
+	let initialized = false;
+
+	const supabase = createClient();
+
+	const isAuthenticated = $derived(!!session);
+
+	function init() {
+		if (initialized) return;
+		initialized = true;
+
+		supabase.auth
+			.getSession()
+			.then(({ data }) => {
+				session = data.session;
+				user = data.session?.user ?? null;
+			})
+			.finally(() => {
+				loading = false;
+			});
+
+		supabase.auth.onAuthStateChange((_event, newSession) => {
+			session = newSession;
+			user = newSession?.user ?? null;
+		});
+	}
+
+	async function signIn(email: string) {
+		const { error } = await supabase.auth.signInWithOtp({ email });
+		return { error };
+	}
+
+	async function signUp(email: string, password: string) {
+		const { error } = await supabase.auth.signUp({ email, password });
+		return { error };
+	}
+
+	async function signInWithPassword(email: string, password: string) {
+		const { error } = await supabase.auth.signInWithPassword({ email, password });
+		return { error };
+	}
+
+	async function signOut() {
+		const { error } = await supabase.auth.signOut();
+		return { error };
+	}
+
+	return {
+		get session() {
+			return session;
+		},
+		get user() {
+			return user;
+		},
+		get loading() {
+			return loading;
+		},
+		get isAuthenticated() {
+			return isAuthenticated;
+		},
+		init,
+		signIn,
+		signUp,
+		signInWithPassword,
+		signOut
+	};
+}
+
+export const auth = createAuthStore();
+
+================
+File: tilt-app/src/lib/supabase.ts
+================
+import { createBrowserClient, createServerClient } from '@supabase/ssr';
+import { env } from '$env/dynamic/public';
+
+export function createClient() {
+	const url = env.PUBLIC_SUPABASE_URL;
+	const key = env.PUBLIC_SUPABASE_ANON_KEY;
+	if (!url || !key) {
+		throw new Error('Missing PUBLIC_SUPABASE_URL or PUBLIC_SUPABASE_ANON_KEY');
+	}
+	return createBrowserClient(url, key);
+}
+
+export function createServerSupabase(
+	_fetch: typeof globalThis.fetch,
+	cookies: { get: (name: string) => string | undefined }
+) {
+	const url = env.PUBLIC_SUPABASE_URL;
+	const key = env.PUBLIC_SUPABASE_ANON_KEY;
+	if (!url || !key) {
+		throw new Error('Missing PUBLIC_SUPABASE_URL or PUBLIC_SUPABASE_ANON_KEY');
+	}
+	return createServerClient(url, key, {
+		cookies: {
+			get(name) {
+				return cookies.get(name) ?? '';
+			},
+			set() {},
+			remove() {}
+		}
+	});
+}
+
+================
+File: tilt-app/src/routes/(auth)/login/+page.svelte
+================
+<script lang="ts">
+import { goto } from '$app/navigation';
+import { auth } from '$lib/stores/auth.svelte';
+
+let email = $state('');
+let password = $state('');
+let error = $state('');
+let loading = $state(false);
+
+async function handleSubmit(e: Event) {
+	e.preventDefault();
+	loading = true;
+	error = '';
+
+	try {
+		const result = await auth.signInWithPassword(email, password);
+		if (result.error) {
+			error = result.error.message;
+		} else {
+			goto('/');
+		}
+	} finally {
+		loading = false;
+	}
+}
+</script>
+
+<div class="auth-screen">
+	<div class="auth-header">
+		<div class="eyebrow">◆ Tilt</div>
+		<h1 class="h-display">Welcome back</h1>
+		<p class="subtitle">Pick up where you left off.</p>
+	</div>
+
+	<form class="auth-form" onsubmit={handleSubmit}>
+		{#if error}
+			<div class="error-message" role="alert" aria-live="assertive">{error}</div>
+		{/if}
+
+		<label class="field">
+			<span class="field-label">Email</span>
+			<input
+				type="email"
+				bind:value={email}
+				placeholder="you@example.com"
+				required
+				disabled={loading}
+			/>
+		</label>
+
+		<label class="field">
+			<span class="field-label">Password</span>
+			<input
+				type="password"
+				bind:value={password}
+				placeholder="••••••••"
+				required
+				disabled={loading}
+			/>
+		</label>
+
+		<button type="submit" class="btn btn-primary" disabled={loading}>
+			{loading ? 'Signing in...' : 'Sign in'}
+		</button>
+	</form>
+
+	<div class="auth-footer">
+		<span>Don't have an account?</span>
+		<a href="/register">Create one</a>
+	</div>
+</div>
+
+<style>
+	.auth-screen {
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		background: var(--felt);
+		padding: 60px 28px 40px;
+	}
+
+	.auth-header {
+		margin-bottom: 40px;
+	}
+
+	.auth-header h1 {
+		font-size: 36px;
+		margin-top: 8px;
+	}
+
+	.subtitle {
+		font-size: 16px;
+		color: var(--cream-dim);
+		margin-top: 8px;
+	}
+
+	.auth-form {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.field-label {
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--cream-dim);
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+
+	.field input {
+		background: rgba(245, 233, 212, 0.05);
+		border: 1.5px solid var(--hairline-strong);
+		border-radius: 12px;
+		padding: 14px 16px;
+		font-size: 16px;
+		color: var(--cream);
+		font-family: var(--sans);
+		transition: border-color 180ms ease;
+	}
+
+	.field input:focus {
+		outline: none;
+		border-color: var(--coral);
+	}
+
+	.field input::placeholder {
+		color: var(--cream-dim);
+		opacity: 0.5;
+	}
+
+	.error-message {
+		background: rgba(255, 91, 72, 0.12);
+		border: 1px solid rgba(255, 91, 72, 0.3);
+		border-radius: 12px;
+		padding: 12px 16px;
+		font-size: 14px;
+		color: var(--coral);
+	}
+
+	.auth-footer {
+		margin-top: 32px;
+		text-align: center;
+		font-size: 14px;
+		color: var(--cream-dim);
+	}
+
+	.auth-footer a {
+		color: var(--coral);
+		text-decoration: none;
+		font-weight: 600;
+		margin-left: 4px;
+	}
+
+	.auth-footer a:hover {
+		text-decoration: underline;
+	}
+</style>
+
+================
+File: tilt-app/src/routes/(auth)/register/+page.svelte
+================
+<script lang="ts">
+import { auth } from '$lib/stores/auth.svelte';
+
+let email = $state('');
+let password = $state('');
+let confirmPassword = $state('');
+let error = $state('');
+let loading = $state(false);
+let success = $state(false);
+
+async function handleSubmit(e: Event) {
+	e.preventDefault();
+	loading = true;
+	error = '';
+
+	if (password !== confirmPassword) {
+		error = 'Passwords do not match';
+		loading = false;
+		return;
+	}
+
+	if (password.length < 6) {
+		error = 'Password must be at least 6 characters';
+		loading = false;
+		return;
+	}
+
+	try {
+		const result = await auth.signUp(email, password);
+		if (result.error) {
+			error = result.error.message;
+		} else {
+			success = true;
+		}
+	} finally {
+		loading = false;
+	}
+}
+</script>
+
+<div class="auth-screen">
+	<div class="auth-header">
+		<div class="eyebrow">◆ Tilt</div>
+		<h1 class="h-display">Create account</h1>
+		<p class="subtitle">Start your poker training journey.</p>
+	</div>
+
+	{#if success}
+		<div class="success-card">
+			<div class="success-icon">✉️</div>
+			<h2>Check your email</h2>
+			<p>We sent a confirmation link to <strong>{email}</strong></p>
+			<a href="/login" class="btn btn-ghost" style="margin-top: 16px">Back to login</a>
+		</div>
+	{:else}
+		<form class="auth-form" onsubmit={handleSubmit}>
+			{#if error}
+				<div class="error-message" role="alert" aria-live="assertive">{error}</div>
+			{/if}
+
+			<label class="field">
+				<span class="field-label">Email</span>
+				<input
+					type="email"
+					bind:value={email}
+					placeholder="you@example.com"
+					required
+					disabled={loading}
+				/>
+			</label>
+
+			<label class="field">
+				<span class="field-label">Password</span>
+				<input
+					type="password"
+					bind:value={password}
+					placeholder="••••••••"
+					required
+					disabled={loading}
+				/>
+			</label>
+
+			<label class="field">
+				<span class="field-label">Confirm password</span>
+				<input
+					type="password"
+					bind:value={confirmPassword}
+					placeholder="••••••••"
+					required
+					disabled={loading}
+				/>
+			</label>
+
+			<button type="submit" class="btn btn-primary" disabled={loading}>
+				{loading ? 'Creating account...' : 'Create account'}
+			</button>
+		</form>
+
+		<div class="auth-footer">
+			<span>Already have an account?</span>
+			<a href="/login">Sign in</a>
+		</div>
+	{/if}
+</div>
+
+<style>
+	.auth-screen {
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		background: var(--felt);
+		padding: 60px 28px 40px;
+	}
+
+	.auth-header {
+		margin-bottom: 40px;
+	}
+
+	.auth-header h1 {
+		font-size: 36px;
+		margin-top: 8px;
+	}
+
+	.subtitle {
+		font-size: 16px;
+		color: var(--cream-dim);
+		margin-top: 8px;
+	}
+
+	.auth-form {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.field-label {
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--cream-dim);
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+
+	.field input {
+		background: rgba(245, 233, 212, 0.05);
+		border: 1.5px solid var(--hairline-strong);
+		border-radius: 12px;
+		padding: 14px 16px;
+		font-size: 16px;
+		color: var(--cream);
+		font-family: var(--sans);
+		transition: border-color 180ms ease;
+	}
+
+	.field input:focus {
+		outline: none;
+		border-color: var(--coral);
+	}
+
+	.field input::placeholder {
+		color: var(--cream-dim);
+		opacity: 0.5;
+	}
+
+	.error-message {
+		background: rgba(255, 91, 72, 0.12);
+		border: 1px solid rgba(255, 91, 72, 0.3);
+		border-radius: 12px;
+		padding: 12px 16px;
+		font-size: 14px;
+		color: var(--coral);
+	}
+
+	.success-card {
+		background: rgba(76, 175, 80, 0.12);
+		border: 1px solid rgba(76, 175, 80, 0.3);
+		border-radius: 22px;
+		padding: 32px 24px;
+		text-align: center;
+	}
+
+	.success-icon {
+		font-size: 48px;
+		margin-bottom: 16px;
+	}
+
+	.success-card h2 {
+		font-size: 22px;
+		margin-bottom: 8px;
+	}
+
+	.success-card p {
+		font-size: 14px;
+		color: var(--cream-dim);
+	}
+
+	.auth-footer {
+		margin-top: 32px;
+		text-align: center;
+		font-size: 14px;
+		color: var(--cream-dim);
+	}
+
+	.auth-footer a {
+		color: var(--coral);
+		text-decoration: none;
+		font-weight: 600;
+		margin-left: 4px;
+	}
+
+	.auth-footer a:hover {
+		text-decoration: underline;
+	}
+</style>
+
+================
+File: tilt-app/src/routes/onboarding/+page.svelte
+================
+<script lang="ts">
+import { goto } from '$app/navigation';
+// biome-ignore lint/correctness/noUnusedImports: Used in template
+import PlayingCard from '$lib/components/PlayingCard.svelte';
+
+interface Option {
+	v: string | number;
+	label: string;
+	emoji?: string;
+	sub?: string;
+}
+
+interface Slide {
+	kind: string;
+	eyebrow?: string;
+	q?: string;
+	key?: string;
+	opts?: Option[];
+}
+
+let step = $state(0);
+let picks = $state({
+	goal: null as string | null,
+	time: null as number | null,
+	level: null as string | null
+});
+
+const slides: Slide[] = [
+	{
+		kind: 'hero'
+	},
+	{
+		kind: 'q',
+		eyebrow: 'Question 1 of 3',
+		q: 'What brings you to the table?',
+		key: 'goal',
+		opts: [
+			{ v: 'win', label: 'Win money from friends', emoji: '💰' },
+			{ v: 'pro', label: 'Take poker seriously', emoji: '🎯' },
+			{ v: 'fun', label: 'Just enjoy the game more', emoji: '✨' },
+			{ v: 'crush', label: 'Crush online cash games', emoji: '🔥' }
+		]
+	},
+	{
+		kind: 'q',
+		eyebrow: 'Question 2 of 3',
+		q: 'How honest are we being about your game?',
+		key: 'level',
+		opts: [
+			{ v: 'new', label: 'I know what a flush is. Mostly.', sub: 'Brand new' },
+			{ v: 'casual', label: "I lose more than I'd like to admit", sub: 'Casual' },
+			{ v: 'mid', label: 'I know GTO but I freeze on the river', sub: 'Improving' },
+			{ v: 'shark', label: "I'm a shark sharpening teeth", sub: 'Advanced' }
+		]
+	},
+	{
+		kind: 'q',
+		eyebrow: 'Question 3 of 3',
+		q: 'How much time can you steal each day?',
+		key: 'time',
+		opts: [
+			{ v: 5, label: '5 min', sub: 'Coffee break' },
+			{ v: 10, label: '10 min', sub: 'Commute' },
+			{ v: 20, label: '20 min', sub: 'Serious' },
+			{ v: 30, label: '30+ min', sub: 'All in' }
+		]
+	},
+	{
+		kind: 'plan'
+	}
+];
+
+const slide = $derived(slides[step]);
+
+let advanceTimer: ReturnType<typeof setTimeout> | null = null;
+
+function advance(key: string | undefined, value: string | number | null) {
+	if (advanceTimer) return;
+	if (key && value !== null) {
+		picks = { ...picks, [key]: value };
+	}
+	advanceTimer = setTimeout(() => {
+		step = step + 1;
+		advanceTimer = null;
+	}, 240);
+}
+
+async function complete() {
+	// Save onboarding choices to Supabase (placeholder for now)
+	goto('/');
+}
+</script>
+
+<div class="screen felt-bg">
+	{#if step > 0 && step < slides.length - 1}
+		<div class="progress-dots">
+			{#each [1, 2, 3] as i}
+				<div
+					class="dot"
+					class:active={i === step}
+					class:completed={i < step}
+				></div>
+			{/each}
+		</div>
+	{/if}
+
+	{#if slide.kind === 'hero'}
+		<div class="hero-slide">
+			<div class="floating-cards">
+				<div class="card-float card-1">
+					<PlayingCard rank="A" suit="♠" size="lg" />
+				</div>
+				<div class="card-float card-2">
+					<PlayingCard rank="K" suit="♥" size="xl" delay={150} />
+				</div>
+				<div class="card-float card-3">
+					<PlayingCard rank="?" suit="?" faceDown size="lg" delay={300} />
+				</div>
+			</div>
+
+			<div class="hero-content">
+				<div class="eyebrow">◆ Tilt</div>
+			</div>
+
+			<div class="hero-cta">
+				<h1 class="h-display hero-title">
+					Poker is<br />
+					reading <em class="serif italic">minds.</em>
+				</h1>
+				<p class="hero-subtitle">
+					We'll teach you how. Five minutes a day. No theory dumps.
+				</p>
+				<button class="btn btn-primary" onclick={() => (step = 1)}>
+					Deal me in →
+				</button>
+				<button class="btn btn-ghost" onclick={() => goto('/login')}>
+					I have an account
+				</button>
+			</div>
+		</div>
+	{:else if slide.kind === 'q'}
+		<div class="question-slide">
+			<div class="eyebrow anim-float">{slide.eyebrow}</div>
+			<h2 class="h-1 anim-float question-title">{slide.q}</h2>
+			<div class="options">
+				{#each slide.opts ?? [] as opt, i}
+					<button
+						class="option-btn anim-float"
+						style="animation-delay: {120 + i * 60}ms"
+						onclick={() => advance(slide.key, opt.v)}
+					>
+						{#if opt.emoji}
+							<span class="option-emoji">{opt.emoji}</span>
+						{/if}
+						<div class="option-text">
+							<div class="option-label">{opt.label}</div>
+							{#if opt.sub}
+								<div class="option-sub">{opt.sub}</div>
+							{/if}
+						</div>
+						<span class="option-arrow">›</span>
+					</button>
+				{/each}
+			</div>
+		</div>
+	{:else if slide.kind === 'plan'}
+		<div class="plan-slide">
+			<div class="eyebrow anim-float">Your plan</div>
+			<h2 class="h-1 anim-float plan-title">
+				Built for <em class="serif italic">you</em>, dealer.
+			</h2>
+
+			<div class="plan-card anim-float">
+				<div class="plan-header">
+					<div class="eyebrow">Daily session</div>
+					<div class="mono plan-time">~{picks.time || 10} MIN</div>
+				</div>
+				{#each [{ e: '🃏', t: 'Hand of the Day', s: 'A new tricky spot, every morning' }, { e: '🧠', t: 'Pattern Drills', s: 'Repetition that actually sticks' }, { e: '👁️', t: 'The Read', s: 'Spot tells in <3 seconds' }, { e: '🎬', t: 'Replay Theater', s: 'Watch your last session, narrated' }] as item}
+					<div class="plan-item">
+						<span class="plan-emoji">{item.e}</span>
+						<div>
+							<div class="plan-item-title">{item.t}</div>
+							<div class="plan-item-desc">{item.s}</div>
+						</div>
+					</div>
+				{/each}
+			</div>
+
+			<div class="spacer"></div>
+
+			<button class="btn btn-primary anim-float" style="animation-delay: 300ms" onclick={complete}>
+				Start your first hand →
+			</button>
+		</div>
+	{/if}
+</div>
+
+<style>
+	.screen {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		background: var(--felt);
+		overflow: hidden;
+	}
+
+	.progress-dots {
+		position: absolute;
+		top: 60px;
+		left: 0;
+		right: 0;
+		display: flex;
+		justify-content: center;
+		gap: 6px;
+		z-index: 10;
+	}
+
+	.dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 999px;
+		background: rgba(245, 233, 212, 0.2);
+		transition: all 300ms ease;
+	}
+
+	.dot.active {
+		width: 28px;
+		background: var(--coral);
+	}
+
+	.dot.completed {
+		background: var(--coral);
+	}
+
+	.hero-slide {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		padding: 60px 28px 40px;
+		position: relative;
+	}
+
+	.floating-cards {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+	}
+
+	.card-float {
+		position: absolute;
+	}
+
+	.card-1 {
+		top: 12%;
+		right: -20px;
+		transform: rotate(18deg);
+		opacity: 0.5;
+	}
+
+	.card-2 {
+		top: 22%;
+		right: 40px;
+		transform: rotate(-8deg);
+	}
+
+	.card-3 {
+		top: 8%;
+		left: -30px;
+		transform: rotate(-22deg);
+		opacity: 0.4;
+	}
+
+	.hero-content {
+		margin-top: 80px;
+		position: relative;
+		z-index: 2;
+	}
+
+	.hero-title {
+		font-size: 64px;
+	}
+
+	.italic {
+		color: var(--coral-soft);
+		font-style: italic;
+	}
+
+	.hero-subtitle {
+		font-size: 18px;
+		color: var(--cream-dim);
+		margin-top: 16px;
+		line-height: 1.4;
+		max-width: 280px;
+	}
+
+	.hero-cta {
+		position: relative;
+		z-index: 2;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		margin-top: 28px;
+	}
+
+	.question-slide {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		padding: 90px 24px 28px;
+	}
+
+	.question-title {
+		margin-top: 8px;
+		font-size: 30px;
+		animation-delay: 60ms;
+	}
+
+	.options {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		margin-top: 28px;
+	}
+
+	.option-btn {
+		background: rgba(245, 233, 212, 0.05);
+		border: 1.5px solid var(--hairline-strong);
+		border-radius: 16px;
+		padding: 16px 18px;
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		color: var(--cream);
+		cursor: pointer;
+		text-align: left;
+		transition: all 180ms ease;
+		font-family: var(--sans);
+	}
+
+	.option-btn:active {
+		background: rgba(255, 91, 72, 0.12);
+	}
+
+	.option-emoji {
+		font-size: 22px;
+	}
+
+	.option-text {
+		flex: 1;
+	}
+
+	.option-label {
+		font-size: 16px;
+		font-weight: 600;
+	}
+
+	.option-sub {
+		font-size: 12px;
+		color: var(--cream-dim);
+		margin-top: 2px;
+	}
+
+	.option-arrow {
+		color: var(--cream-dim);
+	}
+
+	.plan-slide {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		padding: 80px 28px 40px;
+	}
+
+	.plan-title {
+		margin-top: 8px;
+		font-size: 30px;
+		animation-delay: 80ms;
+		max-width: 300px;
+	}
+
+	.plan-card {
+		margin-top: 32px;
+		padding: 22px;
+		border-radius: 22px;
+		background: linear-gradient(180deg, rgba(255, 91, 72, 0.12), rgba(233, 185, 73, 0.08));
+		border: 1px solid rgba(255, 91, 72, 0.25);
+		animation-delay: 160ms;
+	}
+
+	.plan-header {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 16px;
+	}
+
+	.plan-time {
+		font-size: 11px;
+		color: var(--gold);
+	}
+
+	.plan-item {
+		display: flex;
+		align-items: flex-start;
+		gap: 12px;
+		padding: 10px 0;
+		border-top: 1px solid var(--hairline);
+	}
+
+	.plan-emoji {
+		font-size: 18px;
+	}
+
+	.plan-item-title {
+		font-size: 14px;
+		font-weight: 600;
+	}
+
+	.plan-item-desc {
+		font-size: 12px;
+		color: var(--cream-dim);
+	}
+
+	.spacer {
+		flex: 1;
+	}
+
+	.anim-float {
+		animation: float-up 400ms ease both;
+	}
+
+	@keyframes float-up {
+		from {
+			opacity: 0;
+			transform: translateY(16px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+</style>
+
+================
+File: tilt-app/supabase/schema.sql
+================
+-- Tilt Poker Training App - Supabase Schema
+-- Run this in your Supabase SQL Editor to set up the database
+
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Profiles table (extends auth.users)
+CREATE TABLE IF NOT EXISTS public.profiles (
+    id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+    username TEXT UNIQUE,
+    avatar_url TEXT,
+    level INTEGER DEFAULT 1,
+    xp INTEGER DEFAULT 0,
+    streak_count INTEGER DEFAULT 0,
+    last_session_date DATE,
+    onboarding_completed BOOLEAN DEFAULT FALSE,
+    onboarding_goal TEXT,
+    onboarding_level TEXT,
+    onboarding_time INTEGER,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- User settings table
+CREATE TABLE IF NOT EXISTS public.user_settings (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE UNIQUE NOT NULL,
+    theme TEXT DEFAULT 'felt',
+    card_style TEXT DEFAULT 'classic',
+    sound_enabled BOOLEAN DEFAULT TRUE,
+    haptics_enabled BOOLEAN DEFAULT TRUE,
+    daily_goal_minutes INTEGER DEFAULT 10,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Achievements table
+CREATE TABLE IF NOT EXISTS public.achievements (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    key TEXT UNIQUE NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT,
+    emoji TEXT,
+    category TEXT,
+    requirement_type TEXT,
+    requirement_value INTEGER,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- User achievements (unlocked badges)
+CREATE TABLE IF NOT EXISTS public.user_achievements (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+    achievement_id UUID REFERENCES public.achievements(id) ON DELETE CASCADE NOT NULL,
+    unlocked_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(user_id, achievement_id)
+);
+
+-- Training progress table
+CREATE TABLE IF NOT EXISTS public.training_progress (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+    module_type TEXT NOT NULL, -- 'ranges', 'pushfold', 'exploits', 'concepts'
+    module_id TEXT NOT NULL,
+    progress_percent INTEGER DEFAULT 0,
+    completed_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(user_id, module_type, module_id)
+);
+
+-- SRS cards table (spaced repetition)
+CREATE TABLE IF NOT EXISTS public.srs_cards (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+    deck_id TEXT NOT NULL,
+    card_id TEXT NOT NULL,
+    front TEXT NOT NULL,
+    back TEXT NOT NULL,
+    category TEXT,
+    tags TEXT[],
+    n INTEGER DEFAULT 0,
+    ef REAL DEFAULT 2.5,
+    interval INTEGER DEFAULT 0,
+    next_review TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    last_review TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(user_id, deck_id, card_id)
+);
+
+-- Sessions table (completed training sessions)
+CREATE TABLE IF NOT EXISTS public.sessions (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+    session_type TEXT NOT NULL, -- 'lesson', 'quiz', 'srs', 'drill'
+    duration_seconds INTEGER,
+    xp_earned INTEGER DEFAULT 0,
+    accuracy REAL,
+    questions_total INTEGER,
+    questions_correct INTEGER,
+    streak_count INTEGER,
+    metadata JSONB,
+    completed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Daily progress table (for tracking daily XP and sessions)
+CREATE TABLE IF NOT EXISTS public.daily_progress (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+    date DATE NOT NULL,
+    xp_earned INTEGER DEFAULT 0,
+    sessions_completed INTEGER DEFAULT 0,
+    time_spent_seconds INTEGER DEFAULT 0,
+    streak_maintained BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(user_id, date)
+);
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_profiles_username ON public.profiles(username);
+CREATE INDEX IF NOT EXISTS idx_user_achievements_user ON public.user_achievements(user_id);
+CREATE INDEX IF NOT EXISTS idx_training_progress_user ON public.training_progress(user_id);
+CREATE INDEX IF NOT EXISTS idx_srs_cards_user ON public.srs_cards(user_id);
+CREATE INDEX IF NOT EXISTS idx_srs_cards_next_review ON public.srs_cards(user_id, next_review);
+CREATE INDEX IF NOT EXISTS idx_sessions_user ON public.sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_completed ON public.sessions(user_id, completed_at);
+CREATE INDEX IF NOT EXISTS idx_daily_progress_user_date ON public.daily_progress(user_id, date);
+
+-- Row Level Security (RLS) policies
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_achievements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.training_progress ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.srs_cards ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.daily_progress ENABLE ROW LEVEL SECURITY;
+
+-- Profiles: Users can read/update their own profile
+CREATE POLICY "Users can view own profile" ON public.profiles
+    FOR SELECT USING (auth.uid() = id);
+
+CREATE POLICY "Users can update own profile" ON public.profiles
+    FOR UPDATE USING (auth.uid() = id);
+
+CREATE POLICY "Users can insert own profile" ON public.profiles
+    FOR INSERT WITH CHECK (auth.uid() = id);
+
+-- User settings: Users can read/update their own settings
+CREATE POLICY "Users can view own settings" ON public.user_settings
+    FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own settings" ON public.user_settings
+    FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own settings" ON public.user_settings
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Achievements: Public read access
+CREATE POLICY "Achievements are viewable by everyone" ON public.achievements
+    FOR SELECT USING (TRUE);
+
+-- User achievements: Users can read their own achievements
+CREATE POLICY "Users can view own achievements" ON public.user_achievements
+    FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own achievements" ON public.user_achievements
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Training progress: Users can read/update their own progress
+CREATE POLICY "Users can view own training progress" ON public.training_progress
+    FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own training progress" ON public.training_progress
+    FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own training progress" ON public.training_progress
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- SRS cards: Users can CRUD their own cards
+CREATE POLICY "Users can view own srs cards" ON public.srs_cards
+    FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own srs cards" ON public.srs_cards
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own srs cards" ON public.srs_cards
+    FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own srs cards" ON public.srs_cards
+    FOR DELETE USING (auth.uid() = user_id);
+
+-- Sessions: Users can read/insert their own sessions
+CREATE POLICY "Users can view own sessions" ON public.sessions
+    FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own sessions" ON public.sessions
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Daily progress: Users can read/update their own daily progress
+CREATE POLICY "Users can view own daily progress" ON public.daily_progress
+    FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own daily progress" ON public.daily_progress
+    FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own daily progress" ON public.daily_progress
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Function to handle new user creation
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO public.profiles (id, username, avatar_url)
+    VALUES (
+        NEW.id,
+        NEW.raw_user_meta_data->>'username',
+        NEW.raw_user_meta_data->>'avatar_url'
+    )
+    ON CONFLICT (id) DO NOTHING;
+
+    INSERT INTO public.user_settings (user_id)
+    VALUES (NEW.id)
+    ON CONFLICT (user_id) DO NOTHING;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger for new user creation
+CREATE OR REPLACE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- Function to update updated_at timestamp
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Add updated_at triggers
+CREATE TRIGGER update_profiles_updated_at
+    BEFORE UPDATE ON public.profiles
+    FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER update_user_settings_updated_at
+    BEFORE UPDATE ON public.user_settings
+    FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER update_training_progress_updated_at
+    BEFORE UPDATE ON public.training_progress
+    FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER update_srs_cards_updated_at
+    BEFORE UPDATE ON public.srs_cards
+    FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER update_daily_progress_updated_at
+    BEFORE UPDATE ON public.daily_progress
+    FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+================
+File: tilt-app/package.json
+================
+{
+	"name": "tilt-app",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"lint": "biome check src/",
+		"lint:fix": "biome check --fix src/",
+		"format": "biome format src/",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:coverage": "vitest run --coverage",
+		"test:e2e": "playwright test",
+		"typecheck": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.13",
+		"@playwright/test": "^1.59.1",
+		"@sveltejs/adapter-auto": "^7.0.1",
+		"@sveltejs/kit": "^2.57.0",
+		"@sveltejs/vite-plugin-svelte": "^7.0.0",
+		"@tailwindcss/vite": "^4.2.4",
+		"@types/node": "^25.6.0",
+		"@vitest/coverage-v8": "^4.1.5",
+		"svelte": "^5.55.2",
+		"svelte-check": "^4.4.6",
+		"tailwindcss": "^4.2.4",
+		"typescript": "^6.0.2",
+		"vite": "^8.0.7",
+		"vitest": "^4.1.5"
+	},
+	"dependencies": {
+		"@supabase/ssr": "^0.10.2",
+		"@supabase/supabase-js": "^2.105.1"
+	}
+}
+
+================
+File: tilt-app/src/routes/+layout.svelte
+================
+<script lang="ts">
+import '../app.css';
+import { goto } from '$app/navigation';
+import { page } from '$app/state';
+import { auth } from '$lib/stores/auth.svelte';
+
+let { children } = $props();
+
+$effect(() => {
+	auth.init();
+});
+
+const isAuthRoute = $derived(
+	page.url.pathname.startsWith('/login') || page.url.pathname.startsWith('/register')
+);
+
+$effect(() => {
+	if (!auth.loading && !auth.isAuthenticated && !isAuthRoute) {
+		goto('/login');
+	}
+});
+</script>
+
+<svelte:head>
+	<title>Tilt — Poker Training</title>
+	<meta name="description" content="Poker training app with GTO principles" />
+</svelte:head>
+
+{#if auth.loading}
+	<div class="loading-screen">
+		<div class="spinner"></div>
+	</div>
+{:else if isAuthRoute || auth.isAuthenticated}
+	{@render children()}
+{/if}
+
+<style>
+	.loading-screen {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 100vh;
+		background: var(--felt);
+	}
+
+	.spinner {
+		width: 32px;
+		height: 32px;
+		border: 3px solid var(--hairline);
+		border-top-color: var(--coral);
+		border-radius: 50%;
+		animation: spin 0.8s linear infinite;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+</style>
+
 
 
 
