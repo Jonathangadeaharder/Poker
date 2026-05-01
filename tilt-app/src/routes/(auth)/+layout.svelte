@@ -1,42 +1,21 @@
 <script lang="ts">
-import '../app.css';
-import { get } from 'svelte/store';
 import { goto } from '$app/navigation';
-import { page } from '$app/stores';
 import { auth } from '$lib/stores/auth.svelte';
 
 let { children } = $props();
 
 $effect(() => {
-	auth.init();
-});
-
-let isAuthRoute = $state(false);
-
-$effect(() => {
-	const currentPage = get(page);
-	isAuthRoute =
-		currentPage.url.pathname.startsWith('/login') ||
-		currentPage.url.pathname.startsWith('/register');
-});
-
-$effect(() => {
-	if (!auth.loading && !auth.isAuthenticated && !isAuthRoute) {
-		goto('/login');
+	if (!auth.loading && auth.isAuthenticated) {
+		goto('/');
 	}
 });
 </script>
-
-<svelte:head>
-	<title>Tilt — Poker Training</title>
-	<meta name="description" content="Poker training app with GTO principles" />
-</svelte:head>
 
 {#if auth.loading}
 	<div class="loading-screen">
 		<div class="spinner"></div>
 	</div>
-{:else if isAuthRoute || auth.isAuthenticated}
+{:else if !auth.isAuthenticated}
 	{@render children()}
 {/if}
 
