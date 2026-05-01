@@ -72,12 +72,16 @@ const slides: Slide[] = [
 
 const slide = $derived(slides[step]);
 
+let advanceTimer: ReturnType<typeof setTimeout> | null = null;
+
 function advance(key: string | undefined, value: string | number | null) {
+	if (advanceTimer) return;
 	if (key && value !== null) {
 		picks = { ...picks, [key]: value };
 	}
-	setTimeout(() => {
+	advanceTimer = setTimeout(() => {
 		step = step + 1;
+		advanceTimer = null;
 	}, 240);
 }
 

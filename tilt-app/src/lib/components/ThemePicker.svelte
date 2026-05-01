@@ -10,6 +10,7 @@ interface Props {
 let { value = 'felt', onChange }: Props = $props();
 
 function select(theme: ThemeName) {
+	value = theme;
 	applyTheme(theme);
 	onChange?.(theme);
 }
@@ -20,6 +21,7 @@ function select(theme: ThemeName) {
 		{@const themeName = name as ThemeName}
 		{@const t = themes[themeName]}
 		<button
+			type="button"
 			onclick={() => select(themeName)}
 			style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 12px; background: {value === themeName
 				? 'rgba(245,233,212,0.12)'

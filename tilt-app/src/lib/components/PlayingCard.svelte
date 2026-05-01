@@ -28,7 +28,7 @@ const sizes: Record<string, { w: number; h: number; rank: number; suit: number }
 	xl: { w: 120, h: 168, rank: 52, suit: 42 }
 };
 
-const s = $derived(sizes[size]);
+const s = $derived(sizes[size] ?? sizes.md);
 </script>
 
 {#if faceDown}

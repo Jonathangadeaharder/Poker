@@ -218,11 +218,13 @@ BEGIN
         NEW.id,
         NEW.raw_user_meta_data->>'username',
         NEW.raw_user_meta_data->>'avatar_url'
-    );
-    
+    )
+    ON CONFLICT (id) DO NOTHING;
+
     INSERT INTO public.user_settings (user_id)
-    VALUES (NEW.id);
-    
+    VALUES (NEW.id)
+    ON CONFLICT (user_id) DO NOTHING;
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

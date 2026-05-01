@@ -1,8 +1,7 @@
 <script lang="ts">
 import '../app.css';
-import { get } from 'svelte/store';
 import { goto } from '$app/navigation';
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import { auth } from '$lib/stores/auth.svelte';
 
 let { children } = $props();
@@ -11,14 +10,9 @@ $effect(() => {
 	auth.init();
 });
 
-let isAuthRoute = $state(false);
-
-$effect(() => {
-	const currentPage = get(page);
-	isAuthRoute =
-		currentPage.url.pathname.startsWith('/login') ||
-		currentPage.url.pathname.startsWith('/register');
-});
+const isAuthRoute = $derived(
+	page.url.pathname.startsWith('/login') || page.url.pathname.startsWith('/register')
+);
 
 $effect(() => {
 	if (!auth.loading && !auth.isAuthenticated && !isAuthRoute) {

@@ -5,17 +5,25 @@ function createAuthStore() {
 	let session = $state<Session | null>(null);
 	let user = $state<User | null>(null);
 	let loading = $state(true);
+	let initialized = false;
 
 	const supabase = createClient();
 
 	const isAuthenticated = $derived(!!session);
 
 	function init() {
-		supabase.auth.getSession().then(({ data }) => {
-			session = data.session;
-			user = data.session?.user ?? null;
-			loading = false;
-		});
+		if (initialized) return;
+		initialized = true;
+
+		supabase.auth
+			.getSession()
+			.then(({ data }) => {
+				session = data.session;
+				user = data.session?.user ?? null;
+			})
+			.finally(() => {
+				loading = false;
+			});
 
 		supabase.auth.onAuthStateChange((_event, newSession) => {
 			session = newSession;

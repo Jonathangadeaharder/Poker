@@ -12,12 +12,15 @@ async function handleSubmit(e: Event) {
 	loading = true;
 	error = '';
 
-	const result = await auth.signInWithPassword(email, password);
-	if (result.error) {
-		error = result.error.message;
+	try {
+		const result = await auth.signInWithPassword(email, password);
+		if (result.error) {
+			error = result.error.message;
+		} else {
+			goto('/');
+		}
+	} finally {
 		loading = false;
-	} else {
-		goto('/');
 	}
 }
 </script>
@@ -31,7 +34,7 @@ async function handleSubmit(e: Event) {
 
 	<form class="auth-form" onsubmit={handleSubmit}>
 		{#if error}
-			<div class="error-message">{error}</div>
+			<div class="error-message" role="alert" aria-live="assertive">{error}</div>
 		{/if}
 
 		<label class="field">

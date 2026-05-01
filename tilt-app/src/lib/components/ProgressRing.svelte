@@ -11,7 +11,8 @@ let { value, size = 64, stroke = 6, label, sublabel }: Props = $props();
 
 const r = $derived((size - stroke) / 2);
 const c = $derived(2 * Math.PI * r);
-const offset = $derived(c - (value / 100) * c);
+const clamped = $derived(Math.max(0, Math.min(100, value)));
+const offset = $derived(c - (clamped / 100) * c);
 </script>
 
 <div style="position: relative; width: {size}px; height: {size}px;">

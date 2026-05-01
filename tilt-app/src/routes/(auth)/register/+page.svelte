@@ -25,12 +25,14 @@ async function handleSubmit(e: Event) {
 		return;
 	}
 
-	const result = await auth.signUp(email, password);
-	if (result.error) {
-		error = result.error.message;
-		loading = false;
-	} else {
-		success = true;
+	try {
+		const result = await auth.signUp(email, password);
+		if (result.error) {
+			error = result.error.message;
+		} else {
+			success = true;
+		}
+	} finally {
 		loading = false;
 	}
 }
@@ -53,7 +55,7 @@ async function handleSubmit(e: Event) {
 	{:else}
 		<form class="auth-form" onsubmit={handleSubmit}>
 			{#if error}
-				<div class="error-message">{error}</div>
+				<div class="error-message" role="alert" aria-live="assertive">{error}</div>
 			{/if}
 
 			<label class="field">
