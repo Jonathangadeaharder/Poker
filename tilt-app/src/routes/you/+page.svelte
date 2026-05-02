@@ -1,29 +1,34 @@
 <!-- src/routes/you/+page.svelte -->
 <script lang="ts">
-import { goto } from '$app/navigation';
+import { untrack } from 'svelte';
 import { browser } from '$app/environment';
-import Screen from '$lib/components/Screen.svelte';
-import TopBar from '$lib/components/TopBar.svelte';
-import ProgressRing from '$lib/components/ProgressRing.svelte';
-import StreakBadge from '$lib/components/StreakBadge.svelte';
-import Button from '$lib/components/Button.svelte';
-import ThemePicker from '$lib/components/ThemePicker.svelte';
-import StatCard from '$lib/components/StatCard.svelte';
+import { goto } from '$app/navigation';
 import AchievementBadge from '$lib/components/AchievementBadge.svelte';
+import Button from '$lib/components/Button.svelte';
 import CardStylePicker from '$lib/components/CardStylePicker.svelte';
+import ProgressRing from '$lib/components/ProgressRing.svelte';
+import Screen from '$lib/components/Screen.svelte';
+import StatCard from '$lib/components/StatCard.svelte';
+import StreakBadge from '$lib/components/StreakBadge.svelte';
+import ThemePicker from '$lib/components/ThemePicker.svelte';
+import TopBar from '$lib/components/TopBar.svelte';
+import {
+	ACHIEVEMENTS,
+	AchievementManager,
+	calculateLevel,
+	type UserStats
+} from '$lib/core/gamification';
 import { auth } from '$lib/stores/auth.svelte';
 import { profileStore } from '$lib/stores/profile.svelte';
 import {
 	cardStyle,
-	soundEnabled,
 	hapticsEnabled,
 	setCardStyle,
-	toggleSound,
-	toggleHaptics
+	soundEnabled,
+	toggleHaptics,
+	toggleSound
 } from '$lib/stores/settings.svelte';
-import { calculateLevel, ACHIEVEMENTS, AchievementManager, type UserStats } from '$lib/core/gamification';
 import { createClient } from '$lib/supabase';
-import { untrack } from 'svelte';
 
 const supabase = createClient();
 
