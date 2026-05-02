@@ -29,7 +29,7 @@ export function useAsyncData(asyncFunction, dependencies = []) {
     } finally {
       setLoading(false);
     }
-  }, dependencies);
+  }, [asyncFunction, ...dependencies]);
 
   useEffect(() => {
     let mounted = true;
@@ -60,7 +60,7 @@ export function useAsyncData(asyncFunction, dependencies = []) {
     return () => {
       mounted = false;
     };
-  }, dependencies);
+  }, [asyncFunction, ...dependencies]);
 
   return {
     data,

@@ -33,7 +33,7 @@ export function AuthProvider({ children }) {
 
       if (authToken && userId) {
         // Initialize API client with stored tokens
-        await apiClient.initializeFromStorage();
+        apiClient.setAuth(authToken, null, userId);
 
         // Verify token is still valid
         const result = await apiClient.request('/auth/verify', {

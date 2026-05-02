@@ -1,0 +1,17 @@
+{
+	"/(auth)": [],
+	"/": [],
+	"/home": [],
+	"/learn/exploits": [],
+	"/learn/plan": [],
+	"/learn/pushfold": [],
+	"/learn/ranges": [],
+	"/lesson": [],
+	"/(auth)/login": [],
+	"/onboarding": [],
+	"/practice/quiz": [],
+	"/practice/srs": [],
+	"/profile": [],
+	"/(auth)/register": [],
+	"/results/[sessionId]": []
+}

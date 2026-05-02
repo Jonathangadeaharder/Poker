@@ -13,12 +13,14 @@ import syncService from '../services/syncService';
  */
 export function useSyncService(autoSync = true, intervalMinutes = 15) {
   useEffect(() => {
+    let cancelled = false;
+
     // Initialize sync service
     const initializeSync = async () => {
       try {
         await syncService.initialize();
 
-        if (autoSync) {
+        if (!cancelled && autoSync) {
           await syncService.enableAutoSync(intervalMinutes);
         }
       } catch (error) {
@@ -30,6 +32,7 @@ export function useSyncService(autoSync = true, intervalMinutes = 15) {
 
     // Cleanup on unmount
     return () => {
+      cancelled = true;
       syncService.stopAutoSync();
     };
   }, [autoSync, intervalMinutes]);

@@ -6,14 +6,17 @@ import { calculateLevel, LEVELS } from '../core/gamification';
 export default function XPBar({ totalXP, showDetails = true, compact = false }) {
   const animatedProgress = useRef(new Animated.Value(0)).current;
   const levelData = calculateLevel(totalXP);
+  const progress = Number.isFinite(levelData.progress)
+    ? Math.min(Math.max(levelData.progress, 0), 1)
+    : 1;
 
   useEffect(() => {
     Animated.timing(animatedProgress, {
-      toValue: levelData.progress,
+      toValue: progress,
       duration: 800,
       useNativeDriver: false,
     }).start();
-  }, [levelData.progress]);
+  }, [progress]);
 
   if (compact) {
     return (
@@ -23,7 +26,7 @@ export default function XPBar({ totalXP, showDetails = true, compact = false }) 
         </Text>
         <View style={styles.compactBarContainer}>
           <ProgressBar
-            progress={levelData.progress}
+            progress={progress}
             color="#ffd700"
             style={styles.compactBar}
           />
@@ -56,11 +59,11 @@ export default function XPBar({ totalXP, showDetails = true, compact = false }) 
 
       <View style={styles.barContainer}>
         <ProgressBar
-          progress={levelData.progress}
+          progress={progress}
           color="#ffd700"
           style={styles.progressBar}
         />
-        <View style={[styles.progressFill, { width: `${levelData.progress * 100}%` }]} />
+        <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
       </View>
 
       {showDetails && (

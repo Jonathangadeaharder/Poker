@@ -350,9 +350,8 @@ export class StudySession {
 
   getSessionSummary() {
     const duration = (new Date() - this.sessionStats.startTime) / 1000 / 60; // minutes
-    const accuracy = this.sessionStats.reviews > 0
-      ? this.sessionStats.correct / (this.sessionStats.newCards + this.sessionStats.reviews)
-      : 0;
+    const attempts = this.sessionStats.newCards + this.sessionStats.reviews;
+    const accuracy = attempts > 0 ? this.sessionStats.correct / attempts : 0;
 
     return {
       ...this.sessionStats,
