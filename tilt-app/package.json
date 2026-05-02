@@ -27,12 +27,14 @@
 		"@sveltejs/vite-plugin-svelte": "^7.0.0",
 		"@tailwindcss/vite": "^4.2.4",
 		"@types/node": "^25.6.0",
+		"@vite-pwa/sveltekit": "^1.1.0",
 		"@vitest/coverage-v8": "^4.1.5",
 		"svelte": "^5.55.2",
 		"svelte-check": "^4.4.6",
 		"tailwindcss": "^4.2.4",
 		"typescript": "^6.0.2",
 		"vite": "^8.0.7",
+		"vite-plugin-pwa": "^1.2.0",
 		"vitest": "^4.1.5"
 	},
 	"dependencies": {
