@@ -104,6 +104,33 @@ async function handleLogout() {
 				<div class="stat-label">Total XP</div>
 			</div>
 		</div>
+
+		<!-- Achievements -->
+		<div class="section">
+			<div class="section-header">
+				<div class="eyebrow">Achievements</div>
+				<div class="mono" style="font-size: 10px; color: var(--cream-dim);">{unlockedCount} / {achievements.length}</div>
+			</div>
+			<div class="achievement-scroll">
+				{#each achievements as achievement (achievement.id)}
+					{@const mgr = new AchievementManager()}
+					{@const progress = mgr.getProgress(achievement.id, { sessionsCompleted: sessionCount, currentStreak: streak })}
+					{@const unlocked = progress?.unlocked ?? false}
+					<div class="achievement-card" style="opacity: {unlocked ? 1 : 0.5};">
+						<div style="font-size: 28px;">{achievement.icon}</div>
+						<div style="font-size: 13px; font-weight: 600; margin-top: 6px;">{achievement.title}</div>
+						<div style="font-size: 11px; color: var(--cream-dim); margin-top: 2px;">{achievement.description}</div>
+						{#if unlocked}
+							<div class="mono" style="font-size: 11px; color: var(--gold); margin-top: 6px;">+{achievement.xpReward} XP</div>
+						{:else}
+							<div class="achievement-bar-track">
+								<div class="achievement-bar-fill" style="width: {progress?.percentage ?? 0}%;"></div>
+							</div>
+						{/if}
+					</div>
+				{/each}
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -173,5 +200,46 @@ async function handleLogout() {
 		letter-spacing: 0.08em;
 		margin-top: 2px;
 		font-family: var(--mono);
+	}
+
+	.section {
+		margin-top: 28px;
+	}
+
+	.section-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		margin-bottom: 12px;
+	}
+
+	.achievement-scroll {
+		display: flex;
+		gap: 10px;
+		overflow-x: auto;
+		padding-bottom: 4px;
+		scrollbar-width: none;
+	}
+
+	.achievement-card {
+		min-width: 140px;
+		padding: 16px;
+		border-radius: 18px;
+		background: rgba(245,233,212,0.04);
+		border: 1px solid var(--hairline);
+	}
+
+	.achievement-bar-track {
+		height: 4px;
+		border-radius: 2px;
+		background: rgba(245,233,212,0.12);
+		overflow: hidden;
+		margin-top: 8px;
+	}
+
+	.achievement-bar-fill {
+		height: 100%;
+		border-radius: 2px;
+		background: var(--cream-dim);
 	}
 </style>
