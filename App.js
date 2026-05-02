@@ -11,6 +11,9 @@ import { errorTracking } from './src/services/errorTracking';
 // Highlight.io telemetry
 import { hookConsole } from './src/config/highlight';
 
+// Hook console immediately at module level to capture early boot errors
+hookConsole();
+
 // Context
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 
@@ -213,10 +216,9 @@ function AppNavigator() {
 }
 
 export default function App() {
-  // Initialize error tracking and telemetry on app start
+  // Initialize error tracking on app start
   useEffect(() => {
     errorTracking.initialize();
-    hookConsole();
   }, []);
 
   // Navigation state change handler
