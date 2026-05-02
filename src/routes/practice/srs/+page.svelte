@@ -5,6 +5,8 @@ import { createPokerDecks, StudySession, DIFFICULTY_RATINGS } from '$lib/core/sp
 import type { Deck, DeckStats, SessionSummary, QualityRating } from '$lib/core/spacedRepetition';
 import soundManager, { SOUND_EVENTS } from '$lib/core/soundManager';
 import { XP_REWARDS } from '$lib/core/gamification';
+import { auth } from '$lib/stores/auth.svelte';
+import { profileStore } from '$lib/stores/profile.svelte';
 
 const DECK_META: Record<string, { icon: string; color: string }> = {
 	'Preflop Ranges (6-Max)': { icon: '🃏', color: 'var(--gold)' },
@@ -68,6 +70,9 @@ async function handleRating(quality: QualityRating) {
 					? XP_REWARDS.CARD_REVIEW_GOOD
 					: XP_REWARDS.CARD_REVIEW_HARD;
 		totalXP += ratingXP;
+		if (auth.user?.id) {
+			await profileStore.addXP(auth.user.id, ratingXP);
+		}
 	} else {
 		await soundManager.playSound(SOUND_EVENTS.WRONG_ANSWER);
 	}
@@ -78,7 +83,9 @@ async function handleRating(quality: QualityRating) {
 		await soundManager.playSound(SOUND_EVENTS.SESSION_COMPLETE);
 	} else {
 		showAnswer = false;
-		lastResult = null;
+		setTimeout(() => {
+			lastResult = null;
+		}, 800);
 	}
 }
 

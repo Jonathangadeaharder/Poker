@@ -12,7 +12,7 @@ let phase = $state<Phase>('setup');
 let confidence = $state(60);
 let choice = $state<Choice>(null);
 let tellMeter = $state(0);
-let handNumber = $state(3);
+let handNumber = $state(1);
 let totalHands = 5;
 let xpEarned = $state(0);
 
@@ -29,8 +29,9 @@ const phaseText = $derived.by(() => {
 
 const xpResult = $derived.by(() => {
 	if (phase !== 'reveal' || !choice) return 0;
-	if (correct) return Math.round(20 * confidence / 60);
-	return -Math.round(5 * confidence / 60);
+	const base = confidence > 0 ? confidence : 1;
+	if (correct) return Math.round(20 * base / 60);
+	return -Math.round(5 * base / 60);
 });
 
 $effect(() => {
@@ -76,7 +77,7 @@ function nextHand() {
 			Hand {handNumber} of {totalHands}
 		{/snippet}
 		{#snippet right()}
-			<Pill><span style="color: var(--gold);">●</span> +{xpEarned} XP</Pill>
+			<Pill><span style="color: var(--gold);">●</span> {xpEarned >= 0 ? `+${xpEarned}` : xpEarned} XP</Pill>
 		{/snippet}
 	</TopBar>
 
