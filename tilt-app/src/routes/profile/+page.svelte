@@ -81,6 +81,29 @@ function toPoints(data: { day: string; value: number }[], max: number, w: number
 		return `${x},${y}`;
 	}).join(' ');
 }
+
+let deferredPrompt = $state<any>(null);
+let canInstall = $state(false);
+
+$effect(() => {
+	function handler(e: Event) {
+		e.preventDefault();
+		deferredPrompt = e;
+		canInstall = true;
+	}
+	window.addEventListener('beforeinstallprompt', handler);
+	return () => window.removeEventListener('beforeinstallprompt', handler);
+});
+
+async function handleInstall() {
+	if (!deferredPrompt) return;
+	deferredPrompt.prompt();
+	const { outcome } = await deferredPrompt.userChoice;
+	if (outcome === 'accepted') {
+		canInstall = false;
+	}
+	deferredPrompt = null;
+}
 </script>
 
 <div class="screen felt-bg">
@@ -206,6 +229,54 @@ function toPoints(data: { day: string; value: number }[], max: number, w: number
 				</div>
 			</div>
 		</div>
+
+		<!-- Settings -->
+		<div class="section">
+			<div class="eyebrow" style="margin-bottom: 12px;">Settings</div>
+			<div class="settings-card">
+				<div class="setting-row">
+					<div>
+						<div style="font-size: 15px; font-weight: 600;">Sound Effects</div>
+						<div style="font-size: 12px; color: var(--cream-dim);">Play sounds on actions</div>
+					</div>
+					<button
+						type="button"
+						class="toggle"
+						class:toggle-on={soundEnabled}
+						onclick={toggleSound}
+					>
+						<div class="toggle-knob"></div>
+					</button>
+				</div>
+
+				<div class="setting-row">
+					<div>
+						<div style="font-size: 15px; font-weight: 600;">Theme</div>
+						<div style="font-size: 12px; color: var(--cream-dim);">Choose your table style</div>
+					</div>
+				</div>
+				<div style="padding: 0 0 12px;">
+					<ThemePicker />
+				</div>
+
+				{#if canInstall}
+					<button type="button" class="setting-row tap" onclick={handleInstall}>
+						<div>
+							<div style="font-size: 15px; font-weight: 600;">Install App</div>
+							<div style="font-size: 12px; color: var(--cream-dim);">Add to home screen</div>
+						</div>
+						<div style="font-size: 18px;">📲</div>
+					</button>
+				{/if}
+
+				<button type="button" class="setting-row tap" onclick={handleLogout} style="color: var(--coral);">
+					<div>
+						<div style="font-size: 15px; font-weight: 600;">Log Out</div>
+						<div style="font-size: 12px; color: var(--cream-dim);">Sign out of your account</div>
+					</div>
+				</button>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -323,5 +394,67 @@ function toPoints(data: { day: string; value: number }[], max: number, w: number
 		border-radius: 22px;
 		background: rgba(245,233,212,0.04);
 		border: 1px solid var(--hairline);
+	}
+
+	.settings-card {
+		border-radius: 22px;
+		background: rgba(245,233,212,0.04);
+		border: 1px solid var(--hairline);
+		overflow: hidden;
+	}
+
+	.setting-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 16px 18px;
+		border-bottom: 1px solid var(--hairline);
+		background: none;
+		border-left: none;
+		border-right: none;
+		border-top: none;
+		width: 100%;
+		text-align: left;
+		color: var(--cream);
+		font-family: inherit;
+		cursor: default;
+	}
+
+	.setting-row.tap {
+		cursor: pointer;
+	}
+
+	.setting-row.tap:active {
+		opacity: 0.8;
+	}
+
+	.toggle {
+		width: 48px;
+		height: 28px;
+		border-radius: 14px;
+		background: rgba(245,233,212,0.15);
+		border: none;
+		cursor: pointer;
+		position: relative;
+		transition: background 200ms ease;
+	}
+
+	.toggle-on {
+		background: var(--coral);
+	}
+
+	.toggle-knob {
+		width: 22px;
+		height: 22px;
+		border-radius: 50%;
+		background: var(--cream);
+		position: absolute;
+		top: 3px;
+		left: 3px;
+		transition: transform 200ms ease;
+	}
+
+	.toggle-on .toggle-knob {
+		transform: translateX(20px);
 	}
 </style>
