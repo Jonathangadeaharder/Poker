@@ -234,7 +234,7 @@ class SoundManager {
 		if (!this.hapticsEnabled) return;
 
 		// Use Vibration API (web equivalent of expo-haptics)
-		if (!navigator.vibrate) return;
+		if (typeof navigator === "undefined" || !navigator.vibrate) return;
 
 		try {
 			switch (type) {

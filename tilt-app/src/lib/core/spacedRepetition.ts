@@ -381,8 +381,12 @@ export class StudySession {
 		const dueCards = this.deck.getDueCards();
 		const newCards = this.deck.getNewCards().slice(0, this.newCardsPerSession);
 
-		// Shuffle
-		this.cardsToday = [...dueCards, ...newCards].sort(() => Math.random() - 0.5);
+		// Shuffle (Fisher-Yates)
+		this.cardsToday = [...dueCards, ...newCards];
+		for (let i = this.cardsToday.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[this.cardsToday[i], this.cardsToday[j]] = [this.cardsToday[j], this.cardsToday[i]];
+		}
 		this.currentIndex = 0;
 
 		return {

@@ -60,25 +60,26 @@ export interface LevelResult {
 
 export function calculateLevel(totalXP: number): LevelResult {
 	let currentLevel = 1;
-	let xpForNextLevel = LEVELS[2].xpRequired;
 
 	for (let level = 1; level <= 10; level++) {
 		if (totalXP >= LEVELS[level].xpRequired) {
 			currentLevel = level;
-			xpForNextLevel = LEVELS[level + 1]?.xpRequired || LEVELS[10].xpRequired;
 		} else {
 			break;
 		}
 	}
 
+	const nextLevelData = LEVELS[currentLevel + 1];
+	const xpForNextLevel = nextLevelData ? nextLevelData.xpRequired : LEVELS[currentLevel].xpRequired;
+	const xpInCurrentLevel = totalXP - LEVELS[currentLevel].xpRequired;
+	const xpRange = xpForNextLevel - LEVELS[currentLevel].xpRequired;
+
 	return {
 		level: currentLevel,
-		xpForNextLevel,
-		xpInCurrentLevel: totalXP - LEVELS[currentLevel].xpRequired,
-		xpNeededForNext: xpForNextLevel - totalXP,
-		progress:
-			(totalXP - LEVELS[currentLevel].xpRequired) /
-			(xpForNextLevel - LEVELS[currentLevel].xpRequired),
+		xpForNextLevel: nextLevelData ? xpForNextLevel : totalXP,
+		xpInCurrentLevel,
+		xpNeededForNext: Math.max(0, xpForNextLevel - totalXP),
+		progress: !nextLevelData || xpRange === 0 ? 1 : xpInCurrentLevel / xpRange,
 		levelData: LEVELS[currentLevel]
 	};
 }

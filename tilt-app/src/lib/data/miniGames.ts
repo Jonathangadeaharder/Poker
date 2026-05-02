@@ -91,7 +91,7 @@ export class QuizGenerator {
 		);
 
 		return {
-			id: `range_${position}_${Date.now()}`,
+			id: `range_${position}_${Math.random().toString(36).slice(2, 9)}`,
 			category: 'ranges',
 			difficulty,
 			question: selectedType.question,
@@ -116,7 +116,7 @@ export class QuizGenerator {
 			: Math.random() > 0.5;
 
 		return {
-			id: `pushfold_${stackSize}_${selectedPos}_${Date.now()}`,
+			id: `pushfold_${stackSize}_${selectedPos}_${Math.random().toString(36).slice(2, 9)}`,
 			category: 'push_fold',
 			difficulty,
 			question: `${selectedHand} from ${selectedPos} with ${chart.stackSize}?\nOpen-shove or fold?`,
@@ -138,7 +138,7 @@ export class QuizGenerator {
 		const leak = COMMON_LEAKS[selectedKey];
 
 		return {
-			id: `exploit_${selectedKey}_${Date.now()}`,
+			id: `exploit_${selectedKey}_${Math.random().toString(36).slice(2, 9)}`,
 			category: 'exploits',
 			difficulty,
 			question: `Opponent shows this leak:\n"${leak.leak}"\n\nWhich adjustment is optimal?`,
@@ -245,7 +245,7 @@ export class SpeedDrillGenerator {
 		const shouldRaise = range.hands.includes(testHand);
 
 		return {
-			id: `speed_${position}_${testHand}_${Date.now()}`,
+			id: `speed_${position}_${testHand}_${Math.random().toString(36).slice(2, 9)}`,
 			hand: testHand,
 			position,
 			question: `${testHand} from ${position}?\nRaise or fold?`,
