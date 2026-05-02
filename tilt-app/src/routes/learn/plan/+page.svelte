@@ -21,6 +21,18 @@ const completedCount = $derived(
 
 const progress = $derived(totalModules > 0 ? completedCount / totalModules : 0);
 
+const totalHours = $derived(
+	schedule.reduce((sum, day) => sum + day.totalHours, 0)
+);
+
+const completedHours = $derived(
+	schedule.reduce((sum, day, di) =>
+		sum + day.modules.reduce((dSum, _, mi) =>
+			dSum + (completedModules[`${di}-${mi}`] ? day.totalHours / day.modules.length : 0)
+		, 0)
+	, 0)
+);
+
 function storageKey() {
 	return `tilt_progress_${selectedPath}`;
 }
@@ -119,15 +131,15 @@ $effect(() => {
 			</div>
 			<div class="stats-row">
 				<div class="stat">
-					<div class="stat-value">40h</div>
+					<div class="stat-value">{Math.round(totalHours)}h</div>
 					<div class="stat-label">Total</div>
 				</div>
 				<div class="stat">
-					<div class="stat-value">{Math.round(progress * 40)}h</div>
+					<div class="stat-value">{Math.round(completedHours)}h</div>
 					<div class="stat-label">Done</div>
 				</div>
 				<div class="stat">
-					<div class="stat-value">{40 - Math.round(progress * 40)}h</div>
+					<div class="stat-value">{Math.max(0, Math.round(totalHours - completedHours))}h</div>
 					<div class="stat-label">Left</div>
 				</div>
 			</div>

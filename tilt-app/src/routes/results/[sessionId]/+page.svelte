@@ -87,8 +87,5 @@ const stats = [
 		<button class="btn btn-primary" style="width: 100%;" onclick={() => goto('/home')}>
 			Done · See you tomorrow
 		</button>
-		<button class="btn btn-ghost" style="width: 100%; margin-top: 8px; padding: 12px;">
-			Share session
-		</button>
 	</div>
 </div>

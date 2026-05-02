@@ -27,7 +27,8 @@ $effect(() => {
 	if (!auth.loading && auth.isAuthenticated && auth.user) {
 		const userId = auth.user.id;
 		profileStore.fetchProfile(userId);
-		const today = new Date().toISOString().split('T')[0];
+		const d = new Date();
+		const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 		profileStore.fetchDailyProgress(userId, today);
 		profileStore.fetchTrainingProgress(userId);
 	}
@@ -37,7 +38,7 @@ const profile = $derived(profileStore.profile);
 const dailyProgress = $derived(profileStore.dailyProgress);
 const levelResult = $derived(profile ? calculateLevel(profile.xp) : null);
 const xpToday = $derived(dailyProgress?.xp_earned ?? 0);
-const xpPercent = $derived(Math.round((xpToday / DAILY_GOAL) * 100));
+const xpPercent = $derived(Math.min(100, Math.max(0, Math.round((xpToday / DAILY_GOAL) * 100))));
 const streak = $derived(profile?.streak_count ?? 0);
 const username = $derived(profile?.username ?? 'Player');
 const initial = $derived(username.charAt(0).toUpperCase());
