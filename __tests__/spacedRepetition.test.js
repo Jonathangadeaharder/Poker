@@ -65,9 +65,9 @@ describe('Spaced Repetition System', () => {
       card.review(DIFFICULTY_RATINGS.EASY);
       expect(card.ef).toBeGreaterThan(initialEF);
 
+      const beforeHard = card.ef;
       card.review(DIFFICULTY_RATINGS.HARD);
-      const afterHard = card.ef;
-      expect(afterHard).toBeLessThan(card.ef);
+      expect(card.ef).toBeLessThan(beforeHard);
     });
 
     it('should maintain minimum EF of 1.3', () => {
