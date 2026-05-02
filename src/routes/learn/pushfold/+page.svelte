@@ -1,5 +1,10 @@
 <script lang="ts">
-import { PUSH_FOLD_CHARTS } from '$lib/data/pushFoldCharts';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import { goto } from '$app/navigation';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import TopBar from '$lib/components/TopBar.svelte';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import { ICM_GUIDELINES, PUSH_FOLD_CHARTS } from '$lib/data/pushFoldCharts';
 
 let selectedStack = $state<'TWENTY_BB' | 'FIFTEEN_BB' | 'TEN_BB'>('TWENTY_BB');
 let selectedAction = $state<'openShove' | 'reShove'>('openShove');

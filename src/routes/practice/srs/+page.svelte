@@ -1,4 +1,8 @@
 <script lang="ts">
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import { goto } from '$app/navigation';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import TopBar from '$lib/components/TopBar.svelte';
 import { XP_REWARDS } from '$lib/core/gamification';
 import soundManager, { SOUND_EVENTS } from '$lib/core/soundManager';
 import type { Deck, QualityRating, SessionSummary } from '$lib/core/spacedRepetition';

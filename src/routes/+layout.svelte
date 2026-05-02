@@ -2,6 +2,8 @@
 import '../app.css';
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import BottomNav from '$lib/components/BottomNav.svelte';
 import { auth } from '$lib/stores/auth.svelte';
 
 let { children } = $props();

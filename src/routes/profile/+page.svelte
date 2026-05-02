@@ -1,5 +1,9 @@
 <script lang="ts">
 import { goto } from '$app/navigation';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import ThemePicker from '$lib/components/ThemePicker.svelte';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import TopBar from '$lib/components/TopBar.svelte';
 import { ACHIEVEMENTS, AchievementManager, calculateLevel } from '$lib/core/gamification';
 import soundManager from '$lib/core/soundManager';
 import { auth } from '$lib/stores/auth.svelte';

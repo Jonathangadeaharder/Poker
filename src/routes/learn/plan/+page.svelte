@@ -1,4 +1,8 @@
 <script lang="ts">
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import { goto } from '$app/navigation';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import TopBar from '$lib/components/TopBar.svelte';
 import type { DaySchedule } from '$lib/data/trainingPlan';
 import { TRAINING_PATHS, TRAINING_SCHEDULE } from '$lib/data/trainingPlan';
 

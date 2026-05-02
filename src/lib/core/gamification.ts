@@ -300,6 +300,8 @@ export interface UserStats {
 
 export class AchievementManager {
 	private unlockedAchievements: Set<string>;
+	// biome-ignore lint/correctness/noUnusedPrivateClassMembers: reserved for future use
+	private progress: Record<string, unknown>;
 
 	constructor() {
 		this.unlockedAchievements = new Set();

@@ -1,5 +1,13 @@
 <script lang="ts">
 import { goto } from '$app/navigation';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import Chip from '$lib/components/Chip.svelte';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import Pill from '$lib/components/Pill.svelte';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import PlayingCard from '$lib/components/PlayingCard.svelte';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import TopBar from '$lib/components/TopBar.svelte';
 
 type Phase = 'setup' | 'read' | 'decide' | 'reveal';
 type Choice = 'fold' | 'call' | 'raise' | null;

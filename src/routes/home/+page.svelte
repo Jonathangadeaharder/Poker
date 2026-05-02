@@ -1,5 +1,13 @@
 <script lang="ts">
 import { goto } from '$app/navigation';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import PlayingCard from '$lib/components/PlayingCard.svelte';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import ProgressRing from '$lib/components/ProgressRing.svelte';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import StreakBadge from '$lib/components/StreakBadge.svelte';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import TopBar from '$lib/components/TopBar.svelte';
 import { calculateLevel } from '$lib/core/gamification';
 import { auth } from '$lib/stores/auth.svelte';
 import { profileStore } from '$lib/stores/profile.svelte';

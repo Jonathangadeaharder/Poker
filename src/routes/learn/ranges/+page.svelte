@@ -1,6 +1,11 @@
 <script lang="ts">
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import { goto } from '$app/navigation';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import TopBar from '$lib/components/TopBar.svelte';
 import type { Position } from '$lib/data/pokerRanges';
-import { RFI_RANGES } from '$lib/data/pokerRanges';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import { COLD_CALL_RANGES, RFI_RANGES, THREE_BET_RANGES } from '$lib/data/pokerRanges';
 
 let selectedCategory = $state<'RFI' | '3BET' | 'CALL'>('RFI');
 let selectedPosition = $state<Position>('UTG');

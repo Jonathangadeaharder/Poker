@@ -1,5 +1,9 @@
 <script lang="ts">
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import { goto } from '$app/navigation';
 import { page } from '$app/state';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import Confetti from '$lib/components/Confetti.svelte';
 
 let showConfetti = $state(false);
 
