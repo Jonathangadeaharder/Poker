@@ -1,18 +1,22 @@
 import type { Session, User } from '@supabase/supabase-js';
+import { browser } from '$app/environment';
 import { createClient } from '$lib/supabase';
 
+// TODO: Refactor to per-request context for proper SSR isolation.
+// Current singleton is safe because init() only runs client-side via $effect,
+// but the module-level createClient() call runs during SSR imports.
 function createAuthStore() {
 	let session = $state<Session | null>(null);
 	let user = $state<User | null>(null);
 	let loading = $state(true);
 	let initialized = false;
 
-	const supabase = createClient();
+	const supabase = browser ? createClient() : null;
 
 	const isAuthenticated = $derived(!!session);
 
 	function init() {
-		if (initialized) return;
+		if (initialized || !supabase) return;
 		initialized = true;
 
 		supabase.auth
@@ -32,21 +36,25 @@ function createAuthStore() {
 	}
 
 	async function signIn(email: string) {
+		if (!supabase) return { error: new Error('Not initialized') };
 		const { error } = await supabase.auth.signInWithOtp({ email });
 		return { error };
 	}
 
 	async function signUp(email: string, password: string) {
+		if (!supabase) return { error: new Error('Not initialized') };
 		const { error } = await supabase.auth.signUp({ email, password });
 		return { error };
 	}
 
 	async function signInWithPassword(email: string, password: string) {
+		if (!supabase) return { error: new Error('Not initialized') };
 		const { error } = await supabase.auth.signInWithPassword({ email, password });
 		return { error };
 	}
 
 	async function signOut() {
+		if (!supabase) return { error: new Error('Not initialized') };
 		const { error } = await supabase.auth.signOut();
 		return { error };
 	}

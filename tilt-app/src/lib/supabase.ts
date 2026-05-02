@@ -12,7 +12,7 @@ export function createClient() {
 
 export function createServerSupabase(
 	_fetch: typeof globalThis.fetch,
-	cookies: { get: (name: string) => string | undefined }
+	cookies: import('@sveltejs/kit').Cookies
 ) {
 	const url = env.PUBLIC_SUPABASE_URL;
 	const key = env.PUBLIC_SUPABASE_ANON_KEY;
@@ -24,8 +24,12 @@ export function createServerSupabase(
 			get(name) {
 				return cookies.get(name) ?? '';
 			},
-			set() {},
-			remove() {}
+			set(name, value, options) {
+				cookies.set(name, value, { ...options, path: '/' });
+			},
+			remove(name, options) {
+				cookies.delete(name, { ...options, path: '/' });
+			}
 		}
 	});
 }

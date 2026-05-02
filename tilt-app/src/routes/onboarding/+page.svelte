@@ -86,7 +86,12 @@ function advance(key: string | undefined, value: string | number | null) {
 }
 
 async function complete() {
-	// Save onboarding choices to Supabase (placeholder for now)
+	try {
+		localStorage.setItem('tilt_onboarding', JSON.stringify(picks));
+	} catch {
+		// localStorage unavailable — continue anyway
+	}
+	// TODO: Save onboarding choices to Supabase
 	goto('/');
 }
 </script>
