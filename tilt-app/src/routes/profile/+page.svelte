@@ -49,6 +49,38 @@ async function handleLogout() {
 	await auth.logout();
 	goto('/login');
 }
+
+// TODO: replace with real session data from training_sessions table
+const xpTrend = [
+	{ day: 'Mon', xp: 45 },
+	{ day: 'Tue', xp: 80 },
+	{ day: 'Wed', xp: 60 },
+	{ day: 'Thu', xp: 120 },
+	{ day: 'Fri', xp: 90 },
+	{ day: 'Sat', xp: 150 },
+	{ day: 'Sun', xp: 70 }
+];
+
+const accuracyTrend = [
+	{ day: 'Mon', pct: 65 },
+	{ day: 'Tue', pct: 72 },
+	{ day: 'Wed', pct: 68 },
+	{ day: 'Thu', pct: 85 },
+	{ day: 'Fri', pct: 78 },
+	{ day: 'Sat', pct: 90 },
+	{ day: 'Sun', pct: 82 }
+];
+
+const xpMax = Math.max(...xpTrend.map(d => d.xp));
+const accMax = 100;
+
+function toPoints(data: { day: string; value: number }[], max: number, w: number, h: number): string {
+	return data.map((d, i) => {
+		const x = (i / (data.length - 1)) * w;
+		const y = h - (d.value / max) * h;
+		return `${x},${y}`;
+	}).join(' ');
+}
 </script>
 
 <div class="screen felt-bg">
@@ -129,6 +161,49 @@ async function handleLogout() {
 						{/if}
 					</div>
 				{/each}
+			</div>
+		</div>
+
+		<!-- Analytics -->
+		<div class="section">
+			<div class="eyebrow" style="margin-bottom: 12px;">Your Progress</div>
+			<div class="analytics-card">
+				<div style="margin-bottom: 16px;">
+					<div class="mono" style="font-size: 10px; color: var(--cream-dim); text-transform: uppercase; margin-bottom: 8px;">XP This Week</div>
+					<svg viewBox="0 0 280 60" style="width: 100%; height: 60px;">
+						<polyline
+							points={toPoints(xpTrend.map(d => ({ ...d, value: d.xp })), xpMax, 280, 60)}
+							fill="none"
+							stroke="var(--coral)"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+					</svg>
+					<div style="display: flex; justify-content: space-between; margin-top: 4px;">
+						{#each xpTrend as d}
+							<div class="mono" style="font-size: 9px; color: var(--cream-dim);">{d.day}</div>
+						{/each}
+					</div>
+				</div>
+				<div>
+					<div class="mono" style="font-size: 10px; color: var(--cream-dim); text-transform: uppercase; margin-bottom: 8px;">Accuracy</div>
+					<svg viewBox="0 0 280 60" style="width: 100%; height: 60px;">
+						<polyline
+							points={toPoints(accuracyTrend.map(d => ({ ...d, value: d.pct })), accMax, 280, 60)}
+							fill="none"
+							stroke="var(--gold)"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+					</svg>
+					<div style="display: flex; justify-content: space-between; margin-top: 4px;">
+						{#each accuracyTrend as d}
+							<div class="mono" style="font-size: 9px; color: var(--cream-dim);">{d.day}</div>
+						{/each}
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -241,5 +316,12 @@ async function handleLogout() {
 		height: 100%;
 		border-radius: 2px;
 		background: var(--cream-dim);
+	}
+
+	.analytics-card {
+		padding: 18px;
+		border-radius: 22px;
+		background: rgba(245,233,212,0.04);
+		border: 1px solid var(--hairline);
 	}
 </style>
