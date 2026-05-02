@@ -105,103 +105,103 @@ export const ACHIEVEMENTS: Record<string, Achievement> = {
 		description: 'Complete your first training session',
 		icon: '\u{1F3AF}',
 		xpReward: 50,
-		requirement: { type: 'sessions_completed', count: 1 }
+		requirement: { type: 'sessionsCompleted', count: 1 }
 	},
 	DEDICATED_LEARNER: {
 		id: 'dedicated_learner',
 		title: 'Dedicated Learner',
 		description: 'Complete 10 training sessions',
-		icon: '\u{1F4D6}',
+		icon: '📖',
 		xpReward: 100,
-		requirement: { type: 'sessions_completed', count: 10 }
+		requirement: { type: 'sessionsCompleted', count: 10 }
 	},
 	POKER_SCHOLAR: {
 		id: 'poker_scholar',
 		title: 'Poker Scholar',
 		description: 'Complete all 7 days of the training plan',
-		icon: '\u{1F393}',
+		icon: '🎓',
 		xpReward: 500,
-		requirement: { type: 'training_plan_completed', count: 1 }
+		requirement: { type: 'trainingPlanCompleted', count: 1 }
 	},
 	WEEK_WARRIOR: {
 		id: 'week_warrior',
 		title: '7-Day Streak',
 		description: 'Train 7 days in a row',
-		icon: '\u{1F525}',
+		icon: '🔥',
 		xpReward: 200,
-		requirement: { type: 'streak', count: 7 }
+		requirement: { type: 'currentStreak', count: 7 }
 	},
 	MONTH_MASTER: {
 		id: 'month_master',
 		title: '30-Day Streak',
 		description: 'Train 30 days in a row',
-		icon: '\u{1F4AA}',
+		icon: '💪',
 		xpReward: 1000,
-		requirement: { type: 'streak', count: 30 }
+		requirement: { type: 'currentStreak', count: 30 }
 	},
 	UNSTOPPABLE: {
 		id: 'unstoppable',
 		title: 'Unstoppable',
 		description: 'Train 100 days in a row',
-		icon: '\u26A1',
+		icon: '⚡',
 		xpReward: 5000,
-		requirement: { type: 'streak', count: 100 }
+		requirement: { type: 'currentStreak', count: 100 }
 	},
 	QUIZ_ROOKIE: {
 		id: 'quiz_rookie',
 		title: 'Quiz Rookie',
 		description: 'Complete your first quiz',
-		icon: '\u2753',
+		icon: '❓',
 		xpReward: 25,
-		requirement: { type: 'quizzes_completed', count: 1 }
+		requirement: { type: 'quizzesCompleted', count: 1 }
 	},
 	PERFECT_SCORE: {
 		id: 'perfect_score',
 		title: 'Perfect!',
 		description: 'Score 100% in a quiz',
-		icon: '\u{1F4AF}',
+		icon: '💯',
 		xpReward: 100,
-		requirement: { type: 'perfect_quizzes', count: 1 }
+		requirement: { type: 'perfectQuizzes', count: 1 }
 	},
 	QUIZ_MASTER: {
 		id: 'quiz_master',
 		title: 'Quiz Master',
 		description: 'Score 100% in 5 quizzes in a row',
-		icon: '\u{1F3C5}',
+		icon: '🏆',
 		xpReward: 300,
-		requirement: { type: 'perfect_quiz_streak', count: 5 }
+		requirement: { type: 'perfectQuizStreak', count: 5 }
 	},
 	RANGE_EXPLORER: {
 		id: 'range_explorer',
 		title: 'Range Explorer',
 		description: 'Study all 6 positions',
-		icon: '\u{1F5FA}\uFE0F',
+		icon: '🗺️',
 		xpReward: 150,
-		requirement: { type: 'positions_studied', count: 6 }
+		requirement: { type: 'positionsStudied', count: 6 }
 	},
 	PUSH_FOLD_PRO: {
 		id: 'push_fold_pro',
 		title: 'Push/Fold Pro',
 		description: 'Master all 3 stack sizes',
-		icon: '\u{1F4CA}',
+		icon: '📊',
 		xpReward: 200,
-		requirement: { type: 'stack_sizes_mastered', count: 3 }
+		requirement: { type: 'stackSizesMastered', count: 3 }
 	},
 	EXPLOIT_HUNTER: {
 		id: 'exploit_hunter',
 		title: 'Exploit Hunter',
 		description: 'Study all 5 common leaks',
-		icon: '\u{1F3AF}',
+		icon: '🎯',
 		xpReward: 150,
-		requirement: { type: 'leaks_studied', count: 5 }
+		requirement: { type: 'leaksStudied', count: 5 }
 	},
 	LIGHTNING_FAST: {
 		id: 'lightning_fast',
 		title: 'Lightning Fast',
 		description: 'Answer 10 questions in under 5 seconds each',
-		icon: '\u26A1',
+		icon: '⚡',
 		xpReward: 200,
-		requirement: { type: 'speed_drills_fast', count: 10 }
+		requirement: { type: 'speedDrillsFast', count: 10 }
 	}
 };
 
@@ -217,7 +217,13 @@ export class StreakManager {
 	): number {
 		if (!lastActiveDate) return 0;
 
-		const last = new Date(lastActiveDate);
+		let last: Date;
+		if (typeof lastActiveDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(lastActiveDate)) {
+			const [y, m, d] = lastActiveDate.split('-').map(Number);
+			last = new Date(y, m - 1, d);
+		} else {
+			last = new Date(lastActiveDate);
+		}
 		const current = new Date(currentDate);
 
 		last.setHours(0, 0, 0, 0);
@@ -267,10 +273,11 @@ export function getDailyGoalProgress(
 	xpToday: number,
 	goal: number = DAILY_GOALS.RECOMMENDED_XP
 ): DailyGoalProgress {
+	const safeGoal = goal > 0 ? goal : 1;
 	return {
 		xpToday,
 		goal,
-		progress: xpToday / goal,
+		progress: xpToday / safeGoal,
 		achieved: xpToday >= goal,
 		remaining: Math.max(0, goal - xpToday)
 	};
@@ -327,7 +334,7 @@ export class AchievementManager {
 		achievementId: string,
 		stats: UserStats
 	): { current: number; required: number; percentage: number; unlocked: boolean } | null {
-		const achievement = ACHIEVEMENTS[achievementId];
+		const achievement = ACHIEVEMENTS[achievementId] ?? Object.values(ACHIEVEMENTS).find((a) => a.id === achievementId);
 		if (!achievement) return null;
 
 		const { type, count } = achievement.requirement;

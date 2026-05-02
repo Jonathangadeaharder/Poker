@@ -320,20 +320,8 @@ export class AdaptiveEngine {
 			weights[DIFFICULTY_LEVELS.EXPERT] = 0.2;
 		}
 
-		// Boost weak topics
-		if (weakTopics.length > 0) {
-			for (const topic of weakTopics) {
-				if (weights[topic.topic as DifficultyLevel]) {
-					weights[topic.topic as DifficultyLevel] *= 1.5; // 50% boost for weak areas
-				}
-			}
-
-			// Normalize weights to sum to 1
-			const total = Object.values(weights).reduce((a, b) => a + b, 0);
-			for (const key of Object.keys(weights) as DifficultyLevel[]) {
-				weights[key] /= total;
-			}
-		}
+		// Note: weakTopics are categories (e.g. 'theory', 'ranges'), not difficulty levels.
+		// Category-based boosting is handled separately in getRecommendedCards.
 
 		return weights;
 	}
@@ -490,14 +478,10 @@ export class AdaptiveSRSIntegration {
 				newCards.push(...deck.getNewCards());
 			}
 
-			const recommendedDifficulty = this.adaptiveEngine.currentDifficulty;
-
-			// Filter new cards by difficulty and weak topics
+			// Filter new cards by weak topics
 			const filteredNew = newCards
 				.filter((card) => {
-					const matchesDifficulty = card.category === recommendedDifficulty;
-					const isWeakTopic = weakTopicNames.includes(card.category);
-					return matchesDifficulty || isWeakTopic;
+					return weakTopicNames.includes(card.category);
 				})
 				.slice(0, count - recommendedCards.length);
 
