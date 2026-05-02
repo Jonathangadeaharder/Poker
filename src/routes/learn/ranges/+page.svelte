@@ -1,13 +1,6 @@
 <script lang="ts">
-import TopBar from '$lib/components/TopBar.svelte';
-import { goto } from '$app/navigation';
-import {
-	RFI_RANGES,
-	THREE_BET_RANGES,
-	COLD_CALL_RANGES,
-	POSITIONS
-} from '$lib/data/pokerRanges';
 import type { Position } from '$lib/data/pokerRanges';
+import { RFI_RANGES } from '$lib/data/pokerRanges';
 
 let selectedCategory = $state<'RFI' | '3BET' | 'CALL'>('RFI');
 let selectedPosition = $state<Position>('UTG');
@@ -19,9 +12,7 @@ const categories = [
 	{ key: 'CALL', label: 'Cold Call' }
 ] as const;
 
-const currentRange = $derived(
-	selectedCategory === 'RFI' ? RFI_RANGES[selectedPosition] : null
-);
+const currentRange = $derived(selectedCategory === 'RFI' ? RFI_RANGES[selectedPosition] : null);
 </script>
 
 <div class="screen felt-bg">

@@ -3,7 +3,7 @@ import type { Snippet } from 'svelte';
 
 interface Props {
 	left?: Snippet;
-	center?: string;
+	center?: Snippet;
 	right?: Snippet;
 	onBack?: () => void;
 }
@@ -31,7 +31,7 @@ let { left, center, right, onBack }: Props = $props();
 	<div
 		style="flex: 1; text-align: center; font-size: 13px; font-family: var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--cream-dim);"
 	>
-		{center ?? ''}
+		{#if center}{@render center()}{/if}
 	</div>
 	<div style="min-width: 40px; text-align: right;">
 		{#if right}

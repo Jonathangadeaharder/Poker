@@ -1,10 +1,8 @@
 <script lang="ts">
-import TopBar from '$lib/components/TopBar.svelte';
-import { goto } from '$app/navigation';
-import { createPokerDecks, StudySession, DIFFICULTY_RATINGS } from '$lib/core/spacedRepetition';
-import type { Deck, DeckStats, SessionSummary, QualityRating } from '$lib/core/spacedRepetition';
-import soundManager, { SOUND_EVENTS } from '$lib/core/soundManager';
 import { XP_REWARDS } from '$lib/core/gamification';
+import soundManager, { SOUND_EVENTS } from '$lib/core/soundManager';
+import type { Deck, QualityRating, SessionSummary } from '$lib/core/spacedRepetition';
+import { createPokerDecks, DIFFICULTY_RATINGS, StudySession } from '$lib/core/spacedRepetition';
 import { auth } from '$lib/stores/auth.svelte';
 import { profileStore } from '$lib/stores/profile.svelte';
 
@@ -32,9 +30,24 @@ const deckStats = $derived(decks.map((d) => ({ deck: d, stats: d.getStats() })))
 
 const ratingButtons: { label: string; quality: QualityRating; xp: number; preview: string }[] = [
 	{ label: 'Again', quality: DIFFICULTY_RATINGS.AGAIN, xp: 0, preview: '<1m' },
-	{ label: 'Hard', quality: DIFFICULTY_RATINGS.HARD, xp: XP_REWARDS.CARD_REVIEW_HARD, preview: '6m' },
-	{ label: 'Good', quality: DIFFICULTY_RATINGS.GOOD, xp: XP_REWARDS.CARD_REVIEW_GOOD, preview: '1d' },
-	{ label: 'Easy', quality: DIFFICULTY_RATINGS.EASY, xp: XP_REWARDS.CARD_REVIEW_EASY, preview: '4d' }
+	{
+		label: 'Hard',
+		quality: DIFFICULTY_RATINGS.HARD,
+		xp: XP_REWARDS.CARD_REVIEW_HARD,
+		preview: '6m'
+	},
+	{
+		label: 'Good',
+		quality: DIFFICULTY_RATINGS.GOOD,
+		xp: XP_REWARDS.CARD_REVIEW_GOOD,
+		preview: '1d'
+	},
+	{
+		label: 'Easy',
+		quality: DIFFICULTY_RATINGS.EASY,
+		xp: XP_REWARDS.CARD_REVIEW_EASY,
+		preview: '4d'
+	}
 ];
 
 $effect(() => {

@@ -3,12 +3,14 @@ import {
 	ACHIEVEMENTS,
 	AchievementManager,
 	calculateLevel,
+	calculateStreak,
 	DAILY_GOALS,
 	getDailyGoalProgress,
+	getStreakColor,
+	getStreakStatus,
+	isStreakActive,
 	LEVELS,
-	MILESTONES,
 	MilestoneTracker,
-	StreakManager,
 	XP_REWARDS
 } from './gamification';
 
@@ -84,71 +86,71 @@ describe('calculateLevel', () => {
 describe('StreakManager', () => {
 	describe('calculateStreak', () => {
 		it('returns 0 for null', () => {
-			expect(StreakManager.calculateStreak(null)).toBe(0);
+			expect(calculateStreak(null)).toBe(0);
 		});
 
 		it('returns 0 for same day', () => {
 			const today = new Date('2026-01-15');
-			expect(StreakManager.calculateStreak('2026-01-15', today)).toBe(0);
+			expect(calculateStreak('2026-01-15', today)).toBe(0);
 		});
 
 		it('returns 1 for yesterday', () => {
 			const today = new Date('2026-01-15');
-			expect(StreakManager.calculateStreak('2026-01-14', today)).toBe(1);
+			expect(calculateStreak('2026-01-14', today)).toBe(1);
 		});
 
 		it('returns 7 for a week ago', () => {
 			const today = new Date('2026-01-22');
-			expect(StreakManager.calculateStreak('2026-01-15', today)).toBe(7);
+			expect(calculateStreak('2026-01-15', today)).toBe(7);
 		});
 	});
 
 	describe('isStreakActive', () => {
 		it('returns true for null (no streak = 0 days, within 1-day threshold)', () => {
-			expect(StreakManager.isStreakActive(null)).toBe(true);
+			expect(isStreakActive(null)).toBe(true);
 		});
 
 		it('returns true for today', () => {
-			expect(StreakManager.isStreakActive(new Date().toISOString())).toBe(true);
+			expect(isStreakActive(new Date().toISOString())).toBe(true);
 		});
 
 		it('returns true for yesterday', () => {
 			const yesterday = new Date();
 			yesterday.setDate(yesterday.getDate() - 1);
-			expect(StreakManager.isStreakActive(yesterday)).toBe(true);
+			expect(isStreakActive(yesterday)).toBe(true);
 		});
 
 		it('returns false for 3 days ago', () => {
 			const threeDaysAgo = new Date();
 			threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-			expect(StreakManager.isStreakActive(threeDaysAgo)).toBe(false);
+			expect(isStreakActive(threeDaysAgo)).toBe(false);
 		});
 	});
 
 	describe('getStreakStatus', () => {
 		it('returns sleep emoji for 0 streak', () => {
-			const status = StreakManager.getStreakStatus(0);
+			const status = getStreakStatus(0);
 			expect(status.emoji).toBe('\u{1F634}');
 		});
 
 		it('returns fire emoji for streak 5', () => {
-			const status = StreakManager.getStreakStatus(5);
+			const status = getStreakStatus(5);
 			expect(status.emoji).toBe('\u{1F525}');
 		});
 
 		it('returns legendary for streak 100+', () => {
-			const status = StreakManager.getStreakStatus(100);
+			const status = getStreakStatus(100);
 			expect(status.message).toBe('Legendary!');
 		});
 	});
 
 	describe('getStreakColor', () => {
 		it('returns grey for 0', () => {
-			expect(StreakManager.getStreakColor(0)).toBe('#9e9e9e');
+			expect(getStreakColor(0)).toBe('#9e9e9e');
 		});
 
 		it('returns purple for 100+', () => {
-			expect(StreakManager.getStreakColor(100)).toBe('#d500f9');
+			expect(getStreakColor(100)).toBe('#d500f9');
 		});
 	});
 });
@@ -156,25 +158,25 @@ describe('StreakManager', () => {
 describe('AchievementManager', () => {
 	it('unlocks achievement when requirement met', () => {
 		const manager = new AchievementManager();
-		const unlocked = manager.checkAchievements({ sessions_completed: 1 });
+		const unlocked = manager.checkAchievements({ sessionsCompleted: 1 });
 		expect(unlocked).toHaveLength(1);
 		expect(unlocked[0].id).toBe('first_steps');
 	});
 
 	it('does not unlock same achievement twice', () => {
 		const manager = new AchievementManager();
-		manager.checkAchievements({ sessions_completed: 1 });
-		const second = manager.checkAchievements({ sessions_completed: 1 });
+		manager.checkAchievements({ sessionsCompleted: 1 });
+		const second = manager.checkAchievements({ sessionsCompleted: 1 });
 		expect(second).toHaveLength(0);
 	});
 
 	it('unlocks multiple achievements', () => {
 		const manager = new AchievementManager();
 		const unlocked = manager.checkAchievements({
-			sessions_completed: 10,
-			current_streak: 7,
-			quizzes_completed: 1,
-			perfect_quizzes: 1
+			sessionsCompleted: 10,
+			currentStreak: 7,
+			quizzesCompleted: 1,
+			perfectQuizzes: 1
 		});
 		expect(unlocked.length).toBeGreaterThanOrEqual(4);
 	});
@@ -193,18 +195,18 @@ describe('AchievementManager', () => {
 
 		it('returns progress for valid achievement', () => {
 			const manager = new AchievementManager();
-			const progress = manager.getProgress('FIRST_STEPS', { sessions_completed: 0 });
+			const progress = manager.getProgress('FIRST_STEPS', { sessionsCompleted: 0 });
 			expect(progress).not.toBeNull();
-			expect(progress!.current).toBe(0);
-			expect(progress!.required).toBe(1);
-			expect(progress!.percentage).toBe(0);
-			expect(progress!.unlocked).toBe(false);
+			expect(progress?.current).toBe(0);
+			expect(progress?.required).toBe(1);
+			expect(progress?.percentage).toBe(0);
+			expect(progress?.unlocked).toBe(false);
 		});
 
 		it('caps percentage at 100', () => {
 			const manager = new AchievementManager();
-			const progress = manager.getProgress('FIRST_STEPS', { sessions_completed: 50 });
-			expect(progress!.percentage).toBe(100);
+			const progress = manager.getProgress('FIRST_STEPS', { sessionsCompleted: 50 });
+			expect(progress?.percentage).toBe(100);
 		});
 	});
 
@@ -216,7 +218,7 @@ describe('AchievementManager', () => {
 
 		it('returns unlocked achievements', () => {
 			const manager = new AchievementManager();
-			manager.checkAchievements({ sessions_completed: 1 });
+			manager.checkAchievements({ sessionsCompleted: 1 });
 			const unlocked = manager.getUnlockedAchievements();
 			expect(unlocked).toHaveLength(1);
 		});
@@ -231,7 +233,7 @@ describe('AchievementManager', () => {
 
 		it('excludes unlocked achievements', () => {
 			const manager = new AchievementManager();
-			manager.checkAchievements({ sessions_completed: 1 });
+			manager.checkAchievements({ sessionsCompleted: 1 });
 			const locked = manager.getLockedAchievements({});
 			expect(locked.length).toBe(Object.keys(ACHIEVEMENTS).length - 1);
 		});
@@ -287,7 +289,7 @@ describe('MilestoneTracker', () => {
 			const next = tracker.getNextMilestones({ totalXP: 500 });
 			const xpMilestone = next.find((m) => m.type === 'xp');
 			expect(xpMilestone).toBeDefined();
-			expect(xpMilestone!.progress).toBeCloseTo(500 / 1000, 2);
+			expect(xpMilestone?.progress).toBeCloseTo(500 / 1000, 2);
 		});
 	});
 });

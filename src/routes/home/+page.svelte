@@ -1,26 +1,64 @@
 <script lang="ts">
 import { goto } from '$app/navigation';
+import { calculateLevel } from '$lib/core/gamification';
 import { auth } from '$lib/stores/auth.svelte';
 import { profileStore } from '$lib/stores/profile.svelte';
-import { calculateLevel } from '$lib/core/gamification';
-import TopBar from '$lib/components/TopBar.svelte';
-import StreakBadge from '$lib/components/StreakBadge.svelte';
-import ProgressRing from '$lib/components/ProgressRing.svelte';
-import PlayingCard from '$lib/components/PlayingCard.svelte';
 
 const DAILY_GOAL = 100;
 
 const moods = [
-	{ emoji: '⚡', title: 'Just 5 min', sub: 'Quick drill', bg: 'rgba(255,91,72,0.12)', border: 'rgba(255,91,72,0.3)' },
-	{ emoji: '🧠', title: 'Feel smart', sub: 'Easy wins', bg: 'rgba(233,185,73,0.12)', border: 'rgba(233,185,73,0.3)' },
-	{ emoji: '🔥', title: 'Challenge', sub: 'Hard mode', bg: 'rgba(178,76,228,0.12)', border: 'rgba(178,76,228,0.3)' },
-	{ emoji: '🎬', title: 'Replay', sub: 'Last session', bg: 'rgba(72,180,255,0.12)', border: 'rgba(72,180,255,0.3)' }
+	{
+		emoji: '⚡',
+		title: 'Just 5 min',
+		sub: 'Quick drill',
+		bg: 'rgba(255,91,72,0.12)',
+		border: 'rgba(255,91,72,0.3)'
+	},
+	{
+		emoji: '🧠',
+		title: 'Feel smart',
+		sub: 'Easy wins',
+		bg: 'rgba(233,185,73,0.12)',
+		border: 'rgba(233,185,73,0.3)'
+	},
+	{
+		emoji: '🔥',
+		title: 'Challenge',
+		sub: 'Hard mode',
+		bg: 'rgba(178,76,228,0.12)',
+		border: 'rgba(178,76,228,0.3)'
+	},
+	{
+		emoji: '🎬',
+		title: 'Replay',
+		sub: 'Last session',
+		bg: 'rgba(72,180,255,0.12)',
+		border: 'rgba(72,180,255,0.3)'
+	}
 ] as const;
 
 const skillTree = [
-	{ title: 'Preflop ranges', progress: 100, status: 'Mastered', color: 'var(--gold)', locked: false },
-	{ title: 'Continuation betting', progress: 65, status: 'In progress', color: 'var(--coral)', locked: false },
-	{ title: 'River decisions', progress: 0, status: 'Locked · Lvl 5', color: 'var(--cream-dim)', locked: true }
+	{
+		title: 'Preflop ranges',
+		progress: 100,
+		status: 'Mastered',
+		color: 'var(--gold)',
+		locked: false
+	},
+	{
+		title: 'Continuation betting',
+		progress: 65,
+		status: 'In progress',
+		color: 'var(--coral)',
+		locked: false
+	},
+	{
+		title: 'River decisions',
+		progress: 0,
+		status: 'Locked · Lvl 5',
+		color: 'var(--cream-dim)',
+		locked: true
+	}
 ] as const;
 
 $effect(() => {

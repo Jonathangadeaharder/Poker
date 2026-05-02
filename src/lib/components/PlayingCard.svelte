@@ -1,7 +1,7 @@
 <script lang="ts">
 interface Props {
-	rank: string;
-	suit: string;
+	rank?: string;
+	suit?: string;
 	faceDown?: boolean;
 	treatment?: 'classic' | 'minimal' | 'luxury';
 	size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -10,8 +10,8 @@ interface Props {
 }
 
 let {
-	rank,
-	suit,
+	rank = '',
+	suit = '',
 	faceDown = false,
 	treatment = 'classic',
 	size = 'md',

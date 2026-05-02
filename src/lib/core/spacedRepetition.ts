@@ -427,7 +427,7 @@ export class StudySession {
 	}
 
 	getSessionSummary(): SessionSummary {
-		const duration = (new Date().getTime() - this.sessionStats.startTime.getTime()) / 1000 / 60; // minutes
+		const duration = (Date.now() - this.sessionStats.startTime.getTime()) / 1000 / 60; // minutes
 		const total = this.sessionStats.newCards + this.sessionStats.reviews;
 		const accuracy = total > 0 ? this.sessionStats.correct / total : 0;
 

@@ -1,8 +1,6 @@
 <script lang="ts">
-import TopBar from '$lib/components/TopBar.svelte';
-import { goto } from '$app/navigation';
-import { TRAINING_SCHEDULE, TRAINING_PATHS } from '$lib/data/trainingPlan';
 import type { DaySchedule } from '$lib/data/trainingPlan';
+import { TRAINING_PATHS, TRAINING_SCHEDULE } from '$lib/data/trainingPlan';
 
 let selectedPath = $state<'CASH_GAME' | 'MTT'>('CASH_GAME');
 let expandedDay = $state<number | null>(null);
@@ -11,26 +9,25 @@ let completedModules = $state<Record<string, boolean>>({});
 const schedule = $derived(TRAINING_SCHEDULE[selectedPath]);
 const currentPath = $derived(TRAINING_PATHS[selectedPath]);
 
-const totalModules = $derived(
-	schedule.reduce((sum, day) => sum + day.modules.length, 0)
-);
+const totalModules = $derived(schedule.reduce((sum, day) => sum + day.modules.length, 0));
 
-const completedCount = $derived(
-	Object.values(completedModules).filter(Boolean).length
-);
+const completedCount = $derived(Object.values(completedModules).filter(Boolean).length);
 
 const progress = $derived(totalModules > 0 ? completedCount / totalModules : 0);
 
-const totalHours = $derived(
-	schedule.reduce((sum, day) => sum + day.totalHours, 0)
-);
+const totalHours = $derived(schedule.reduce((sum, day) => sum + day.totalHours, 0));
 
 const completedHours = $derived(
-	schedule.reduce((sum, day, di) =>
-		sum + day.modules.reduce((dSum, _, mi) =>
-			dSum + (completedModules[`${di}-${mi}`] ? day.totalHours / day.modules.length : 0)
-		, 0)
-	, 0)
+	schedule.reduce(
+		(sum, day, di) =>
+			sum +
+			day.modules.reduce(
+				(dSum, _, mi) =>
+					dSum + (completedModules[`${di}-${mi}`] ? day.totalHours / day.modules.length : 0),
+				0
+			),
+		0
+	)
 );
 
 function storageKey() {

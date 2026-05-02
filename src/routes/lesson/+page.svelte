@@ -1,9 +1,5 @@
 <script lang="ts">
 import { goto } from '$app/navigation';
-import TopBar from '$lib/components/TopBar.svelte';
-import PlayingCard from '$lib/components/PlayingCard.svelte';
-import Chip from '$lib/components/Chip.svelte';
-import Pill from '$lib/components/Pill.svelte';
 
 type Phase = 'setup' | 'read' | 'decide' | 'reveal';
 type Choice = 'fold' | 'call' | 'raise' | null;
@@ -20,18 +16,22 @@ const correct = $derived(choice === 'raise');
 
 const phaseText = $derived.by(() => {
 	switch (phase) {
-		case 'setup': return 'Folded to you on the button.';
-		case 'read': return 'Villain just min-raised. Quickly.';
-		case 'decide': return "What's your move?";
-		case 'reveal': return correct ? 'Nice read.' : 'Hmm. Re-deal that one.';
+		case 'setup':
+			return 'Folded to you on the button.';
+		case 'read':
+			return 'Villain just min-raised. Quickly.';
+		case 'decide':
+			return "What's your move?";
+		case 'reveal':
+			return correct ? 'Nice read.' : 'Hmm. Re-deal that one.';
 	}
 });
 
 const xpResult = $derived.by(() => {
 	if (phase !== 'reveal' || !choice) return 0;
 	const base = confidence > 0 ? confidence : 1;
-	if (correct) return Math.round(20 * base / 60);
-	return -Math.round(5 * base / 60);
+	if (correct) return Math.round((20 * base) / 60);
+	return -Math.round((5 * base) / 60);
 });
 
 $effect(() => {
@@ -47,7 +47,9 @@ $effect(() => {
 
 $effect(() => {
 	if (phase === 'setup') {
-		const t = setTimeout(() => { phase = 'read'; }, 1400);
+		const t = setTimeout(() => {
+			phase = 'read';
+		}, 1400);
 		return () => clearTimeout(t);
 	}
 });

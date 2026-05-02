@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { QualityRating } from './spacedRepetition';
 import { Card, createPokerDecks, Deck, DIFFICULTY_RATINGS, StudySession } from './spacedRepetition';
 
 describe('DIFFICULTY_RATINGS', () => {

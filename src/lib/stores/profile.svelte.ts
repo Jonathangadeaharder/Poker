@@ -48,11 +48,7 @@ function createProfileStore() {
 		if (!supabase) return;
 		loading = true;
 		try {
-			const { data, error } = await supabase
-				.from('profiles')
-				.select('*')
-				.eq('id', userId)
-				.single();
+			const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
 
 			if (error) {
 				console.error('Failed to fetch profile:', error);
@@ -107,10 +103,7 @@ function createProfileStore() {
 	async function updateProfile(userId: string, updates: Partial<Profile>) {
 		if (!supabase) return;
 		try {
-			const { error } = await supabase
-				.from('profiles')
-				.update(updates)
-				.eq('id', userId);
+			const { error } = await supabase.from('profiles').update(updates).eq('id', userId);
 
 			if (error) {
 				console.error('Failed to update profile:', error);
@@ -170,10 +163,7 @@ function createProfileStore() {
 		} else {
 			const { data: newDaily, error: insertErr } = await supabase
 				.from('daily_progress')
-				.upsert(
-					{ user_id: userId, date: today, xp_earned: amount },
-					{ onConflict: 'user_id,date' }
-				)
+				.upsert({ user_id: userId, date: today, xp_earned: amount }, { onConflict: 'user_id,date' })
 				.select()
 				.single();
 

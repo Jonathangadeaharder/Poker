@@ -1,7 +1,5 @@
 <script lang="ts">
-import TopBar from '$lib/components/TopBar.svelte';
-import { goto } from '$app/navigation';
-import { PUSH_FOLD_CHARTS, ICM_GUIDELINES } from '$lib/data/pushFoldCharts';
+import { PUSH_FOLD_CHARTS } from '$lib/data/pushFoldCharts';
 
 let selectedStack = $state<'TWENTY_BB' | 'FIFTEEN_BB' | 'TEN_BB'>('TWENTY_BB');
 let selectedAction = $state<'openShove' | 'reShove'>('openShove');

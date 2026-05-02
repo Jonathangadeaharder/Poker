@@ -1,13 +1,10 @@
 <script lang="ts">
-import TopBar from '$lib/components/TopBar.svelte';
-import Confetti from '$lib/components/Confetti.svelte';
-import { goto } from '$app/navigation';
-import { QuizGenerator } from '$lib/data/miniGames';
-import type { QuizQuestion } from '$lib/data/miniGames';
-import soundManager, { SOUND_EVENTS } from '$lib/core/soundManager';
 import { XP_REWARDS } from '$lib/core/gamification';
+import soundManager, { SOUND_EVENTS } from '$lib/core/soundManager';
+import type { QuizQuestion } from '$lib/data/miniGames';
+import { generateMixedQuiz } from '$lib/data/miniGames';
 
-let quiz = $state<QuizQuestion[]>(QuizGenerator.generateMixedQuiz(10, 'mixed'));
+let quiz = $state<QuizQuestion[]>(generateMixedQuiz(10, 'mixed'));
 let currentIndex = $state(0);
 let selectedAnswer = $state<string | null>(null);
 let showFeedback = $state(false);
@@ -61,7 +58,7 @@ async function handleNext() {
 }
 
 function handlePlayAgain() {
-	quiz = QuizGenerator.generateMixedQuiz(10, 'mixed');
+	quiz = generateMixedQuiz(10, 'mixed');
 	currentIndex = 0;
 	selectedAnswer = null;
 	showFeedback = false;

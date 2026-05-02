@@ -210,49 +210,47 @@ export interface StreakStatus {
 	message: string;
 }
 
-export class StreakManager {
-	static calculateStreak(
-		lastActiveDate: string | Date | null,
-		currentDate: Date = new Date()
-	): number {
-		if (!lastActiveDate) return 0;
+export function calculateStreak(
+	lastActiveDate: string | Date | null,
+	currentDate: Date = new Date()
+): number {
+	if (!lastActiveDate) return 0;
 
-		let last: Date;
-		if (typeof lastActiveDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(lastActiveDate)) {
-			const [y, m, d] = lastActiveDate.split('-').map(Number);
-			last = new Date(y, m - 1, d);
-		} else {
-			last = new Date(lastActiveDate);
-		}
-		const current = new Date(currentDate);
-
-		last.setHours(0, 0, 0, 0);
-		current.setHours(0, 0, 0, 0);
-
-		return Math.floor((current.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
+	let last: Date;
+	if (typeof lastActiveDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(lastActiveDate)) {
+		const [y, m, d] = lastActiveDate.split('-').map(Number);
+		last = new Date(y, m - 1, d);
+	} else {
+		last = new Date(lastActiveDate);
 	}
+	const current = new Date(currentDate);
 
-	static isStreakActive(lastActiveDate: string | Date | null): boolean {
-		const diff = StreakManager.calculateStreak(lastActiveDate);
-		return diff <= 1;
-	}
+	last.setHours(0, 0, 0, 0);
+	current.setHours(0, 0, 0, 0);
 
-	static getStreakStatus(currentStreak: number): StreakStatus {
-		if (currentStreak === 0) return { emoji: '\u{1F634}', message: 'Start your streak!' };
-		if (currentStreak < 3) return { emoji: '\u{1F331}', message: 'Getting started!' };
-		if (currentStreak < 7) return { emoji: '\u{1F525}', message: 'Hot!' };
-		if (currentStreak < 30) return { emoji: '\u{1F4AA}', message: 'Strong!' };
-		if (currentStreak < 100) return { emoji: '\u26A1', message: 'Unstoppable!' };
-		return { emoji: '\u{1F451}', message: 'Legendary!' };
-	}
+	return Math.floor((current.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
+}
 
-	static getStreakColor(currentStreak: number): string {
-		if (currentStreak === 0) return '#9e9e9e';
-		if (currentStreak < 7) return '#ff9800';
-		if (currentStreak < 30) return '#ff5722';
-		if (currentStreak < 100) return '#f44336';
-		return '#d500f9';
-	}
+export function isStreakActive(lastActiveDate: string | Date | null): boolean {
+	const diff = calculateStreak(lastActiveDate);
+	return diff <= 1;
+}
+
+export function getStreakStatus(currentStreak: number): StreakStatus {
+	if (currentStreak === 0) return { emoji: '\u{1F634}', message: 'Start your streak!' };
+	if (currentStreak < 3) return { emoji: '\u{1F331}', message: 'Getting started!' };
+	if (currentStreak < 7) return { emoji: '\u{1F525}', message: 'Hot!' };
+	if (currentStreak < 30) return { emoji: '\u{1F4AA}', message: 'Strong!' };
+	if (currentStreak < 100) return { emoji: '\u26A1', message: 'Unstoppable!' };
+	return { emoji: '\u{1F451}', message: 'Legendary!' };
+}
+
+export function getStreakColor(currentStreak: number): string {
+	if (currentStreak === 0) return '#9e9e9e';
+	if (currentStreak < 7) return '#ff9800';
+	if (currentStreak < 30) return '#ff5722';
+	if (currentStreak < 100) return '#f44336';
+	return '#d500f9';
 }
 
 export const DAILY_GOALS = {
@@ -302,7 +300,6 @@ export interface UserStats {
 
 export class AchievementManager {
 	private unlockedAchievements: Set<string>;
-	private progress: Record<string, number>;
 
 	constructor() {
 		this.unlockedAchievements = new Set();
@@ -334,7 +331,9 @@ export class AchievementManager {
 		achievementId: string,
 		stats: UserStats
 	): { current: number; required: number; percentage: number; unlocked: boolean } | null {
-		const achievement = ACHIEVEMENTS[achievementId] ?? Object.values(ACHIEVEMENTS).find((a) => a.id === achievementId);
+		const achievement =
+			ACHIEVEMENTS[achievementId] ??
+			Object.values(ACHIEVEMENTS).find((a) => a.id === achievementId);
 		if (!achievement) return null;
 
 		const { type, count } = achievement.requirement;

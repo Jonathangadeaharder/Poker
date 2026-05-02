@@ -1,7 +1,5 @@
 <script lang="ts">
-import { goto } from '$app/navigation';
-import { page } from '$app/stores';
-import Confetti from '$lib/components/Confetti.svelte';
+import { page } from '$app/state';
 
 let showConfetti = $state(false);
 
@@ -12,7 +10,7 @@ $effect(() => {
 	return () => clearTimeout(t);
 });
 
-const sessionId = $derived($page.params.sessionId);
+const sessionId = $derived(page.params.sessionId);
 
 const stats = [
 	{ label: 'XP earned', value: '+85', color: 'var(--coral)' },

@@ -104,7 +104,11 @@ class SoundManager {
 				[523, 659, 784, 1047],
 				0.5
 			);
-			this.sounds[SOUND_EVENTS.STREAK_MILESTONE] = this.generateChord(ctx, [440, 554, 659, 880], 0.4);
+			this.sounds[SOUND_EVENTS.STREAK_MILESTONE] = this.generateChord(
+				ctx,
+				[440, 554, 659, 880],
+				0.4
+			);
 			this.sounds[SOUND_EVENTS.PAGE_TURN] = this.generateNoise(ctx, 0.03);
 
 			this.initialized = true;
@@ -236,7 +240,7 @@ class SoundManager {
 		if (!this.hapticsEnabled) return;
 
 		// Use Vibration API (web equivalent of expo-haptics)
-		if (typeof navigator === "undefined" || !navigator.vibrate) return;
+		if (typeof navigator === 'undefined' || !navigator.vibrate) return;
 
 		try {
 			switch (type) {

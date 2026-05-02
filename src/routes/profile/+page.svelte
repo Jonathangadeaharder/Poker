@@ -1,12 +1,9 @@
 <script lang="ts">
 import { goto } from '$app/navigation';
+import { ACHIEVEMENTS, AchievementManager, calculateLevel } from '$lib/core/gamification';
+import soundManager from '$lib/core/soundManager';
 import { auth } from '$lib/stores/auth.svelte';
 import { profileStore } from '$lib/stores/profile.svelte';
-import { calculateLevel, ACHIEVEMENTS, AchievementManager } from '$lib/core/gamification';
-import soundManager from '$lib/core/soundManager';
-import TopBar from '$lib/components/TopBar.svelte';
-import ProgressRing from '$lib/components/ProgressRing.svelte';
-import ThemePicker from '$lib/components/ThemePicker.svelte';
 
 $effect(() => {
 	if (!auth.loading && auth.isAuthenticated && auth.user) {
@@ -36,8 +33,8 @@ const unlockedAchievementIds = $derived(() => {
 	achievementManager.checkAchievements(userStats);
 	return new Set(
 		achievements
-			.filter(a => achievementManager.getProgress(a.id, userStats)?.unlocked)
-			.map(a => a.id)
+			.filter((a) => achievementManager.getProgress(a.id, userStats)?.unlocked)
+			.map((a) => a.id)
 	);
 });
 const unlockedCount = $derived(unlockedAchievementIds().size);
@@ -50,8 +47,7 @@ function toggleSound() {
 }
 
 async function handleLogout() {
-	if (!auth.logout) return;
-	await auth.logout();
+	await auth.signOut();
 	goto('/login');
 }
 
@@ -76,17 +72,24 @@ const accuracyTrend = [
 	{ day: 'Sun', pct: 82 }
 ];
 
-const xpMax = Math.max(...xpTrend.map(d => d.xp));
+const xpMax = Math.max(...xpTrend.map((d) => d.xp));
 const accMax = 100;
 
-function toPoints(data: { day: string; value: number }[], max: number, w: number, h: number): string {
+function toPoints(
+	data: { day: string; value: number }[],
+	max: number,
+	w: number,
+	h: number
+): string {
 	if (data.length === 0) return '';
 	if (data.length === 1) return `${w / 2},${h - (data[0].value / max) * h}`;
-	return data.map((d, i) => {
-		const x = (i / (data.length - 1)) * w;
-		const y = h - (d.value / max) * h;
-		return `${x},${y}`;
-	}).join(' ');
+	return data
+		.map((d, i) => {
+			const x = (i / (data.length - 1)) * w;
+			const y = h - (d.value / max) * h;
+			return `${x},${y}`;
+		})
+		.join(' ');
 }
 
 let deferredPrompt = $state<any>(null);
