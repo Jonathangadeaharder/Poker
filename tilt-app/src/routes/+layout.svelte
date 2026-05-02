@@ -33,7 +33,7 @@ function handleNav(id: string) {
 		today: '/home',
 		practice: '/practice',
 		replay: '/replay',
-		you: '/you'
+		you: '/profile'
 	};
 	goto(routes[id] ?? '/home');
 }
