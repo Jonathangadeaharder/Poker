@@ -23,6 +23,9 @@ import {
 } from '$lib/stores/settings.svelte';
 import { calculateLevel, ACHIEVEMENTS, AchievementManager, type UserStats } from '$lib/core/gamification';
 import { createClient } from '$lib/supabase';
+import { untrack } from 'svelte';
+
+const supabase = createClient();
 
 const profile = $derived(profileStore.profile);
 const level = $derived(profile ? calculateLevel(profile.xp) : null);
@@ -52,7 +55,6 @@ const unlockedIds = $derived(achievementManager.getUnlockedAchievements().map((a
 
 async function fetchSessionStats() {
 	if (!browser || !auth.user) return;
-	const supabase = createClient();
 	const { data } = await supabase
 		.from('sessions')
 		.select('xp_earned, accuracy')
@@ -73,7 +75,7 @@ $effect(() => {
 $effect(() => {
 	if (auth.isAuthenticated && auth.user) {
 		profileStore.fetchProfile(auth.user.id);
-		fetchSessionStats();
+		untrack(() => fetchSessionStats());
 	}
 });
 
@@ -94,8 +96,8 @@ function scrollToSettings() {
 				<button
 					type="button"
 					aria-label="Settings"
+					class="settings-gear"
 					onclick={scrollToSettings}
-					style="background: rgba(245,233,212,0.08); border: 1px solid var(--hairline); border-radius: 999px; width: 36px; height: 36px; color: var(--cream); cursor: pointer; font-size: 16px; display: inline-flex; align-items: center; justify-content: center;"
 				>
 					⚙
 				</button>
@@ -324,5 +326,18 @@ function scrollToSettings() {
 	}
 	.logout-section {
 		padding-top: 8px;
+	}
+	.settings-gear {
+		background: rgba(245, 233, 212, 0.08);
+		border: 1px solid var(--hairline);
+		border-radius: 999px;
+		width: 36px;
+		height: 36px;
+		color: var(--cream);
+		cursor: pointer;
+		font-size: 16px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 	}
 </style>
