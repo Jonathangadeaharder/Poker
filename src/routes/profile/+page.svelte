@@ -29,15 +29,20 @@ const levelProgress = $derived(levelResult?.progress ?? 0);
 const streak = $derived(profile?.streak_count ?? 0);
 const sessionCount = $derived(profileStore.trainingProgress.length);
 
+const achievementManager = new AchievementManager();
+const userStats = $derived({ sessionsCompleted: sessionCount, currentStreak: streak });
 const achievements = $derived(Object.values(ACHIEVEMENTS));
-const unlockedCount = $derived(
-	achievements.filter(a => {
-		const mgr = new AchievementManager();
-		return mgr.checkAchievements({ sessionsCompleted: sessionCount, currentStreak: streak }).some(n => n.id === a.id);
-	}).length
-);
+const unlockedAchievementIds = $derived(() => {
+	achievementManager.checkAchievements(userStats);
+	return new Set(
+		achievements
+			.filter(a => achievementManager.getProgress(a.id, userStats)?.unlocked)
+			.map(a => a.id)
+	);
+});
+const unlockedCount = $derived(unlockedAchievementIds().size);
 
-let soundEnabled = $state(true);
+let soundEnabled = $state(soundManager.isEnabled());
 
 function toggleSound() {
 	soundEnabled = !soundEnabled;
@@ -75,6 +80,8 @@ const xpMax = Math.max(...xpTrend.map(d => d.xp));
 const accMax = 100;
 
 function toPoints(data: { day: string; value: number }[], max: number, w: number, h: number): string {
+	if (data.length === 0) return '';
+	if (data.length === 1) return `${w / 2},${h - (data[0].value / max) * h}`;
 	return data.map((d, i) => {
 		const x = (i / (data.length - 1)) * w;
 		const y = h - (d.value / max) * h;
@@ -168,9 +175,8 @@ async function handleInstall() {
 			</div>
 			<div class="achievement-scroll">
 				{#each achievements as achievement (achievement.id)}
-					{@const mgr = new AchievementManager()}
-					{@const progress = mgr.getProgress(achievement.id, { sessionsCompleted: sessionCount, currentStreak: streak })}
-					{@const unlocked = progress?.unlocked ?? false}
+					{@const progress = achievementManager.getProgress(achievement.id, userStats)}
+					{@const unlocked = unlockedAchievementIds().has(achievement.id)}
 					<div class="achievement-card" style="opacity: {unlocked ? 1 : 0.5};">
 						<div style="font-size: 28px;">{achievement.icon}</div>
 						<div style="font-size: 13px; font-weight: 600; margin-top: 6px;">{achievement.title}</div>
