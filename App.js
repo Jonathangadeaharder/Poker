@@ -8,6 +8,9 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 // Services
 import { errorTracking } from './src/services/errorTracking';
 
+// Highlight.io telemetry
+import { hookConsole } from './src/config/highlight';
+
 // Context
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 
@@ -210,9 +213,10 @@ function AppNavigator() {
 }
 
 export default function App() {
-  // Initialize error tracking on app start
+  // Initialize error tracking and telemetry on app start
   useEffect(() => {
     errorTracking.initialize();
+    hookConsole();
   }, []);
 
   // Navigation state change handler
