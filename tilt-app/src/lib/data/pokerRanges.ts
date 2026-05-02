@@ -1,0 +1,335 @@
+/**
+ * GTO-based Preflop Ranges for 6-Max Cash Games (100bb)
+ * Based on KISS Ranges (Smart Poker Study)
+ */
+
+// Position Definitions
+export const POSITIONS = {
+	UTG: 'Under The Gun',
+	MP: 'Middle Position',
+	CO: 'Cutoff',
+	BTN: 'Button',
+	SB: 'Small Blind',
+	BB: 'Big Blind'
+} as const;
+
+export type Position = keyof typeof POSITIONS;
+
+export interface RangeData {
+	position: string;
+	percentage: string;
+	hands: string[];
+	description: string;
+}
+
+// RFI (Raise First In) Ranges for 6-Max Cash Game
+export const RFI_RANGES: Record<Position, RangeData> = {
+	UTG: {
+		position: 'UTG',
+		percentage: '15%',
+		hands: [
+			'AA',
+			'KK',
+			'QQ',
+			'JJ',
+			'TT',
+			'99',
+			'AKs',
+			'AKo',
+			'AQs',
+			'AQo',
+			'AJs',
+			'AJo',
+			'KQs',
+			'KJs',
+			'KTs',
+			'QJs',
+			'JTs',
+			'88',
+			'77',
+			'A5s',
+			'A4s',
+			'A3s',
+			'A2s'
+		],
+		description: 'Very tight from early position. Premium hands + suited aces for implied odds.'
+	},
+	MP: {
+		position: 'MP',
+		percentage: '18%',
+		hands: [
+			'AA',
+			'KK',
+			'QQ',
+			'JJ',
+			'TT',
+			'99',
+			'88',
+			'77',
+			'66',
+			'AKs',
+			'AKo',
+			'AQs',
+			'AQo',
+			'AJs',
+			'AJo',
+			'ATs',
+			'KQs',
+			'KQo',
+			'KJs',
+			'KTs',
+			'QJs',
+			'QTs',
+			'JTs',
+			'T9s',
+			'A9s',
+			'A8s',
+			'A7s',
+			'A6s',
+			'A5s',
+			'A4s',
+			'A3s',
+			'A2s'
+		],
+		description: 'Extended range. More suited connectors and medium pairs.'
+	},
+	CO: {
+		position: 'CO',
+		percentage: '25%',
+		hands: [
+			'AA',
+			'KK',
+			'QQ',
+			'JJ',
+			'TT',
+			'99',
+			'88',
+			'77',
+			'66',
+			'55',
+			'44',
+			'AKs',
+			'AKo',
+			'AQs',
+			'AQo',
+			'AJs',
+			'AJo',
+			'ATs',
+			'ATo',
+			'KQs',
+			'KQo',
+			'KJs',
+			'KJo',
+			'KTs',
+			'QJs',
+			'QJo',
+			'QTs',
+			'JTs',
+			'J9s',
+			'T9s',
+			'98s',
+			'A9s',
+			'A8s',
+			'A7s',
+			'A6s',
+			'A5s',
+			'A4s',
+			'A3s',
+			'A2s',
+			'K9s'
+		],
+		description: 'Late position - significantly more hands. Suited connectors become profitable.'
+	},
+	BTN: {
+		position: 'BTN',
+		percentage: '45%',
+		hands: [
+			'AA',
+			'KK',
+			'QQ',
+			'JJ',
+			'TT',
+			'99',
+			'88',
+			'77',
+			'66',
+			'55',
+			'44',
+			'33',
+			'22',
+			'AKs',
+			'AKo',
+			'AQs',
+			'AQo',
+			'AJs',
+			'AJo',
+			'ATs',
+			'ATo',
+			'A9o',
+			'A8o',
+			'KQs',
+			'KQo',
+			'KJs',
+			'KJo',
+			'KTs',
+			'KTo',
+			'K9s',
+			'QJs',
+			'QJo',
+			'QTs',
+			'QTo',
+			'Q9s',
+			'JTs',
+			'JTo',
+			'J9s',
+			'J8s',
+			'T9s',
+			'T8s',
+			'98s',
+			'97s',
+			'87s',
+			'76s',
+			'65s',
+			'A9s',
+			'A8s',
+			'A7s',
+			'A6s',
+			'A5s',
+			'A4s',
+			'A3s',
+			'A2s',
+			'K9s',
+			'K8s',
+			'K7s',
+			'Q9s',
+			'Q8s'
+		],
+		description: 'Button = best position. Nearly 50% range. Maximum aggression.'
+	},
+	SB: {
+		position: 'SB',
+		percentage: '35%',
+		hands: [
+			'AA',
+			'KK',
+			'QQ',
+			'JJ',
+			'TT',
+			'99',
+			'88',
+			'77',
+			'66',
+			'55',
+			'44',
+			'33',
+			'22',
+			'AKs',
+			'AKo',
+			'AQs',
+			'AQo',
+			'AJs',
+			'AJo',
+			'ATs',
+			'ATo',
+			'A9s',
+			'A8s',
+			'KQs',
+			'KQo',
+			'KJs',
+			'KJo',
+			'KTs',
+			'KTo',
+			'K9s',
+			'QJs',
+			'QJo',
+			'QTs',
+			'Q9s',
+			'JTs',
+			'J9s',
+			'T9s',
+			'98s',
+			'87s',
+			'76s',
+			'A7s',
+			'A6s',
+			'A5s',
+			'A4s',
+			'A3s',
+			'A2s'
+		],
+		description: 'SB vs BB heads-up. Wide range, but cautious (out of position postflop).'
+	},
+	BB: {
+		position: 'BB',
+		percentage: 'N/A',
+		hands: [],
+		description: 'BB defends against opens rather than RFI. See 3-bet and cold-call ranges.'
+	}
+};
+
+// 3-Bet Ranges (against Late Position Opens)
+export interface ThreeBetRangeLinear {
+	type: string;
+	usage: string;
+	hands: string[];
+	description: string;
+}
+
+export interface ThreeBetRangePolar {
+	type: string;
+	usage: string;
+	valueHands: string[];
+	bluffHands: string[];
+	description: string;
+}
+
+export const THREE_BET_RANGES = {
+	LINEAR: {
+		type: 'Linear/Merged',
+		usage: 'Against passive players (rarely 4-bet)',
+		hands: ['AA', 'KK', 'QQ', 'JJ', 'TT', 'AKs', 'AKo', 'AQs', 'AQo', 'AJs', 'KQs'],
+		description: 'No bluffs. Only value against players who call too much and never 4-bet.'
+	} satisfies ThreeBetRangeLinear,
+	POLAR: {
+		type: 'Polarized',
+		usage: 'Against aggressive players (4-bet often)',
+		valueHands: ['AA', 'KK', 'QQ', 'AKs', 'AKo'],
+		bluffHands: ['A5s', 'A4s', 'A3s', 'A2s', 'K5s', 'Q5s'],
+		description: 'GTO Strategy: Nuts + Blocker bluffs. A5s blocks AA/AK of opponent.'
+	} satisfies ThreeBetRangePolar
+};
+
+// Cold Calling Ranges (vs. Raises)
+export const COLD_CALL_RANGES = {
+	IP: {
+		type: 'In Position (CO/BTN)',
+		hands: [
+			'99',
+			'88',
+			'77',
+			'66',
+			'55',
+			'44',
+			'33',
+			'22',
+			'AJs',
+			'ATs',
+			'KQs',
+			'KJs',
+			'QJs',
+			'JTs',
+			'T9s',
+			'98s',
+			'87s',
+			'76s',
+			'AJo',
+			'KQo'
+		],
+		description: '10x Rule for pairs. Suited connectors for implied odds in position.'
+	},
+	OOP: {
+		type: 'Out of Position (Blinds)',
+		hands: ['99', '88', '77', 'AJs', 'KQs', 'QJs', 'JTs'],
+		description: 'Very tight from the blinds. Most hands either 3-bet or fold.'
+	}
+};
