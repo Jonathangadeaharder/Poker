@@ -3,6 +3,7 @@ import '../app.css';
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
 import { auth } from '$lib/stores/auth.svelte';
+import BottomNav from '$lib/components/BottomNav.svelte';
 
 let { children } = $props();
 
@@ -15,6 +16,27 @@ const isAuthRoute = $derived(
 		page.url.pathname.startsWith('/register') ||
 		page.url.pathname.startsWith('/onboarding')
 );
+
+const showBottomNav = $derived(!isAuthRoute && auth.isAuthenticated);
+
+const activeTab = $derived(() => {
+	const path = page.url.pathname;
+	if (path.startsWith('/home') || path === '/') return 'today';
+	if (path.startsWith('/practice')) return 'practice';
+	if (path.startsWith('/replay')) return 'replay';
+	if (path.startsWith('/you') || path.startsWith('/profile')) return 'you';
+	return 'today';
+});
+
+function handleNav(id: string) {
+	const routes: Record<string, string> = {
+		today: '/home',
+		practice: '/practice',
+		replay: '/replay',
+		you: '/you'
+	};
+	goto(routes[id] ?? '/home');
+}
 
 $effect(() => {
 	if (!auth.loading && !auth.isAuthenticated && !isAuthRoute) {
@@ -34,6 +56,9 @@ $effect(() => {
 	</div>
 {:else if isAuthRoute || auth.isAuthenticated}
 	{@render children()}
+	{#if showBottomNav}
+		<BottomNav active={activeTab()} onNavigate={handleNav} />
+	{/if}
 {/if}
 
 <style>

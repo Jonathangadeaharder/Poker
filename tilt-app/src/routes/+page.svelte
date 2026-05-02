@@ -5,7 +5,7 @@ import { auth } from '$lib/stores/auth.svelte';
 $effect(() => {
 	if (!auth.loading) {
 		if (auth.isAuthenticated) {
-			goto('/onboarding');
+			goto('/home');
 		} else {
 			goto('/login');
 		}
