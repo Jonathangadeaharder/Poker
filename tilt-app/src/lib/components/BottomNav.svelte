@@ -29,6 +29,7 @@ let {
 	{#each tabs as tab}
 		{@const isActive = tab.id === active}
 		<button
+			type="button"
 			onclick={() => onNavigate?.(tab.id)}
 			style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 16px; background: none; border: none; cursor: pointer; color: {isActive
 				? 'var(--coral)'

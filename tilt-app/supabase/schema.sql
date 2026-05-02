@@ -132,6 +132,7 @@ CREATE INDEX IF NOT EXISTS idx_daily_progress_user_date ON public.daily_progress
 -- Row Level Security (RLS) policies
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.achievements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_achievements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.training_progress ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.srs_cards ENABLE ROW LEVEL SECURITY;
@@ -227,7 +228,7 @@ BEGIN
 
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = '';
 
 -- Trigger for new user creation
 CREATE OR REPLACE TRIGGER on_auth_user_created

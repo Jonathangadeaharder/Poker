@@ -9,6 +9,10 @@ interface Props {
 
 let { value = 'felt', onChange }: Props = $props();
 
+$effect(() => {
+	applyTheme(value);
+});
+
 function select(theme: ThemeName) {
 	value = theme;
 	applyTheme(theme);

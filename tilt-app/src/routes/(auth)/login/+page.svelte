@@ -42,6 +42,7 @@ async function handleSubmit(e: Event) {
 			<input
 				type="email"
 				bind:value={email}
+				autocomplete="email"
 				placeholder="you@example.com"
 				required
 				disabled={loading}
@@ -53,6 +54,7 @@ async function handleSubmit(e: Event) {
 			<input
 				type="password"
 				bind:value={password}
+				autocomplete="current-password"
 				placeholder="••••••••"
 				required
 				disabled={loading}
