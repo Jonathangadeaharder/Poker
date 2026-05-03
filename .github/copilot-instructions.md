@@ -17,7 +17,7 @@ Tilt is a mobile-first SvelteKit PWA for poker training. Duolingo-style approach
 
 ## Project Structure
 
-```
+```text
 src/
 ├── routes/
 │   ├── +layout.svelte          # Root layout, auth guard
