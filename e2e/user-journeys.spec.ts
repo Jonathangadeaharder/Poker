@@ -72,26 +72,23 @@ test.describe('Poker — Navigation', () => {
 
 	test('nav TODAY works', async ({ page }) => {
 		const todayBtn = page.getByRole('button', { name: /TODAY/i });
-		if (await todayBtn.isVisible()) {
-			await todayBtn.click();
-			await page.waitForTimeout(1000);
-		}
+		await expect(todayBtn).toBeVisible();
+		await todayBtn.click();
+		await page.waitForTimeout(1000);
 	});
 
 	test('nav PRACTICE works', async ({ page }) => {
 		const practiceBtn = page.getByRole('button', { name: /PRACTICE/i });
-		if (await practiceBtn.isVisible()) {
-			await practiceBtn.click();
-			await expect(page).toHaveURL(/\/practice/);
-		}
+		await expect(practiceBtn).toBeVisible();
+		await practiceBtn.click();
+		await expect(page).toHaveURL(/\/practice/);
 	});
 
 	test('nav YOU works', async ({ page }) => {
 		const youBtn = page.getByRole('button', { name: /YOU/i });
-		if (await youBtn.isVisible()) {
-			await youBtn.click();
-			await expect(page).toHaveURL(/\/profile/);
-		}
+		await expect(youBtn).toBeVisible();
+		await youBtn.click();
+		await expect(page).toHaveURL(/\/profile/);
 	});
 });
 
@@ -154,7 +151,8 @@ async function loginUser(page: import('@playwright/test').Page, email: string, p
 	await page.getByRole('textbox', { name: 'PASSWORD' }).fill(password);
 	await page.getByRole('button', { name: 'Sign in' }).click();
 	await page.waitForURL(/\/home/, { timeout: 15000 }).catch(async () => {
-		await page.goto('/home');
+		const currentUrl = page.url();
+		throw new Error(`Login failed: expected redirect to /home but got ${currentUrl}`);
 	});
 }
 
