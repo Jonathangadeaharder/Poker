@@ -1,4 +1,4 @@
-import { B as attr, V as escape_html } from "../../../../chunks/dev.js";
+import { R as attr, z as escape_html } from "../../../../chunks/dev.js";
 import "../../../../chunks/auth.svelte.js";
 //#region src/routes/(auth)/register/+page.svelte
 function _page($$renderer, $$props) {

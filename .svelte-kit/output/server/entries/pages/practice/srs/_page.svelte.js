@@ -1,8 +1,10 @@
-import { B as attr, V as escape_html, a as ensure_array_like, i as derived, l as stringify, r as attr_style } from "../../../../chunks/dev.js";
+import { R as attr, a as ensure_array_like, c as stringify, i as derived, r as attr_style, z as escape_html } from "../../../../chunks/dev.js";
 import { t as goto } from "../../../../chunks/client.js";
 import "../../../../chunks/navigation.js";
-import { t as XP_REWARDS } from "../../../../chunks/gamification.js";
+import "../../../../chunks/auth.svelte.js";
 import { t as TopBar } from "../../../../chunks/TopBar.js";
+import { r as XP_REWARDS } from "../../../../chunks/gamification.js";
+import "../../../../chunks/profile.svelte.js";
 import "../../../../chunks/soundManager.js";
 //#region src/lib/core/spacedRepetition.ts
 /**

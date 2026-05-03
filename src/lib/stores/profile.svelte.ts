@@ -59,8 +59,9 @@ function createProfileStore() {
 			} else if (data) {
 				profile = data;
 			} else {
-				const username =
-					(await supabase.auth.getUser()).data.user?.user_metadata?.username ?? 'Player';
+				const userMetadata = (await supabase.auth.getUser()).data.user?.user_metadata;
+				const fallbackUsername = `Player${userId.slice(0, 8)}`;
+				const username = userMetadata?.username ?? fallbackUsername;
 				const { data: newProfile, error: upsertErr } = await supabase
 					.from('profiles')
 					.upsert({ id: userId, username }, { onConflict: 'id' })

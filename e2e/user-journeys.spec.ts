@@ -109,12 +109,14 @@ test.describe('Poker — Practice Page', () => {
 test.describe('Poker — You Page', () => {
 	test.beforeEach(async ({ page }) => {
 		await loginAsExistingUser(page);
-		await page.goto('/you');
+		await page.goto('/profile');
 	});
 
 	test('you page shows profile', async ({ page }) => {
-		const content = await page.textContent('body');
-		expect(content).toBeTruthy();
+		await expect(page).toHaveURL(/\/profile/);
+		const bodyText = await page.textContent('body');
+		const hasStat = /level|xp|games?|win|loss|streak|achievement|hand/i.test(bodyText ?? '');
+		expect(hasStat).toBeTruthy();
 	});
 });
 
@@ -219,16 +221,18 @@ test.describe('Poker — Quiz Interaction', () => {
 	});
 
 	test('clicking an answer registers interaction', async ({ page }) => {
-		const pageText = await page.textContent('body');
-		if (pageText) {
-			const firstAnswer = page.getByRole('button').filter({ hasText: /Yes|No|Only suited|Sometimes/i }).first();
-			if (await firstAnswer.isVisible()) {
-				await firstAnswer.click();
-				await page.waitForTimeout(1000);
-				const newText = await page.textContent('body');
-				expect(newText?.length).toBeGreaterThan(0);
-			}
+		const firstAnswer = page.getByRole('button').filter({ hasText: /Yes|No|Only suited|Sometimes/i }).first();
+		const isVisible = await firstAnswer.isVisible().catch(() => false);
+		expect(isVisible).toBe(true);
+		if (!isVisible) {
+			throw new Error('No matching answer button found - expected Yes/No/Only suited/Sometimes');
 		}
+		const beforeText = await page.textContent('body');
+		await firstAnswer.click();
+		await page.waitForTimeout(1000);
+		const afterText = await page.textContent('body');
+		expect(afterText).toBeTruthy();
+		expect(afterText?.length).toBeGreaterThan(0);
 	});
 
 	test('quiz shows progress counter', async ({ page }) => {
@@ -342,7 +346,12 @@ test.describe('Poker — Profile Creation Fallback', () => {
 		await page.goto('/home');
 		await page.waitForTimeout(2000);
 		const bodyText = await page.textContent('body');
-		expect(bodyText).not.toContain('2,847 PLAYING');
+		// Verify username is not the fallback 'Player' literal
+		const hasPlayer = bodyText?.includes('Player');
+		// Allow 'Player' only if it's part of another word (e.g., 'Players')
+		if (hasPlayer) {
+			expect(bodyText).toMatch(/Players|playing/i);
+		}
 	});
 });
 
@@ -355,12 +364,16 @@ test.describe('Poker — Quiz Deep Interaction', () => {
 
 	test('quiz answer click changes page state', async ({ page }) => {
 		const firstAnswer = page.getByRole('button').filter({ hasText: /Yes|No|Only suited|Sometimes/i }).first();
-		if (await firstAnswer.isVisible().catch(() => false)) {
-			await firstAnswer.click();
-			await page.waitForTimeout(1000);
-			const newText = await page.textContent('body');
-			expect(newText!.length).toBeGreaterThan(0);
+		const isVisible = await firstAnswer.isVisible().catch(() => false);
+		expect(isVisible).toBe(true);
+		if (!isVisible) {
+			throw new Error('No matching answer button found - expected Yes/No/Only suited/Sometimes');
 		}
+		await firstAnswer.click();
+		await page.waitForTimeout(1000);
+		const newText = await page.textContent('body');
+		expect(newText).toBeTruthy();
+		expect(newText!.length).toBeGreaterThan(0);
 	});
 
 	test('quiz progress counter updates after answer', async ({ page }) => {

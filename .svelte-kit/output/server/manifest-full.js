@@ -7,10 +7,10 @@ function __memo(fn) {
 return {
 	appDir: "_app",
 	appPath: "_app",
-	assets: new Set(["robots.txt"]),
-	mimeTypes: {".txt":"text/plain"},
+	assets: new Set(["icon-192.svg","icon-512.svg","manifest.json","robots.txt"]),
+	mimeTypes: {".svg":"image/svg+xml",".json":"application/json",".txt":"text/plain"},
 	_: {
-		client: {start:"_app/immutable/entry/start.DVeHAPNM.js",app:"_app/immutable/entry/app.B4iJPg_f.js",imports:["_app/immutable/entry/start.DVeHAPNM.js","_app/immutable/chunks/Dr7ERu_l.js","_app/immutable/chunks/Tc_4A2p1.js","_app/immutable/entry/app.B4iJPg_f.js","_app/immutable/chunks/Tc_4A2p1.js","_app/immutable/chunks/imS9_EF1.js","_app/immutable/chunks/DEggy0fl.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
+		client: {start:"_app/immutable/entry/start.DBcKYaGs.js",app:"_app/immutable/entry/app.CQUqVAYm.js",imports:["_app/immutable/entry/start.DBcKYaGs.js","_app/immutable/chunks/DsIV1KG9.js","_app/immutable/chunks/DqfmvzU2.js","_app/immutable/entry/app.CQUqVAYm.js","_app/immutable/chunks/DqfmvzU2.js","_app/immutable/chunks/B64WrFVF.js","_app/immutable/chunks/BVEOzTpX.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:true},
 		nodes: [
 			__memo(() => import('./nodes/0.js')),
 			__memo(() => import('./nodes/1.js')),
@@ -27,7 +27,8 @@ return {
 			__memo(() => import('./nodes/12.js')),
 			__memo(() => import('./nodes/13.js')),
 			__memo(() => import('./nodes/14.js')),
-			__memo(() => import('./nodes/15.js'))
+			__memo(() => import('./nodes/15.js')),
+			__memo(() => import('./nodes/16.js'))
 		],
 		remotes: {
 			
@@ -111,6 +112,13 @@ return {
 				endpoint: null
 			},
 			{
+				id: "/profile",
+				pattern: /^\/profile\/?$/,
+				params: [],
+				page: { layouts: [0,], errors: [1,], leaf: 15 },
+				endpoint: null
+			},
+			{
 				id: "/(auth)/register",
 				pattern: /^\/register\/?$/,
 				params: [],
@@ -121,7 +129,7 @@ return {
 				id: "/results/[sessionId]",
 				pattern: /^\/results\/([^/]+?)\/?$/,
 				params: [{"name":"sessionId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,], errors: [1,], leaf: 15 },
+				page: { layouts: [0,], errors: [1,], leaf: 16 },
 				endpoint: null
 			}
 		],

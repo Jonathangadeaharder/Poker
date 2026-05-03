@@ -1,7 +1,7 @@
-import { V as escape_html, i as derived, l as stringify, n as attr_class, r as attr_style } from "./dev.js";
+import { c as stringify, i as derived, n as attr_class, r as attr_style, z as escape_html } from "./dev.js";
 //#region src/lib/components/PlayingCard.svelte
 function PlayingCard($$renderer, $$props) {
-	let { rank, suit, faceDown = false, treatment = "classic", size = "md", delay = 0, class: className = "" } = $$props;
+	let { rank = "", suit = "", faceDown = false, treatment = "classic", size = "md", delay = 0, class: className = "" } = $$props;
 	const isRed = derived(() => suit === "♥" || suit === "♦");
 	const sizes = {
 		sm: {

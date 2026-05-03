@@ -83,9 +83,9 @@ pnpm dev
 - `src/lib/stores/profile.svelte.ts` — Profile, XP, training progress
 - `src/lib/stores/settings.svelte.ts` — Theme, card style, sound/haptics
 - `src/lib/engines/spacedRepetition.ts` — SM-2 algorithm, 4 poker decks
-- `src/lib/engines/gamification.ts` — XP, levels, achievements, streaks
-- `src/lib/engines/adaptiveEngine.ts` — Dynamic difficulty, weak topic detection
-- `src/lib/engines/soundManager.ts` — Sound effects
+- `src/lib/core/gamification.ts` — XP, levels, achievements, streaks
+- `src/lib/core/adaptiveEngine.ts` — Dynamic difficulty, weak topic detection
+- `src/lib/core/soundManager.ts` — Sound effects
 - `src/lib/components/` — BottomNav, PlayingCard, ProgressRing, Confetti, etc.
 
 ## Supabase Tables

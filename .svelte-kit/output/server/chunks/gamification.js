@@ -94,9 +94,199 @@ function calculateLevel(totalXP) {
 		xpForNextLevel: nextLevelData ? xpForNextLevel : totalXP,
 		xpInCurrentLevel,
 		xpNeededForNext: Math.max(0, xpForNextLevel - totalXP),
-		progress: !nextLevelData || xpRange === 0 ? 1 : xpInCurrentLevel / xpRange,
+		progress: !nextLevelData ? 1 : xpRange === 0 ? 0 : xpInCurrentLevel / xpRange,
 		levelData: LEVELS[currentLevel]
 	};
 }
+var ACHIEVEMENTS = {
+	FIRST_STEPS: {
+		id: "first_steps",
+		title: "First Steps",
+		description: "Complete your first training session",
+		icon: "🎯",
+		xpReward: 50,
+		requirement: {
+			type: "sessionsCompleted",
+			count: 1
+		}
+	},
+	DEDICATED_LEARNER: {
+		id: "dedicated_learner",
+		title: "Dedicated Learner",
+		description: "Complete 10 training sessions",
+		icon: "📖",
+		xpReward: 100,
+		requirement: {
+			type: "sessionsCompleted",
+			count: 10
+		}
+	},
+	POKER_SCHOLAR: {
+		id: "poker_scholar",
+		title: "Poker Scholar",
+		description: "Complete all 7 days of the training plan",
+		icon: "🎓",
+		xpReward: 500,
+		requirement: {
+			type: "trainingPlanCompleted",
+			count: 1
+		}
+	},
+	WEEK_WARRIOR: {
+		id: "week_warrior",
+		title: "7-Day Streak",
+		description: "Train 7 days in a row",
+		icon: "🔥",
+		xpReward: 200,
+		requirement: {
+			type: "currentStreak",
+			count: 7
+		}
+	},
+	MONTH_MASTER: {
+		id: "month_master",
+		title: "30-Day Streak",
+		description: "Train 30 days in a row",
+		icon: "💪",
+		xpReward: 1e3,
+		requirement: {
+			type: "currentStreak",
+			count: 30
+		}
+	},
+	UNSTOPPABLE: {
+		id: "unstoppable",
+		title: "Unstoppable",
+		description: "Train 100 days in a row",
+		icon: "⚡",
+		xpReward: 5e3,
+		requirement: {
+			type: "currentStreak",
+			count: 100
+		}
+	},
+	QUIZ_ROOKIE: {
+		id: "quiz_rookie",
+		title: "Quiz Rookie",
+		description: "Complete your first quiz",
+		icon: "❓",
+		xpReward: 25,
+		requirement: {
+			type: "quizzesCompleted",
+			count: 1
+		}
+	},
+	PERFECT_SCORE: {
+		id: "perfect_score",
+		title: "Perfect!",
+		description: "Score 100% in a quiz",
+		icon: "💯",
+		xpReward: 100,
+		requirement: {
+			type: "perfectQuizzes",
+			count: 1
+		}
+	},
+	QUIZ_MASTER: {
+		id: "quiz_master",
+		title: "Quiz Master",
+		description: "Score 100% in 5 quizzes in a row",
+		icon: "🏆",
+		xpReward: 300,
+		requirement: {
+			type: "perfectQuizStreak",
+			count: 5
+		}
+	},
+	RANGE_EXPLORER: {
+		id: "range_explorer",
+		title: "Range Explorer",
+		description: "Study all 6 positions",
+		icon: "🗺️",
+		xpReward: 150,
+		requirement: {
+			type: "positionsStudied",
+			count: 6
+		}
+	},
+	PUSH_FOLD_PRO: {
+		id: "push_fold_pro",
+		title: "Push/Fold Pro",
+		description: "Master all 3 stack sizes",
+		icon: "📊",
+		xpReward: 200,
+		requirement: {
+			type: "stackSizesMastered",
+			count: 3
+		}
+	},
+	EXPLOIT_HUNTER: {
+		id: "exploit_hunter",
+		title: "Exploit Hunter",
+		description: "Study all 5 common leaks",
+		icon: "🎯",
+		xpReward: 150,
+		requirement: {
+			type: "leaksStudied",
+			count: 5
+		}
+	},
+	LIGHTNING_FAST: {
+		id: "lightning_fast",
+		title: "Lightning Fast",
+		description: "Answer 10 questions in under 5 seconds each",
+		icon: "⚡",
+		xpReward: 200,
+		requirement: {
+			type: "speedDrillsFast",
+			count: 10
+		}
+	}
+};
+var AchievementManager = class {
+	unlockedAchievements;
+	progress;
+	constructor() {
+		this.unlockedAchievements = /* @__PURE__ */ new Set();
+		this.progress = {};
+	}
+	checkAchievements(stats) {
+		const newlyUnlocked = [];
+		for (const [key, achievement] of Object.entries(ACHIEVEMENTS)) {
+			if (this.unlockedAchievements.has(key)) continue;
+			if (this.checkRequirement(achievement.requirement, stats)) {
+				this.unlockedAchievements.add(key);
+				newlyUnlocked.push(achievement);
+			}
+		}
+		return newlyUnlocked;
+	}
+	checkRequirement(requirement, stats) {
+		const { type, count } = requirement;
+		const value = stats[type];
+		return typeof value === "number" && value >= count;
+	}
+	getProgress(achievementId, stats) {
+		const achievement = ACHIEVEMENTS[achievementId] ?? Object.values(ACHIEVEMENTS).find((a) => a.id === achievementId);
+		if (!achievement) return null;
+		const { type, count } = achievement.requirement;
+		const current = stats[type] || 0;
+		return {
+			current,
+			required: count,
+			percentage: Math.min(current / count * 100, 100),
+			unlocked: this.unlockedAchievements.has(achievementId)
+		};
+	}
+	getUnlockedAchievements() {
+		return Array.from(this.unlockedAchievements).map((id) => ACHIEVEMENTS[id]);
+	}
+	getLockedAchievements(stats) {
+		return Object.entries(ACHIEVEMENTS).filter(([id]) => !this.unlockedAchievements.has(id)).map(([id, achievement]) => ({
+			...achievement,
+			progress: this.getProgress(id, stats)
+		}));
+	}
+};
 //#endregion
-export { calculateLevel as n, XP_REWARDS as t };
+export { calculateLevel as i, AchievementManager as n, XP_REWARDS as r, ACHIEVEMENTS as t };

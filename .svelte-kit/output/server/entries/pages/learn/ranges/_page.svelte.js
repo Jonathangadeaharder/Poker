@@ -1,4 +1,4 @@
-import { V as escape_html, a as ensure_array_like, i as derived, n as attr_class } from "../../../../chunks/dev.js";
+import { a as ensure_array_like, i as derived, n as attr_class, z as escape_html } from "../../../../chunks/dev.js";
 import { t as goto } from "../../../../chunks/client.js";
 import "../../../../chunks/navigation.js";
 import { t as TopBar } from "../../../../chunks/TopBar.js";

@@ -84,7 +84,10 @@ export function generateRangeQuiz(position: Position, difficulty = 'easy'): Quiz
 
 	const uniqueWrong = [...new Set(selectedType.wrong)].filter((a) => a !== selectedType.correct);
 	while (uniqueWrong.length < 3) {
-		uniqueWrong.push(`${Math.floor(Math.random() * 30 + 10)}%`);
+		const candidate = `${Math.floor(Math.random() * 30 + 10)}%`;
+		if (candidate !== selectedType.correct && !uniqueWrong.includes(candidate)) {
+			uniqueWrong.push(candidate);
+		}
 	}
 	const allAnswers = [selectedType.correct, ...uniqueWrong.slice(0, 3)].sort(
 		() => Math.random() - 0.5

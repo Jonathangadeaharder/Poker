@@ -1,4 +1,4 @@
-import { V as escape_html, a as ensure_array_like, i as derived, l as stringify, n as attr_class, r as attr_style } from "../../../../chunks/dev.js";
+import { a as ensure_array_like, c as stringify, i as derived, n as attr_class, r as attr_style, z as escape_html } from "../../../../chunks/dev.js";
 import { t as goto } from "../../../../chunks/client.js";
 import "../../../../chunks/navigation.js";
 import { t as TopBar } from "../../../../chunks/TopBar.js";
@@ -623,6 +623,8 @@ function _page($$renderer, $$props) {
 		const totalModules = derived(() => schedule().reduce((sum, day) => sum + day.modules.length, 0));
 		const completedCount = derived(() => Object.values(completedModules).filter(Boolean).length);
 		const progress = derived(() => totalModules() > 0 ? completedCount() / totalModules() : 0);
+		const totalHours = derived(() => schedule().reduce((sum, day) => sum + day.totalHours, 0));
+		const completedHours = derived(() => schedule().reduce((sum, day, di) => sum + day.modules.reduce((dSum, _, mi) => dSum + (completedModules[`${di}-${mi}`] ? day.totalHours / day.modules.length : 0), 0), 0));
 		function dayCompleted(dayIndex, day) {
 			return day.modules.filter((_, mi) => completedModules[`${dayIndex}-${mi}`]).length;
 		}
@@ -659,7 +661,7 @@ function _page($$renderer, $$props) {
 			let [key, path] = each_array[$$index];
 			$$renderer.push(`<button${attr_class("path-btn svelte-m3sfm5", void 0, { "active": selectedPath === key })}${attr_style(selectedPath === key ? `background: ${path.color}; border-color: ${path.color};` : "")}><div class="path-btn-title svelte-m3sfm5">${escape_html(key === "CASH_GAME" ? "Cash Game" : "MTT")}</div> <div class="path-btn-sub svelte-m3sfm5">${escape_html(path.subtitle)}</div></button>`);
 		}
-		$$renderer.push(`<!--]--></div> <p class="path-desc svelte-m3sfm5">${escape_html(currentPath().description)}</p> <div class="progress-card svelte-m3sfm5"><div class="progress-header svelte-m3sfm5"><span class="eyebrow">Progress</span> <span class="mono progress-pct svelte-m3sfm5">${escape_html(Math.round(progress() * 100))}%</span></div> <div class="progress-track svelte-m3sfm5"><div class="progress-fill svelte-m3sfm5"${attr_style(`width: ${stringify(progress() * 100)}%; background: ${stringify(currentPath().color)};`)}></div></div> <div class="stats-row svelte-m3sfm5"><div class="stat svelte-m3sfm5"><div class="stat-value svelte-m3sfm5">40h</div> <div class="stat-label svelte-m3sfm5">Total</div></div> <div class="stat svelte-m3sfm5"><div class="stat-value svelte-m3sfm5">${escape_html(Math.round(progress() * 40))}h</div> <div class="stat-label svelte-m3sfm5">Done</div></div> <div class="stat svelte-m3sfm5"><div class="stat-value svelte-m3sfm5">${escape_html(40 - Math.round(progress() * 40))}h</div> <div class="stat-label svelte-m3sfm5">Left</div></div></div> <button class="btn btn-ghost reset-btn svelte-m3sfm5">Reset progress</button></div> <div class="section-title svelte-m3sfm5">7-Day Plan</div> <!--[-->`);
+		$$renderer.push(`<!--]--></div> <p class="path-desc svelte-m3sfm5">${escape_html(currentPath().description)}</p> <div class="progress-card svelte-m3sfm5"><div class="progress-header svelte-m3sfm5"><span class="eyebrow">Progress</span> <span class="mono progress-pct svelte-m3sfm5">${escape_html(Math.round(progress() * 100))}%</span></div> <div class="progress-track svelte-m3sfm5"><div class="progress-fill svelte-m3sfm5"${attr_style(`width: ${stringify(progress() * 100)}%; background: ${stringify(currentPath().color)};`)}></div></div> <div class="stats-row svelte-m3sfm5"><div class="stat svelte-m3sfm5"><div class="stat-value svelte-m3sfm5">${escape_html(Math.round(totalHours()))}h</div> <div class="stat-label svelte-m3sfm5">Total</div></div> <div class="stat svelte-m3sfm5"><div class="stat-value svelte-m3sfm5">${escape_html(Math.round(completedHours()))}h</div> <div class="stat-label svelte-m3sfm5">Done</div></div> <div class="stat svelte-m3sfm5"><div class="stat-value svelte-m3sfm5">${escape_html(Math.max(0, Math.round(totalHours() - completedHours())))}h</div> <div class="stat-label svelte-m3sfm5">Left</div></div></div> <button class="btn btn-ghost reset-btn svelte-m3sfm5">Reset progress</button></div> <div class="section-title svelte-m3sfm5">7-Day Plan</div> <!--[-->`);
 		const each_array_1 = ensure_array_like(schedule());
 		for (let di = 0, $$length = each_array_1.length; di < $$length; di++) {
 			let day = each_array_1[di];

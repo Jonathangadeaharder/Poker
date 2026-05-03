@@ -1,8 +1,8 @@
-import { B as attr, V as escape_html, i as derived, l as stringify, n as attr_class, r as attr_style } from "../../../chunks/dev.js";
+import { R as attr, c as stringify, i as derived, n as attr_class, r as attr_style, z as escape_html } from "../../../chunks/dev.js";
 import { t as goto } from "../../../chunks/client.js";
 import "../../../chunks/navigation.js";
-import { t as TopBar } from "../../../chunks/TopBar.js";
 import { t as PlayingCard } from "../../../chunks/PlayingCard.js";
+import { t as TopBar } from "../../../chunks/TopBar.js";
 //#region src/lib/components/Chip.svelte
 function Chip($$renderer, $$props) {
 	let { label = "", class: className = "" } = $$props;
@@ -24,7 +24,7 @@ function _page($$renderer, $$props) {
 		let confidence = 60;
 		let choice = null;
 		let tellMeter = 0;
-		let handNumber = 3;
+		let handNumber = 1;
 		let totalHands = 5;
 		let xpEarned = 0;
 		const correct = derived(() => choice === "raise");
@@ -47,7 +47,7 @@ function _page($$renderer, $$props) {
 			function right($$renderer) {
 				Pill($$renderer, {
 					children: ($$renderer) => {
-						$$renderer.push(`<span style="color: var(--gold);">●</span> +${escape_html(xpEarned)} XP`);
+						$$renderer.push(`<span style="color: var(--gold);">●</span> ${escape_html(xpEarned >= 0 ? `+${xpEarned}` : xpEarned)} XP`);
 					},
 					$$slots: { default: true }
 				});

@@ -94,6 +94,14 @@
     "file": "chunks/pokerRanges.js",
     "name": "pokerRanges"
   },
+  "_profile.svelte.js": {
+    "file": "chunks/profile.svelte.js",
+    "name": "profile.svelte",
+    "imports": [
+      "_dev.js",
+      "_auth.svelte.js"
+    ]
+  },
   "_pushFoldCharts.js": {
     "file": "chunks/pushFoldCharts.js",
     "name": "pushFoldCharts"
@@ -127,10 +135,10 @@
       "_shared.js"
     ]
   },
-  "node_modules/.pnpm/@sveltejs+kit@2.59.0_@sveltejs+vite-plugin-svelte@7.0.0_svelte@5.55.5_vite@8.0.10_@type_1f7bcefe05edb71b3e74d47a7ccdb98b/node_modules/@sveltejs/kit/src/runtime/app/server/remote/index.js": {
+  "node_modules/.pnpm/@sveltejs+kit@2.59.0_@sveltejs+vite-plugin-svelte@7.0.0_svelte@5.55.5_vite@8.0.10_@type_72ff1850efe0a9b28484ed03a4d12607/node_modules/@sveltejs/kit/src/runtime/app/server/remote/index.js": {
     "file": "remote-entry.js",
     "name": "remote-entry",
-    "src": "node_modules/.pnpm/@sveltejs+kit@2.59.0_@sveltejs+vite-plugin-svelte@7.0.0_svelte@5.55.5_vite@8.0.10_@type_1f7bcefe05edb71b3e74d47a7ccdb98b/node_modules/@sveltejs/kit/src/runtime/app/server/remote/index.js",
+    "src": "node_modules/.pnpm/@sveltejs+kit@2.59.0_@sveltejs+vite-plugin-svelte@7.0.0_svelte@5.55.5_vite@8.0.10_@type_72ff1850efe0a9b28484ed03a4d12607/node_modules/@sveltejs/kit/src/runtime/app/server/remote/index.js",
     "isEntry": true,
     "imports": [
       "_environment.js",
@@ -138,20 +146,20 @@
       "_shared.js"
     ]
   },
-  "node_modules/.pnpm/@sveltejs+kit@2.59.0_@sveltejs+vite-plugin-svelte@7.0.0_svelte@5.55.5_vite@8.0.10_@type_1f7bcefe05edb71b3e74d47a7ccdb98b/node_modules/@sveltejs/kit/src/runtime/components/svelte-5/error.svelte": {
+  "node_modules/.pnpm/@sveltejs+kit@2.59.0_@sveltejs+vite-plugin-svelte@7.0.0_svelte@5.55.5_vite@8.0.10_@type_72ff1850efe0a9b28484ed03a4d12607/node_modules/@sveltejs/kit/src/runtime/components/svelte-5/error.svelte": {
     "file": "entries/fallbacks/error.svelte.js",
     "name": "entries/fallbacks/error.svelte",
-    "src": "node_modules/.pnpm/@sveltejs+kit@2.59.0_@sveltejs+vite-plugin-svelte@7.0.0_svelte@5.55.5_vite@8.0.10_@type_1f7bcefe05edb71b3e74d47a7ccdb98b/node_modules/@sveltejs/kit/src/runtime/components/svelte-5/error.svelte",
+    "src": "node_modules/.pnpm/@sveltejs+kit@2.59.0_@sveltejs+vite-plugin-svelte@7.0.0_svelte@5.55.5_vite@8.0.10_@type_72ff1850efe0a9b28484ed03a4d12607/node_modules/@sveltejs/kit/src/runtime/components/svelte-5/error.svelte",
     "isEntry": true,
     "imports": [
       "_state.js",
       "_dev.js"
     ]
   },
-  "node_modules/.pnpm/@sveltejs+kit@2.59.0_@sveltejs+vite-plugin-svelte@7.0.0_svelte@5.55.5_vite@8.0.10_@type_1f7bcefe05edb71b3e74d47a7ccdb98b/node_modules/@sveltejs/kit/src/runtime/server/index.js": {
+  "node_modules/.pnpm/@sveltejs+kit@2.59.0_@sveltejs+vite-plugin-svelte@7.0.0_svelte@5.55.5_vite@8.0.10_@type_72ff1850efe0a9b28484ed03a4d12607/node_modules/@sveltejs/kit/src/runtime/server/index.js": {
     "file": "index.js",
     "name": "index",
-    "src": "node_modules/.pnpm/@sveltejs+kit@2.59.0_@sveltejs+vite-plugin-svelte@7.0.0_svelte@5.55.5_vite@8.0.10_@type_1f7bcefe05edb71b3e74d47a7ccdb98b/node_modules/@sveltejs/kit/src/runtime/server/index.js",
+    "src": "node_modules/.pnpm/@sveltejs+kit@2.59.0_@sveltejs+vite-plugin-svelte@7.0.0_svelte@5.55.5_vite@8.0.10_@type_72ff1850efe0a9b28484ed03a4d12607/node_modules/@sveltejs/kit/src/runtime/server/index.js",
     "isEntry": true,
     "imports": [
       "_environment.js",
@@ -216,7 +224,7 @@
       "_auth.svelte.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.CuM-DKL5.css"
+      "_app/immutable/assets/_layout.CZEQfDcI.css"
     ]
   },
   "src/routes/+page.svelte": {
@@ -241,7 +249,8 @@
       "_PlayingCard.js",
       "_TopBar.js",
       "_gamification.js",
-      "_auth.svelte.js"
+      "_auth.svelte.js",
+      "_profile.svelte.js"
     ],
     "css": [
       "_app/immutable/assets/_page.NHPe_ux_.css"
@@ -371,10 +380,30 @@
       "_dev.js",
       "_TopBar.js",
       "_gamification.js",
-      "_soundManager.js"
+      "_soundManager.js",
+      "_auth.svelte.js",
+      "_profile.svelte.js"
     ],
     "css": [
       "_app/immutable/assets/_page.DxoJK-l1.css"
+    ]
+  },
+  "src/routes/profile/+page.svelte": {
+    "file": "entries/pages/profile/_page.svelte.js",
+    "name": "entries/pages/profile/_page.svelte",
+    "src": "src/routes/profile/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_navigation.js",
+      "_dev.js",
+      "_TopBar.js",
+      "_gamification.js",
+      "_soundManager.js",
+      "_auth.svelte.js",
+      "_profile.svelte.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.FfFqmp9i.css"
     ]
   },
   "src/routes/results/[sessionId]/+page.svelte": {
@@ -383,9 +412,8 @@
     "src": "src/routes/results/[sessionId]/+page.svelte",
     "isEntry": true,
     "imports": [
-      "_environment.js",
       "_navigation.js",
-      "_client.js",
+      "_state.js",
       "_dev.js",
       "_Confetti.js"
     ]

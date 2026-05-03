@@ -19,6 +19,6 @@ export default defineConfig({
 	webServer: {
 		command: 'pnpm run dev --port 5174',
 		port: 5174,
-		reuseExistingServer: true
+		reuseExistingServer: process.env.PLAYWRIGHT_REUSE_SERVER === '1' || !!process.env.CI
 	}
 });

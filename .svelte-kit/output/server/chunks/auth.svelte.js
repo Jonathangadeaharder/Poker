@@ -1,4 +1,4 @@
-import { i as derived, lt as public_env } from "./dev.js";
+import { i as derived, st as public_env } from "./dev.js";
 import { createBrowserClient } from "@supabase/ssr";
 //#region src/lib/supabase.ts
 function createClient() {
