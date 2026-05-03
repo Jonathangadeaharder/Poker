@@ -48,12 +48,29 @@ function createProfileStore() {
 		if (!supabase) return;
 		loading = true;
 		try {
-			const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
+			const { data, error } = await supabase
+				.from('profiles')
+				.select('*')
+				.eq('id', userId)
+				.maybeSingle();
 
 			if (error) {
 				console.error('Failed to fetch profile:', error);
 			} else if (data) {
 				profile = data;
+			} else {
+				const username =
+					(await supabase.auth.getUser()).data.user?.user_metadata?.username ?? 'Player';
+				const { data: newProfile, error: upsertErr } = await supabase
+					.from('profiles')
+					.upsert({ id: userId, username }, { onConflict: 'id' })
+					.select()
+					.maybeSingle();
+				if (upsertErr) {
+					console.error('Failed to create missing profile:', upsertErr);
+				} else if (newProfile) {
+					profile = newProfile;
+				}
 			}
 		} catch (e) {
 			console.error('Failed to fetch profile:', e);

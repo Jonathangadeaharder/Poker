@@ -108,7 +108,7 @@ function handlePlayAgain() {
 
 			<!-- Answer Options -->
 			<div class="answers">
-				{#each currentQuestion.answers as answer, i (answer)}
+				{#each currentQuestion.answers as answer, i (i)}
 					{@const isCorrect = answer === currentQuestion.correctAnswer}
 					{@const isSelected = answer === selectedAnswer}
 					<button

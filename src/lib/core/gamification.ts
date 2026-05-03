@@ -79,7 +79,7 @@ export function calculateLevel(totalXP: number): LevelResult {
 		xpForNextLevel: nextLevelData ? xpForNextLevel : totalXP,
 		xpInCurrentLevel,
 		xpNeededForNext: Math.max(0, xpForNextLevel - totalXP),
-		progress: !nextLevelData || xpRange === 0 ? 1 : xpInCurrentLevel / xpRange,
+		progress: !nextLevelData ? 1 : xpRange === 0 ? 0 : xpInCurrentLevel / xpRange,
 		levelData: LEVELS[currentLevel]
 	};
 }
@@ -438,7 +438,11 @@ export class MilestoneTracker {
 
 		const nextXP = MILESTONES.TOTAL_XP.find((m) => m.threshold > (stats.totalXP ?? 0));
 		if (nextXP) {
-			next.push({ ...nextXP, type: 'xp', progress: (stats.totalXP ?? 0) / nextXP.threshold });
+			next.push({
+				...nextXP,
+				type: 'xp',
+				progress: nextXP.threshold > 0 ? (stats.totalXP ?? 0) / nextXP.threshold : 0
+			});
 		}
 
 		const nextQ = MILESTONES.TOTAL_QUESTIONS.find(

@@ -140,7 +140,6 @@ function handleMood(_mood: string) {
 		<div class="section">
 			<div class="section-header">
 				<div class="eyebrow">Hand of the Day</div>
-				<div class="mono" style="font-size: 10px; color: var(--gold);">2,847 PLAYING</div>
 			</div>
 			<button type="button" class="hand-card tap" onclick={() => goto('/lesson')}>
 				<div class="hand-cards">

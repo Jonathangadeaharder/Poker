@@ -82,7 +82,11 @@ export function generateRangeQuiz(position: Position, difficulty = 'easy'): Quiz
 
 	const selectedType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
 
-	const allAnswers = [selectedType.correct, ...selectedType.wrong.slice(0, 3)].sort(
+	const uniqueWrong = [...new Set(selectedType.wrong)].filter((a) => a !== selectedType.correct);
+	while (uniqueWrong.length < 3) {
+		uniqueWrong.push(`${Math.floor(Math.random() * 30 + 10)}%`);
+	}
+	const allAnswers = [selectedType.correct, ...uniqueWrong.slice(0, 3)].sort(
 		() => Math.random() - 0.5
 	);
 
@@ -138,7 +142,7 @@ export function generateExploitQuiz(difficulty = 'hard'): QuizQuestion {
 		category: 'exploits',
 		difficulty,
 		question: `Opponent shows this leak:\n"${leak.leak}"\n\nWhich adjustment is optimal?`,
-		answers: [leak.exploit.action, 'Play GTO', 'Bluff more', 'Fold more'].sort(
+		answers: [...new Set([leak.exploit.action, 'Play GTO', 'Bluff more', 'Fold more'])].sort(
 			() => Math.random() - 0.5
 		),
 		correctAnswer: leak.exploit.action,
