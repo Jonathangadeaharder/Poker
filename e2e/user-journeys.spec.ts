@@ -8,14 +8,16 @@ async function registerUser(page: import('@playwright/test').Page, email: string
 	await page.getByRole('textbox', { name: 'CONFIRM PASSWORD' }).fill(password);
 	await page.getByRole('button', { name: 'Create account' }).click();
 	// Wait for navigation with longer timeout — registration can be slow
-	await page.waitForURL('/home', { timeout: 15000 }).catch(async () => {
-		// If redirect doesn't happen, check if we're already on home or if there's an error
+	try {
+		await page.waitForURL('/home', { timeout: 15000 });
+	} catch {
+		// Validate post-registration state without forcing navigation
 		const url = page.url();
-		if (!url.includes('/home')) {
-			// Try navigating directly — user may be registered but redirect failed
-			await page.goto('/home');
+		const hasSuccessCard = await page.locator('.success-card, [data-testid="success-message"]').isVisible().catch(() => false);
+		if (!url.includes('/home') && !hasSuccessCard) {
+			throw new Error(`Registration failed: expected redirect to /home or success UI, but got ${url}`);
 		}
-	});
+	}
 }
 
 test.describe('Poker — Auth', () => {
@@ -225,7 +227,6 @@ test.describe('Poker — Quiz Interaction', () => {
 		if (!isVisible) {
 			throw new Error('No matching answer button found - expected Yes/No/Only suited/Sometimes');
 		}
-		const beforeText = await page.textContent('body');
 		await firstAnswer.click();
 		await page.waitForTimeout(1000);
 		const afterText = await page.textContent('body');
@@ -304,7 +305,7 @@ test.describe('Poker — Home Page Edge Cases', () => {
 				just5min.isVisible().catch(() => false),
 				feelSmart.isVisible().catch(() => false),
 				challenge.isVisible().catch(() => false),
-				replay.isVisible().catch(() => false),
+				replay.isVisible().catch(() => false)
 			])
 		).filter(Boolean).length;
 		expect(visibleButtons).toBeGreaterThanOrEqual(2);
@@ -345,11 +346,7 @@ test.describe('Poker — Profile Creation Fallback', () => {
 		await page.waitForTimeout(2000);
 		const bodyText = await page.textContent('body');
 		// Verify username is not the fallback 'Player' literal
-		const hasPlayer = bodyText?.includes('Player');
-		// Allow 'Player' only if it's part of another word (e.g., 'Players')
-		if (hasPlayer) {
-			expect(bodyText).toMatch(/Players|playing/i);
-		}
+		expect(bodyText).not.toMatch(/\bPlayer\b/);
 	});
 });
 
