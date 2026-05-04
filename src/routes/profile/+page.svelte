@@ -96,13 +96,19 @@ function toPoints(
 		.join(' ');
 }
 
-let deferredPrompt = $state<any>(null);
+interface BeforeInstallPromptEvent extends Event {
+	readonly platforms: string[];
+	readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+	prompt(): Promise<void>;
+}
+
+let deferredPrompt = $state<BeforeInstallPromptEvent | null>(null);
 let canInstall = $state(false);
 
 $effect(() => {
 	function handler(e: Event) {
 		e.preventDefault();
-		deferredPrompt = e;
+		deferredPrompt = e as BeforeInstallPromptEvent;
 		canInstall = true;
 	}
 	window.addEventListener('beforeinstallprompt', handler);

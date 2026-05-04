@@ -137,7 +137,14 @@ export function generateExploitQuiz(difficulty = 'hard'): QuizQuestion {
 	const leakKeys = Object.keys(COMMON_LEAKS);
 	const selectedKey = leakKeys[Math.floor(Math.random() * leakKeys.length)];
 	const leak = COMMON_LEAKS[selectedKey];
-	const wrongPool = ['Play GTO', 'Bluff more', 'Fold more', 'Check-call more', 'Bet smaller', 'Overlimp'];
+	const wrongPool = [
+		'Play GTO',
+		'Bluff more',
+		'Fold more',
+		'Check-call more',
+		'Bet smaller',
+		'Overlimp'
+	];
 	const wrongAnswers = wrongPool.filter((a) => a !== leak.exploit.action);
 	const exploitAnswers = [leak.exploit.action, ...wrongAnswers.slice(0, 3)].sort(
 		() => Math.random() - 0.5
