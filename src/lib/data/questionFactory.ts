@@ -2,9 +2,7 @@ import type { QuizQuestion } from './miniGames';
 
 const PTS: Record<string, number> = { easy: 10, medium: 15, hard: 20 };
 
-type QuestionTuple = [string, string, string, string, string, ...string[]];
-
-export function fromTuples(tuples: QuestionTuple[]): QuizQuestion[] {
+export function fromTuples(tuples: string[][]): QuizQuestion[] {
 	return tuples.map(([id, category, difficulty, question, correct, ...rest]) => ({
 		id,
 		category,
