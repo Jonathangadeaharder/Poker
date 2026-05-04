@@ -32,6 +32,12 @@
 	},
 	"overrides": [
 		{
+			"includes": ["src/lib/data/nlheMttQuestions.ts", "src/lib/data/ploQuestions.ts"],
+			"formatter": {
+				"lineWidth": 320
+			}
+		},
+		{
 			"includes": ["**/*.svelte"],
 			"linter": {
 				"rules": {

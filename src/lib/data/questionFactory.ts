@@ -2,32 +2,27 @@ import type { QuizQuestion } from './miniGames';
 
 const PTS: Record<string, number> = { easy: 10, medium: 15, hard: 20 };
 
-export function makeQuestion(
-	id: string,
-	category: string,
-	difficulty: string,
-	question: string,
-	correctAnswer: string,
-	...otherAnswers: string[]
-): QuizQuestion {
-	return {
+type QuestionTuple = [string, string, string, string, string, ...string[]];
+
+export function fromTuples(tuples: QuestionTuple[]): QuizQuestion[] {
+	return tuples.map(([id, category, difficulty, question, correct, ...rest]) => ({
 		id,
 		category,
 		difficulty,
 		question,
-		answers: [correctAnswer, ...otherAnswers],
-		correctAnswer,
+		answers: [correct, ...rest],
+		correctAnswer: correct,
 		explanation: '',
 		points: PTS[difficulty] ?? 10
-	};
+	}));
 }
 
-export function buildQuestions(
-	raw: QuizQuestion[],
+export function withExplanations(
+	questions: QuizQuestion[],
 	explanations: Record<string, string>
 ): QuizQuestion[] {
-	return raw.map((r) => ({
-		...r,
-		explanation: explanations[r.id] ?? r.explanation
+	return questions.map((q) => ({
+		...q,
+		explanation: explanations[q.id] ?? q.explanation
 	}));
 }
