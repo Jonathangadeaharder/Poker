@@ -1,48 +1,10 @@
-import { B as attr, V as escape_html, a as ensure_array_like, i as derived, l as stringify, r as attr_style } from "../../../chunks/dev.js";
+import { R as attr, a as ensure_array_like, c as stringify, i as derived, r as attr_style, z as escape_html } from "../../../chunks/dev.js";
 import "../../../chunks/navigation.js";
 import "../../../chunks/auth.svelte.js";
-import { n as calculateLevel } from "../../../chunks/gamification.js";
-import { t as TopBar } from "../../../chunks/TopBar.js";
 import { t as PlayingCard } from "../../../chunks/PlayingCard.js";
-//#region src/lib/stores/profile.svelte.ts
-function createProfileStore() {
-	let profile = null;
-	let dailyProgress = null;
-	let trainingProgress = [];
-	let loading = true;
-	async function fetchProfile(userId) {}
-	async function fetchDailyProgress(userId, date) {}
-	async function fetchTrainingProgress(userId) {}
-	async function updateProfile(userId, updates) {}
-	async function addXP(userId, amount) {}
-	return {
-		get profile() {
-			return profile;
-		},
-		get dailyProgress() {
-			return dailyProgress;
-		},
-		get trainingProgress() {
-			return trainingProgress;
-		},
-		get loading() {
-			return loading;
-		},
-		fetchProfile,
-		fetchDailyProgress,
-		fetchTrainingProgress,
-		updateProfile,
-		addXP
-	};
-}
-var profileStore = createProfileStore();
-//#endregion
-//#region src/lib/components/StreakBadge.svelte
-function StreakBadge($$renderer, $$props) {
-	let { count } = $$props;
-	$$renderer.push(`<div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(255,91,72,0.12); border: 1px solid rgba(255,91,72,0.3); border-radius: 999px;"><span style="font-size: 14px;">🔥</span> <span class="mono" style="font-size: 13px; font-weight: 700; color: var(--coral-soft);">${escape_html(count)}</span></div>`);
-}
-//#endregion
+import { t as TopBar } from "../../../chunks/TopBar.js";
+import { i as calculateLevel } from "../../../chunks/gamification.js";
+import { t as profileStore } from "../../../chunks/profile.svelte.js";
 //#region src/lib/components/ProgressRing.svelte
 function ProgressRing($$renderer, $$props) {
 	let { value, size = 64, stroke = 6, label, sublabel } = $$props;
@@ -61,6 +23,12 @@ function ProgressRing($$renderer, $$props) {
 		$$renderer.push(`<!--]--></div>`);
 	} else $$renderer.push("<!--[-1-->");
 	$$renderer.push(`<!--]--></div>`);
+}
+//#endregion
+//#region src/lib/components/StreakBadge.svelte
+function StreakBadge($$renderer, $$props) {
+	let { count } = $$props;
+	$$renderer.push(`<div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(255,91,72,0.12); border: 1px solid rgba(255,91,72,0.3); border-radius: 999px;"><span style="font-size: 14px;">🔥</span> <span class="mono" style="font-size: 13px; font-weight: 700; color: var(--coral-soft);">${escape_html(count)}</span></div>`);
 }
 //#endregion
 //#region src/routes/home/+page.svelte
@@ -124,7 +92,7 @@ function _page($$renderer, $$props) {
 		const dailyProgress = derived(() => profileStore.dailyProgress);
 		const levelResult = derived(() => profile() ? calculateLevel(profile().xp) : null);
 		const xpToday = derived(() => dailyProgress()?.xp_earned ?? 0);
-		const xpPercent = derived(() => Math.round(xpToday() / DAILY_GOAL * 100));
+		const xpPercent = derived(() => Math.min(100, Math.max(0, Math.round(xpToday() / DAILY_GOAL * 100))));
 		const streak = derived(() => profile()?.streak_count ?? 0);
 		const username = derived(() => profile()?.username ?? "Player");
 		const initial = derived(() => username().charAt(0).toUpperCase());
@@ -154,7 +122,7 @@ function _page($$renderer, $$props) {
 			size: 64,
 			label: `${stringify(xpPercent())}%`
 		});
-		$$renderer.push(`<!----></div> <button class="btn btn-primary" style="width: 100%; margin-top: 16px;">Continue session · ${escape_html(xpRemaining())} xp left</button></div> <div class="section svelte-1j6ictg"><div class="section-header svelte-1j6ictg"><div class="eyebrow">Hand of the Day</div> <div class="mono" style="font-size: 10px; color: var(--gold);">2,847 PLAYING</div></div> <button type="button" class="hand-card tap svelte-1j6ictg"><div class="hand-cards svelte-1j6ictg"><div style="transform: rotate(-8deg);">`);
+		$$renderer.push(`<!----></div> <button class="btn btn-primary" style="width: 100%; margin-top: 16px;">Continue session · ${escape_html(xpRemaining())} xp left</button></div> <div class="section svelte-1j6ictg"><div class="section-header svelte-1j6ictg"><div class="eyebrow">Hand of the Day</div></div> <button type="button" class="hand-card tap svelte-1j6ictg"><div class="hand-cards svelte-1j6ictg"><div style="transform: rotate(-8deg);">`);
 		PlayingCard($$renderer, {
 			rank: "Q",
 			suit: "♥",

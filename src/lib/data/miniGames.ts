@@ -82,7 +82,12 @@ export function generateRangeQuiz(position: Position, difficulty = 'easy'): Quiz
 
 	const selectedType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
 
-	const allAnswers = [selectedType.correct, ...selectedType.wrong.slice(0, 3)].sort(
+	const wrongSet = new Set(selectedType.wrong.filter((a) => a !== selectedType.correct));
+	while (wrongSet.size < 3) {
+		const candidate = `${Math.floor(Math.random() * 30 + 10)}%`;
+		if (candidate !== selectedType.correct) wrongSet.add(candidate);
+	}
+	const allAnswers = [selectedType.correct, ...Array.from(wrongSet).slice(0, 3)].sort(
 		() => Math.random() - 0.5
 	);
 
@@ -132,15 +137,25 @@ export function generateExploitQuiz(difficulty = 'hard'): QuizQuestion {
 	const leakKeys = Object.keys(COMMON_LEAKS);
 	const selectedKey = leakKeys[Math.floor(Math.random() * leakKeys.length)];
 	const leak = COMMON_LEAKS[selectedKey];
+	const wrongPool = [
+		'Play GTO',
+		'Bluff more',
+		'Fold more',
+		'Check-call more',
+		'Bet smaller',
+		'Overlimp'
+	];
+	const wrongAnswers = wrongPool.filter((a) => a !== leak.exploit.action);
+	const exploitAnswers = [leak.exploit.action, ...wrongAnswers.slice(0, 3)].sort(
+		() => Math.random() - 0.5
+	);
 
 	return {
 		id: `exploit_${selectedKey}_${Math.random().toString(36).slice(2, 9)}`,
 		category: 'exploits',
 		difficulty,
 		question: `Opponent shows this leak:\n"${leak.leak}"\n\nWhich adjustment is optimal?`,
-		answers: [leak.exploit.action, 'Play GTO', 'Bluff more', 'Fold more'].sort(
-			() => Math.random() - 0.5
-		),
+		answers: exploitAnswers,
 		correctAnswer: leak.exploit.action,
 		explanation: `${leak.exploit.action}\n\n${leak.exploit.postflop || leak.exploit.range || ''}\n\nExpected: ${leak.exploit.expectedWinRate}`,
 		points: 20,

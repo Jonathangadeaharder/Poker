@@ -1,0 +1,672 @@
+[
+	[
+		"mtt_1",
+		"mtt_early",
+		"easy",
+		"In early stage (100bb), your main goal is:",
+		"Accumulate chips aggressively",
+		"Survive to later stages",
+		"Play tight and preserve stack",
+		"See cheap flops and hit big hands"
+	],
+	[
+		"mtt_2",
+		"mtt_early",
+		"medium",
+		"Early stage, villain limps from MP. You have AJ on BTN. Best play?",
+		"ISO-raise to 5x BB",
+		"Limp behind - see cheap flop",
+		"Fold - dominated too often",
+		"Min-raise to 2.5x BB"
+	],
+	[
+		"mtt_3",
+		"mtt_early",
+		"medium",
+		"150bb effective, you raise BTN with 98s. BB calls. Flop: K73 (two spades). BB checks. What sizing?",
+		"Bet 33% pot",
+		"Check behind - missed",
+		"Bet 50% pot",
+		"Bet 75% pot"
+	],
+	[
+		"mtt_4",
+		"mtt_early",
+		"hard",
+		"You open UTG, BTN 3-bets, blinds fold. You have JJ (100bb). Correct play?",
+		"Call - see flop in position",
+		"4-bet to 2.5x their 3-bet",
+		"Fold - face overcards too often",
+		"4-bet shove 100bb"
+	],
+	[
+		"mtt_5",
+		"mtt_middle",
+		"easy",
+		"Middle stage (40bb), antes in play. Your strategy should adjust by:",
+		"Opening wider - more to win",
+		"Playing tighter - more at risk",
+		"Same strategy",
+		"Only play premiums"
+	],
+	[
+		"mtt_6",
+		"mtt_middle",
+		"medium",
+		"35bb stack, you open BTN with KQo. SB shoves 25bb. Blinds 500/1000, ante 100. Call or fold?",
+		"Call - getting good odds",
+		"Fold - need stronger hand",
+		"Call - dominating his range",
+		"Fold - too much variance"
+	],
+	[
+		"mtt_7",
+		"mtt_middle",
+		"hard",
+		"40bb stack, CO opens 2.5bb, you 3-bet BTN to 7bb with A5s. CO calls. Flop: K92 (rainbow). CO checks. Best play?",
+		"Bet 4bb (33% pot)",
+		"Check back - missed completely",
+		"Bet 6bb (50% pot)",
+		"Bet 9bb (75% pot)"
+	],
+	[
+		"mtt_8",
+		"mtt_middle",
+		"hard",
+		"50bb, MP opens 2.2bb, BTN calls, you call BB with 98s. Flop: Q94 (pot 7.6bb). MP bets 4bb, BTN folds. Your play?",
+		"Fold - weak kicker, no draws",
+		"Call - 2nd pair decent",
+		"Raise to 12bb - semi-bluff",
+		"Shove 48bb"
+	],
+	[
+		"mtt_9",
+		"mtt_late",
+		"easy",
+		"Late stage (20bb), when should you consider limping?",
+		"Never - always raise or fold",
+		"With small pairs from SB",
+		"With speculative hands in EP",
+		"Frequently to see cheap flops"
+	],
+	[
+		"mtt_10",
+		"mtt_late",
+		"medium",
+		"22bb stack, folds to you in SB with KTo. BB has 18bb. Correct play?",
+		"Shove 22bb",
+		"Limp - see cheap flop",
+		"Min-raise to 2bb",
+		"Raise to 2.5bb"
+	],
+	[
+		"mtt_11",
+		"mtt_late",
+		"hard",
+		"25bb, CO opens 2.2bb (22bb behind). You have AQs on BTN (25bb). Best play?",
+		"3-bet shove 25bb",
+		"Call - see flop with position",
+		"3-bet to 6bb",
+		"Fold - avoid domination"
+	],
+	[
+		"mtt_12",
+		"mtt_late",
+		"hard",
+		"20bb, MP opens 2.5bb, folds to you in BB with TT. Villain has 35bb. Your play?",
+		"3-bet shove 20bb",
+		"Call - set mine",
+		"3-bet to 7.5bb",
+		"Fold"
+	],
+	[
+		"mtt_13",
+		"mtt_push_fold",
+		"easy",
+		"At what stack depth does push/fold strategy become most important?",
+		"15bb",
+		"30bb",
+		"20bb",
+		"10bb"
+	],
+	[
+		"mtt_14",
+		"mtt_push_fold",
+		"medium",
+		"12bb in CO, folds to you with QJo. Correct play?",
+		"Shove 12bb",
+		"Fold - need stronger",
+		"Min-raise 2bb",
+		"Raise to 2.5bb"
+	],
+	[
+		"mtt_15",
+		"mtt_push_fold",
+		"hard",
+		"10bb in BTN, SB (8bb) and BB (12bb). Folds to you, you have A7o. Correct play?",
+		"Shove 10bb",
+		"Fold - weak ace",
+		"Min-raise 2bb",
+		"Raise to 2.5bb"
+	],
+	[
+		"mtt_16",
+		"mtt_push_fold",
+		"hard",
+		"8bb in BB, BTN shoves 15bb. You have KQo. Pot odds require 40% equity to call. Your play?",
+		"Call - KQ strong enough",
+		"Fold - need better hand",
+		"Call - priced in",
+		"Fold - variance too high"
+	],
+	[
+		"mtt_17",
+		"mtt_bubble",
+		"easy",
+		"On the bubble, the correct strategy is generally:",
+		"Apply pressure on medium stacks",
+		"Play very tight - wait for money",
+		"Go all-in every hand",
+		"Min-cash is the goal"
+	],
+	[
+		"mtt_18",
+		"mtt_bubble",
+		"medium",
+		"You have 25bb on bubble (avg 30bb). MP (40bb) opens 2.5bb, folds to you in BB with 99. Correct play?",
+		"3-bet to 7.5bb",
+		"Fold - protect stack on bubble",
+		"Call - see flop",
+		"3-bet shove 25bb"
+	],
+	[
+		"mtt_19",
+		"mtt_bubble",
+		"hard",
+		"Bubble: You (50bb), shortstack (7bb) in SB, BB (30bb). Folds to you in CO with A5s. Play?",
+		"Raise 3bb - larger to pressure BB",
+		"Fold - shortstack about to bust",
+		"Raise 2.5bb - standard open",
+		"Limp - avoid shortstack"
+	],
+	[
+		"mtt_20",
+		"mtt_bubble",
+		"hard",
+		"Stone bubble (1 from money), you (15bb) in BB, BTN (40bb) shoves. You have AJs. Call or fold?",
+		"Fold - ICM pressure huge",
+		"Fold - min-cast secured by waiting",
+		"Call - AJs too strong to fold",
+		"Call - chip EV positive"
+	],
+	[
+		"mtt_21",
+		"mtt_final_table",
+		"medium",
+		"At final table, ICM pressure is:",
+		"Much higher than bubble",
+		"Same as bubble",
+		"Lower than bubble",
+		"Irrelevant - chip EV only"
+	],
+	[
+		"mtt_22",
+		"mtt_final_table",
+		"hard",
+		"Final table (9 left), you (20bb, 5th in chips). Shortstack (5bb) shoves UTG, folds to you in BTN with AKo. Call?",
+		"Call - AK is premium",
+		"Fold - let shortstacks battle",
+		"Call - dominating range",
+		"Fold - ICM considerations"
+	],
+	[
+		"mtt_23",
+		"mtt_final_table",
+		"hard",
+		"FT, 6 players left. You (15bb, 4th), chipleader (60bb) on BTN, you in SB with KQs. Chipleader opens 2.5bb. Play?",
+		"Fold - avoid big stack",
+		"3-bet to 7bb",
+		"3-bet shove 15bb",
+		"Call"
+	],
+	[
+		"mtt_24",
+		"mtt_icm",
+		"hard",
+		"What is the primary difference between chip EV and ICM calculations?",
+		"ICM values survival over accumulation",
+		"Chip EV is always more profitable",
+		"ICM only matters on bubble",
+		"No significant difference"
+	],
+	[
+		"mtt_25",
+		"mtt_ranges",
+		"medium",
+		"From UTG with 30bb, your opening range should be approximately:",
+		"15-18%",
+		"8-10%",
+		"20-22%",
+		"25%+"
+	],
+	[
+		"mtt_26",
+		"mtt_postflop",
+		"hard",
+		"You open BTN (40bb), BB calls. Flop: A72 (heads up, pot 7bb). BB checks. Your AKo. What size?",
+		"Bet 2bb (33% pot)",
+		"Check - way ahead",
+		"Bet 3.5bb (50% pot)",
+		"Bet 5bb (75% pot)"
+	],
+	[
+		"mtt_27",
+		"mtt_strategy",
+		"medium",
+		"In MTT vs cash games, your red line (non-showdown winnings) should be:",
+		"Much higher - more aggression needed",
+		"Lower - tighter play",
+		"Same as cash",
+		"Irrelevant stat for MTTs"
+	],
+	[
+		"mtt_28",
+		"mtt_bubble",
+		"medium",
+		"On bubble, you have 10bb (shortest at table). Best strategy?",
+		"Shove or fold aggressively",
+		"Min-raise to see flops",
+		"Wait for premium hands",
+		"Fold to money"
+	],
+	[
+		"mtt_29",
+		"mtt_final_table",
+		"hard",
+		"3-handed, you (30bb), villain1 (40bb), villain2 (30bb). Villain1 shoves button, you in SB with 88. Call?",
+		"Call - 88 strong 3-handed",
+		"Fold - avoid flip",
+		"Call - getting great odds",
+		"Fold - wait for better spot"
+	],
+	[
+		"mtt_30",
+		"mtt_early",
+		"medium",
+		"120bb deep, you raise BTN with QJs, BB calls (100bb). Flop: KT3 (one spade). BB checks. Your play?",
+		"Bet 33% pot - c-bet",
+		"Check - weak hand",
+		"Bet 50% pot",
+		"Bet 75% pot"
+	],
+	[
+		"mtt_31",
+		"mtt_middle",
+		"medium",
+		"45bb, you open CO with AQo. BTN 3-bets to 10bb (55bb behind). Correct play?",
+		"Fold - avoid big pot OOP",
+		"Call - position is bad for you",
+		"4-bet to 24bb",
+		"4-bet shove 45bb"
+	],
+	[
+		"mtt_32",
+		"mtt_late",
+		"hard",
+		"28bb, BTN (25bb) opens 2.5bb, you in BB with AA. What is optimal play?",
+		"3-bet to 7bb",
+		"Call - trap",
+		"3-bet shove 28bb",
+		"Flat call - see flop"
+	],
+	[
+		"mtt_33",
+		"mtt_push_fold",
+		"medium",
+		"14bb in MP, folds to you with 88. Correct play?",
+		"Shove 14bb",
+		"Fold - too weak for shove",
+		"Raise to 2.5bb",
+		"Limp"
+	],
+	[
+		"mtt_34",
+		"mtt_final_table",
+		"hard",
+		"Heads up, you (60bb), villain (40bb). You on BTN with 76s. Correct play?",
+		"Raise to 2.5bb",
+		"Fold - weak hand",
+		"Limp",
+		"Raise to 2bb"
+	],
+	[
+		"mtt_35",
+		"mtt_middle",
+		"easy",
+		"What is a \"resteal\"?",
+		"3-betting vs late position opener",
+		"Stealing blinds from late position",
+		"Calling a steal attempt",
+		"Opening from blinds"
+	],
+	[
+		"mtt_36",
+		"mtt_middle",
+		"medium",
+		"35bb in BB, BTN (40bb) opens 2.2bb. You have K9s. Resteal shove or fold?",
+		"Fold - not strong enough",
+		"Call - see flop",
+		"Shove 35bb - resteal",
+		"3-bet to 7bb"
+	],
+	[
+		"mtt_37",
+		"mtt_late",
+		"hard",
+		"22bb, BTN opens 2.2bb (28bb behind), you in SB with ATo. BB is tight (30bb). Best play?",
+		"3-bet shove 22bb",
+		"Fold",
+		"Call - see flop",
+		"3-bet to 6.5bb"
+	],
+	[
+		"mtt_38",
+		"mtt_postflop",
+		"hard",
+		"You bluff turn, villain calls. River bricks. Pot = 30bb, you have 40bb behind. Optimal river play?",
+		"Give up - he called turn",
+		"Bet 15bb (50% pot)",
+		"Shove 40bb (130% pot)",
+		"Bet 20bb (66% pot)"
+	],
+	[
+		"mtt_39",
+		"mtt_postflop",
+		"medium",
+		"You have top pair on river. Villain bets 60% pot. Your hand beats bluffs, loses to value. Correct play?",
+		"Call if villain capable of bluffing",
+		"Call - bluff-catchers should call",
+		"Fold - if he bets he has it",
+		"Raise - for thin value"
+	],
+	[
+		"mtt_40",
+		"mtt_icm",
+		"hard",
+		"FT, 5 players left, you're 5th in chips (12bb). 4th place pays $5k, 3rd pays $8k. Best strategy?",
+		"Play push/fold aggressively",
+		"Survive to next pay jump",
+		"Ladder by waiting",
+		"Shove every hand"
+	],
+	[
+		"mtt_41",
+		"mtt_ranges",
+		"medium",
+		"From BTN with 35bb and antes, optimal opening range is approximately:",
+		"45%",
+		"25%",
+		"35%",
+		"55%"
+	],
+	[
+		"mtt_42",
+		"mtt_ranges",
+		"hard",
+		"25bb, CO opens 2.2bb, you are on BTN. Optimal 3-betting range?",
+		"Polarized (premiums + bluffs)",
+		"Linear (strong hands only)",
+		"Merged (premiums + good hands)",
+		"Never 3-bet at 25bb"
+	],
+	[
+		"mtt_43",
+		"mtt_strategy",
+		"medium",
+		"With antes vs without antes, your late position opening range should be:",
+		"Much wider",
+		"Much tighter",
+		"Slightly tighter",
+		"Same"
+	],
+	[
+		"mtt_44",
+		"mtt_middle",
+		"medium",
+		"Big blind ante vs button ante - how does strategy change?",
+		"BB should defend wider",
+		"No difference",
+		"Steals are more profitable",
+		"BTN should open tighter"
+	],
+	[
+		"mtt_45",
+		"mtt_postflop",
+		"medium",
+		"In multi-way pots, you should generally:",
+		"C-bet less often - someone hit",
+		"C-bet more often - more to win",
+		"Same frequency as heads-up",
+		"Always c-bet as preflop raiser"
+	],
+	[
+		"mtt_46",
+		"mtt_postflop",
+		"hard",
+		"You raise BTN, both blinds call. Flop: 952 (pot 9bb). Checked to you. You have AKo. Best play?",
+		"Bet 3bb (33%)",
+		"Check - missed completely",
+		"Bet 5bb (55%)",
+		"Bet 7bb (75%)"
+	],
+	[
+		"mtt_47",
+		"mtt_push_fold",
+		"medium",
+		"With 7bb on BTN (antes in play), you should shove approximately:",
+		"60% of hands",
+		"30% of hands",
+		"45% of hands",
+		"75% of hands"
+	],
+	[
+		"mtt_48",
+		"mtt_push_fold",
+		"hard",
+		"9bb in SB, folds to you, BB has 12bb with QTo. Shove or fold?",
+		"Shove - strong enough",
+		"Fold - need better",
+		"Min-raise - see flop",
+		"Limp"
+	],
+	[
+		"mtt_49",
+		"mtt_push_fold",
+		"medium",
+		"BTN (8bb) shoves, you in BB (25bb) with A9o. Pot gives you 2.3:1 odds. Call or fold?",
+		"Call - priced in",
+		"Fold - need stronger",
+		"Fold - too much variance",
+		"Call - dominating range"
+	],
+	[
+		"mtt_50",
+		"mtt_push_fold",
+		"hard",
+		"MP (10bb) shoves, you in BB (30bb) with 55. Getting 2:1 odds. Call?",
+		"Call - getting correct odds",
+		"Call - pairs play well",
+		"Fold - likely racing",
+		"Fold - protect stack"
+	],
+	[
+		"mtt_51",
+		"mtt_strategy",
+		"medium",
+		"What is a \"squeeze play\"?",
+		"3-betting after open and call(s)",
+		"4-betting preflop",
+		"Shoving over limpers",
+		"Calling a 3-bet in position"
+	],
+	[
+		"mtt_52",
+		"mtt_middle",
+		"hard",
+		"40bb, CO opens 2.5bb, BTN calls, you in SB with AJs. Best play?",
+		"3-bet to 10bb - squeeze",
+		"Fold - multiway trouble",
+		"Call - see flop in multiway",
+		"Shove 40bb"
+	],
+	[
+		"mtt_53",
+		"mtt_strategy",
+		"medium",
+		"At a tight table, you should:",
+		"Open wider - more fold equity",
+		"Play tight - wait for premiums",
+		"Same strategy",
+		"Limp more - see cheap flops"
+	],
+	[
+		"mtt_54",
+		"mtt_strategy",
+		"hard",
+		"At aggressive 3-betting table, how should you adjust?",
+		"Open tighter - avoid 3-bets",
+		"Open wider - fight back",
+		"4-bet lighter - counter aggression",
+		"Limp more"
+	],
+	[
+		"mtt_55",
+		"mtt_strategy",
+		"medium",
+		"SB vs BB (both 30bb), what % should SB open-raise?",
+		"65%",
+		"30%",
+		"50%",
+		"80%"
+	],
+	[
+		"mtt_56",
+		"mtt_strategy",
+		"hard",
+		"BB vs SB open (30bb), you should defend approximately:",
+		"45%",
+		"30%",
+		"60%",
+		"75%"
+	],
+	[
+		"mtt_57",
+		"mtt_strategy",
+		"medium",
+		"Most dangerous stack size in MTT is approximately:",
+		"15-25bb",
+		"5-10bb",
+		"30-40bb",
+		"50bb+"
+	],
+	[
+		"mtt_58",
+		"mtt_strategy",
+		"hard",
+		"With 18bb, you open BTN to 2.2bb. BB shoves 22bb. You have AKo. Call or fold?",
+		"Call - AK too strong",
+		"Fold - avoid flip",
+		"Call - slightly profitable",
+		"Fold - preserve stack"
+	],
+	[
+		"mtt_59",
+		"mtt_satellite",
+		"medium",
+		"In satellites (multiple equal prizes), correct strategy is:",
+		"Much tighter - survival focus",
+		"Same as regular MTT",
+		"More aggressive - need chips",
+		"Push/fold earlier"
+	],
+	[
+		"mtt_60",
+		"mtt_satellite",
+		"hard",
+		"Satellite bubble, you have 25bb (avg 20bb). All spots pay equally. How tight should you play?",
+		"Very tight - preserve stack",
+		"Same as chip EV",
+		"Slightly tighter",
+		"Aggressive - others tight"
+	],
+	[
+		"mtt_61",
+		"mtt_postflop",
+		"hard",
+		"You c-bet flop with air, villain calls. Turn checks to you again. Pot = 12bb, 25bb behind. Optimal play?",
+		"Give up - he called flop",
+		"Barrel 8bb (66% pot)",
+		"Shove 25bb",
+		"Small bet 4bb (33%)"
+	],
+	[
+		"mtt_62",
+		"mtt_postflop",
+		"medium",
+		"You c-bet flop with top pair, villain calls. Turn is a scare card. Pot = 15bb. Best play?",
+		"Bet 5bb - control pot",
+		"Check - scare card appeared",
+		"Bet 10bb - protect hand",
+		"Shove"
+	],
+	[
+		"mtt_63",
+		"mtt_early",
+		"hard",
+		"150bb, recreational player opens 5x BB from EP. You on BTN with 88. Best exploitative play?",
+		"Call - set mine with odds",
+		"Fold - facing strong range",
+		"3-bet to 15bb",
+		"Shove 150bb"
+	],
+	[
+		"mtt_64",
+		"mtt_early",
+		"medium",
+		"Early stage, passive player limps from EP. You have KJs in MP. Optimal play?",
+		"ISO-raise to 5x BB",
+		"Limp behind - see flop",
+		"Fold",
+		"Min-raise"
+	],
+	[
+		"mtt_65",
+		"mtt_mindset",
+		"easy",
+		"Most important skill for MTT success is:",
+		"Patience and discipline",
+		"Preflop hand selection",
+		"Reading opponents",
+		"Aggression"
+	],
+	[
+		"mtt_66",
+		"mtt_strategy",
+		"medium",
+		"Average MTT ROI (return on investment) for winning players is approximately:",
+		"20-30%",
+		"5-10%",
+		"40-50%",
+		"60%+"
+	],
+	[
+		"mtt_67",
+		"mtt_icm",
+		"hard",
+		"Which situation has highest ICM pressure?",
+		"Final table bubble (10th place)",
+		"Bubble of 1000-player MTT",
+		"3-handed at final table",
+		"Satellite bubble with 5bb stack"
+	]
+]

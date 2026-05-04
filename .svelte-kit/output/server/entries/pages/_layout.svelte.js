@@ -1,4 +1,4 @@
-import { V as escape_html, a as ensure_array_like, i as derived, l as stringify, o as head, r as attr_style } from "../../chunks/dev.js";
+import { a as ensure_array_like, c as stringify, i as derived, o as head, r as attr_style, z as escape_html } from "../../chunks/dev.js";
 import { t as goto } from "../../chunks/client.js";
 import "../../chunks/navigation.js";
 import { t as page } from "../../chunks/state.js";
@@ -58,14 +58,14 @@ function _layout($$renderer, $$props) {
 				today: "/home",
 				practice: "/practice",
 				replay: "/replay",
-				you: "/you"
+				you: "/profile"
 			}[id] ?? "/home");
 		}
 		head("12qhfyh", $$renderer, ($$renderer) => {
 			$$renderer.title(($$renderer) => {
 				$$renderer.push(`<title>Tilt — Poker Training</title>`);
 			});
-			$$renderer.push(`<meta name="description" content="Poker training app with GTO principles"/>`);
+			$$renderer.push(`<meta name="description" content="Poker training app with GTO principles"/> <meta name="theme-color" content="#0e2a20"/> <link rel="manifest" href="/manifest.json"/>`);
 		});
 		if (auth.loading) {
 			$$renderer.push("<!--[0-->");

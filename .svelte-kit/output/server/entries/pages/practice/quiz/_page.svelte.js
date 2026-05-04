@@ -1,4 +1,4 @@
-import { B as attr, V as escape_html, a as ensure_array_like, i as derived, l as stringify, n as attr_class, r as attr_style } from "../../../../chunks/dev.js";
+import { R as attr, a as ensure_array_like, c as stringify, i as derived, n as attr_class, r as attr_style, z as escape_html } from "../../../../chunks/dev.js";
 import { t as goto } from "../../../../chunks/client.js";
 import "../../../../chunks/navigation.js";
 import { t as TopBar } from "../../../../chunks/TopBar.js";
@@ -18,151 +18,151 @@ import "../../../../chunks/soundManager.js";
 * 3. Push/Fold Trainer (Interactive scenarios)
 * 4. Hand Evaluation (Evaluate hands)
 */
-/**
-* Quiz Generator - creates multiple choice questions
-*/
-var QuizGenerator = class QuizGenerator {
-	static generateRangeQuiz(position, difficulty = "easy") {
-		const range = RFI_RANGES[position];
-		const allPositions = Object.keys(RFI_RANGES);
-		const questionTypes = [{
-			question: `Which RFI range is correct for ${range.position}?`,
-			correct: range.percentage,
-			wrong: [
-				RFI_RANGES[allPositions[Math.floor(Math.random() * allPositions.length)]].percentage,
-				RFI_RANGES[allPositions[Math.floor(Math.random() * allPositions.length)]].percentage,
-				`${Math.floor(Math.random() * 30 + 10)}%`
-			]
-		}, {
-			question: `Should KQo be played as RFI from ${position}?`,
-			correct: range.hands.includes("KQo") ? "Yes" : "No",
-			wrong: range.hands.includes("KQo") ? [
-				"No",
-				"Sometimes",
-				"Only suited"
-			] : [
-				"Yes",
-				"Always",
-				"Mostly"
-			]
-		}];
-		const selectedType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
-		const allAnswers = [selectedType.correct, ...selectedType.wrong.slice(0, 3)].sort(() => Math.random() - .5);
-		return {
-			id: `range_${position}_${Math.random().toString(36).slice(2, 9)}`,
-			category: "ranges",
-			difficulty,
-			question: selectedType.question,
-			answers: allAnswers,
-			correctAnswer: selectedType.correct,
-			explanation: range.description,
-			points: difficulty === "easy" ? 10 : difficulty === "medium" ? 15 : 20
-		};
+function generateRangeQuiz(position, difficulty = "easy") {
+	const range = RFI_RANGES[position];
+	const allPositions = Object.keys(RFI_RANGES);
+	const questionTypes = [{
+		question: `Which RFI range is correct for ${range.position}?`,
+		correct: range.percentage,
+		wrong: [
+			RFI_RANGES[allPositions[Math.floor(Math.random() * allPositions.length)]].percentage,
+			RFI_RANGES[allPositions[Math.floor(Math.random() * allPositions.length)]].percentage,
+			`${Math.floor(Math.random() * 30 + 10)}%`
+		]
+	}, {
+		question: `Should KQo be played as RFI from ${position}?`,
+		correct: range.hands.includes("KQo") ? "Yes" : "No",
+		wrong: range.hands.includes("KQo") ? [
+			"No",
+			"Sometimes",
+			"Only suited"
+		] : [
+			"Yes",
+			"Always",
+			"Mostly"
+		]
+	}];
+	const selectedType = questionTypes[Math.floor(Math.random() * questionTypes.length)];
+	const uniqueWrong = [...new Set(selectedType.wrong)].filter((a) => a !== selectedType.correct);
+	while (uniqueWrong.length < 3) {
+		const candidate = `${Math.floor(Math.random() * 30 + 10)}%`;
+		if (candidate !== selectedType.correct && !uniqueWrong.includes(candidate)) uniqueWrong.push(candidate);
 	}
-	static generatePushFoldQuiz(stackSize, difficulty = "medium") {
-		const chart = PUSH_FOLD_CHARTS[stackSize];
-		const positions = Object.keys(chart.openShove);
-		const selectedPos = positions[Math.floor(Math.random() * positions.length)];
-		const posData = chart.openShove[selectedPos];
-		const testHands = [
-			"AA",
-			"22",
-			"AKo",
-			"A2s",
-			"KQo",
-			"76s",
-			"J9o",
-			"T8s"
-		];
-		const selectedHand = testHands[Math.floor(Math.random() * testHands.length)];
-		const isInRange = Array.isArray(posData.hands) ? posData.hands.includes(selectedHand) : Math.random() > .5;
-		return {
-			id: `pushfold_${stackSize}_${selectedPos}_${Math.random().toString(36).slice(2, 9)}`,
-			category: "push_fold",
-			difficulty,
-			question: `${selectedHand} from ${selectedPos} with ${chart.stackSize}?\nOpen-shove or fold?`,
-			answers: [
-				"Shove",
-				"Fold",
-				"Min-Raise",
-				"Limp"
-			].sort(() => Math.random() - .5),
-			correctAnswer: isInRange ? "Shove" : "Fold",
-			explanation: `${posData.position}: ${posData.range} range\n${posData.description}`,
-			points: 15,
-			context: {
-				stackSize: chart.stackSize,
-				position: selectedPos,
-				hand: selectedHand
-			}
-		};
-	}
-	static generateExploitQuiz(difficulty = "hard") {
-		const leakKeys = Object.keys(COMMON_LEAKS);
-		const selectedKey = leakKeys[Math.floor(Math.random() * leakKeys.length)];
-		const leak = COMMON_LEAKS[selectedKey];
-		return {
-			id: `exploit_${selectedKey}_${Math.random().toString(36).slice(2, 9)}`,
-			category: "exploits",
-			difficulty,
-			question: `Opponent shows this leak:\n"${leak.leak}"\n\nWhich adjustment is optimal?`,
-			answers: [
-				leak.exploit.action,
-				"Play GTO",
-				"Bluff more",
-				"Fold more"
-			].sort(() => Math.random() - .5),
-			correctAnswer: leak.exploit.action,
-			explanation: `${leak.exploit.action}\n\n${leak.exploit.postflop || leak.exploit.range || ""}\n\nExpected: ${leak.exploit.expectedWinRate}`,
-			points: 20,
-			context: {
-				leak: selectedKey,
-				severity: leak.severity
-			}
-		};
-	}
-	static generateMixedQuiz(count = 10, difficulty = "mixed") {
-		const quiz = [];
-		const types = [
-			"range",
-			"pushfold",
-			"exploit"
-		];
-		for (let i = 0; i < count; i++) {
-			const type = types[Math.floor(Math.random() * types.length)];
-			const diff = difficulty === "mixed" ? [
-				"easy",
-				"medium",
-				"hard"
-			][Math.floor(Math.random() * 3)] : difficulty;
-			let question;
-			switch (type) {
-				case "range": {
-					const positions = Object.keys(RFI_RANGES);
-					const pos = positions[Math.floor(Math.random() * positions.length)];
-					question = QuizGenerator.generateRangeQuiz(pos, diff);
-					break;
-				}
-				case "pushfold": {
-					const stacks = Object.keys(PUSH_FOLD_CHARTS);
-					const stack = stacks[Math.floor(Math.random() * stacks.length)];
-					question = QuizGenerator.generatePushFoldQuiz(stack, diff);
-					break;
-				}
-				case "exploit":
-					question = QuizGenerator.generateExploitQuiz(diff);
-					break;
-			}
-			quiz.push(question);
+	const allAnswers = [selectedType.correct, ...uniqueWrong.slice(0, 3)].sort(() => Math.random() - .5);
+	return {
+		id: `range_${position}_${Math.random().toString(36).slice(2, 9)}`,
+		category: "ranges",
+		difficulty,
+		question: selectedType.question,
+		answers: allAnswers,
+		correctAnswer: selectedType.correct,
+		explanation: range.description,
+		points: difficulty === "easy" ? 10 : difficulty === "medium" ? 15 : 20
+	};
+}
+function generatePushFoldQuiz(stackSize, difficulty = "medium") {
+	const chart = PUSH_FOLD_CHARTS[stackSize];
+	const positions = Object.keys(chart.openShove);
+	const selectedPos = positions[Math.floor(Math.random() * positions.length)];
+	const posData = chart.openShove[selectedPos];
+	const testHands = [
+		"AA",
+		"22",
+		"AKo",
+		"A2s",
+		"KQo",
+		"76s",
+		"J9o",
+		"T8s"
+	];
+	const selectedHand = testHands[Math.floor(Math.random() * testHands.length)];
+	const isInRange = Array.isArray(posData.hands) ? posData.hands.includes(selectedHand) : Math.random() > .5;
+	return {
+		id: `pushfold_${stackSize}_${selectedPos}_${Math.random().toString(36).slice(2, 9)}`,
+		category: "push_fold",
+		difficulty,
+		question: `${selectedHand} from ${selectedPos} with ${chart.stackSize}?\nOpen-shove or fold?`,
+		answers: [
+			"Shove",
+			"Fold",
+			"Min-Raise",
+			"Limp"
+		].sort(() => Math.random() - .5),
+		correctAnswer: isInRange ? "Shove" : "Fold",
+		explanation: `${posData.position}: ${posData.range} range\n${posData.description}`,
+		points: 15,
+		context: {
+			stackSize: chart.stackSize,
+			position: selectedPos,
+			hand: selectedHand
 		}
-		return quiz;
+	};
+}
+function generateExploitQuiz(difficulty = "hard") {
+	const leakKeys = Object.keys(COMMON_LEAKS);
+	const selectedKey = leakKeys[Math.floor(Math.random() * leakKeys.length)];
+	const leak = COMMON_LEAKS[selectedKey];
+	return {
+		id: `exploit_${selectedKey}_${Math.random().toString(36).slice(2, 9)}`,
+		category: "exploits",
+		difficulty,
+		question: `Opponent shows this leak:\n"${leak.leak}"\n\nWhich adjustment is optimal?`,
+		answers: [...new Set([
+			leak.exploit.action,
+			"Play GTO",
+			"Bluff more",
+			"Fold more"
+		])].sort(() => Math.random() - .5),
+		correctAnswer: leak.exploit.action,
+		explanation: `${leak.exploit.action}\n\n${leak.exploit.postflop || leak.exploit.range || ""}\n\nExpected: ${leak.exploit.expectedWinRate}`,
+		points: 20,
+		context: {
+			leak: selectedKey,
+			severity: leak.severity
+		}
+	};
+}
+function generateMixedQuiz(count = 10, difficulty = "mixed") {
+	const quiz = [];
+	const types = [
+		"range",
+		"pushfold",
+		"exploit"
+	];
+	for (let i = 0; i < count; i++) {
+		const type = types[Math.floor(Math.random() * types.length)];
+		const diff = difficulty === "mixed" ? [
+			"easy",
+			"medium",
+			"hard"
+		][Math.floor(Math.random() * 3)] : difficulty;
+		let question;
+		switch (type) {
+			case "range": {
+				const positions = Object.keys(RFI_RANGES);
+				const pos = positions[Math.floor(Math.random() * positions.length)];
+				question = generateRangeQuiz(pos, diff);
+				break;
+			}
+			case "pushfold": {
+				const stacks = Object.keys(PUSH_FOLD_CHARTS);
+				const stack = stacks[Math.floor(Math.random() * stacks.length)];
+				question = generatePushFoldQuiz(stack, diff);
+				break;
+			}
+			default:
+				question = generateExploitQuiz(diff);
+				break;
+		}
+		quiz.push(question);
 	}
-};
+	return quiz;
+}
 //#endregion
 //#region src/routes/practice/quiz/+page.svelte
 function _page($$renderer, $$props) {
 	$$renderer.component(($$renderer) => {
-		let quiz = QuizGenerator.generateMixedQuiz(10, "mixed");
+		let quiz = generateMixedQuiz(10, "mixed");
 		let currentIndex = 0;
 		let showFeedback = false;
 		let score = 0;

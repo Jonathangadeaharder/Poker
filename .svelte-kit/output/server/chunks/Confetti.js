@@ -1,4 +1,4 @@
-import { a as ensure_array_like, l as stringify, r as attr_style } from "./dev.js";
+import { a as ensure_array_like, c as stringify, r as attr_style } from "./dev.js";
 //#region src/lib/components/Confetti.svelte
 function Confetti($$renderer, $$props) {
 	let { active } = $$props;

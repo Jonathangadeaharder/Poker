@@ -1,4 +1,4 @@
-import { V as escape_html } from "./dev.js";
+import "./dev.js";
 //#region src/lib/components/TopBar.svelte
 function TopBar($$renderer, $$props) {
 	let { left, center, right, onBack } = $$props;
@@ -13,7 +13,13 @@ function TopBar($$renderer, $$props) {
 		left($$renderer);
 		$$renderer.push(`<!---->`);
 	} else $$renderer.push("<!--[-1-->");
-	$$renderer.push(`<!--]--></div> <div style="flex: 1; text-align: center; font-size: 13px; font-family: var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--cream-dim);">${escape_html(center ?? "")}</div> <div style="min-width: 40px; text-align: right;">`);
+	$$renderer.push(`<!--]--></div> <div style="flex: 1; text-align: center; font-size: 13px; font-family: var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--cream-dim);">`);
+	if (center) {
+		$$renderer.push("<!--[0-->");
+		center($$renderer);
+		$$renderer.push(`<!---->`);
+	} else $$renderer.push("<!--[-1-->");
+	$$renderer.push(`<!--]--></div> <div style="min-width: 40px; text-align: right;">`);
 	if (right) {
 		$$renderer.push("<!--[0-->");
 		right($$renderer);

@@ -223,6 +223,9 @@ var SoundManager = class {
 			}
 		} catch {}
 	}
+	isEnabled() {
+		return this.enabled;
+	}
 	setEnabled(enabled) {
 		this.enabled = enabled;
 	}
@@ -241,6 +244,6 @@ var SoundManager = class {
 		this.initialized = false;
 	}
 };
-new SoundManager();
+var soundManager = new SoundManager();
 //#endregion
-export {};
+export { soundManager as t };

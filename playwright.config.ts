@@ -8,7 +8,7 @@ export default defineConfig({
 	workers: process.env.CI ? 1 : undefined,
 	reporter: 'html',
 	use: {
-		baseURL: 'http://localhost:4173'
+		baseURL: 'http://localhost:5174'
 	},
 	projects: [
 		{
@@ -17,8 +17,8 @@ export default defineConfig({
 		}
 	],
 	webServer: {
-		command: 'pnpm run build && pnpm run preview',
-		port: 4173,
-		reuseExistingServer: !process.env.CI
+		command: 'pnpm run dev --port 5174',
+		port: 5174,
+		reuseExistingServer: process.env.PLAYWRIGHT_REUSE_SERVER === '1' || !!process.env.CI
 	}
 });

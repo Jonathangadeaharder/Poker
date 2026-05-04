@@ -1,0 +1,252 @@
+[
+	[
+		"plo_1",
+		"plo_preflop",
+		"easy",
+		"What makes a strong PLO starting hand?",
+		"Four connected cards with two suits",
+		"Four high cards regardless of suits",
+		"Any hand with an Ace",
+		"Four cards of the same suit"
+	],
+	[
+		"plo_2",
+		"plo_preflop",
+		"medium",
+		"What is \"dangler\" in PLO?",
+		"Both A and B",
+		"A card that doesn't connect with other three",
+		"A high card without suit connection",
+		"The worst card in your hand"
+	],
+	[
+		"plo_3",
+		"plo_preflop",
+		"hard",
+		"From the BTN in PLO, which hand is stronger?",
+		"JT98 double-suited",
+		"KKJ9 double-suited",
+		"AAT2 rainbow",
+		"QQT9 single-suited"
+	],
+	[
+		"plo_4",
+		"plo_equity",
+		"medium",
+		"Pre-flop in PLO, AA vs random hand has what equity?",
+		"65%",
+		"85% (like in Hold'em)",
+		"70%",
+		"80%"
+	],
+	[
+		"plo_5",
+		"plo_equity",
+		"hard",
+		"You have nut flush draw + pair on flop. Approximately how many outs?",
+		"18-20 outs (redraw considerations)",
+		"9 outs (flush)",
+		"11 outs (flush + pair)",
+		"14 outs"
+	],
+	[
+		"plo_6",
+		"plo_postflop",
+		"easy",
+		"On a paired board in PLO, what is the main danger?",
+		"Full houses",
+		"Straights",
+		"Flushes",
+		"Two pair"
+	],
+	[
+		"plo_7",
+		"plo_postflop",
+		"medium",
+		"You flop top set. Board: K73 rainbow. What is your main concern?",
+		"Opponents with wrap straight draws",
+		"Getting outdrawn by overpairs",
+		"Flush draws",
+		"Lower sets"
+	],
+	[
+		"plo_8",
+		"plo_postflop",
+		"hard",
+		"Flop: AKQ (two spades). You have AKQ2 (no spades). Correct play?",
+		"Check/call - way behind most ranges",
+		"Bet for value - you have top two",
+		"Check/fold - too vulnerable",
+		"Bet/fold - for thin value"
+	],
+	[
+		"plo_9",
+		"plo_draws",
+		"medium",
+		"What is a \"wrap\" straight draw?",
+		"All of the above",
+		"4 cards to a straight",
+		"8+ outs to make straight",
+		"13+ outs (double wrap)"
+	],
+	[
+		"plo_10",
+		"plo_draws",
+		"hard",
+		"You have JT98ds. Flop: Q76. How many clean outs?",
+		"13 outs (wrap)",
+		"17 outs (wrap + backdoors)",
+		"20 outs",
+		"8 outs"
+	],
+	[
+		"plo_11",
+		"plo_position",
+		"easy",
+		"Position in PLO is:",
+		"More important than NLH",
+		"Less important than NLH",
+		"Equally important",
+		"Not important"
+	],
+	[
+		"plo_12",
+		"plo_position",
+		"medium",
+		"From UTG in PLO cash game, you should raise:",
+		"10-15% of hands",
+		"20-25% of hands",
+		"30% of hands",
+		"5-10% of hands"
+	],
+	[
+		"plo_13",
+		"plo_advanced",
+		"hard",
+		"Board runs out KQJT2 (two spades). You have A987 (two diamonds). Correct play?",
+		"Check - vulnerable to higher straight",
+		"Bet large - you have Ace-high straight",
+		"Small bet - for thin value",
+		"Check/call - can't bet for value"
+	],
+	[
+		"plo_14",
+		"plo_advanced",
+		"hard",
+		"What does \"having the idiot end\" mean in PLO?",
+		"Bottom straight on connected board",
+		"Low flush on monotone board",
+		"Weak full house on paired board",
+		"All of the above"
+	],
+	[
+		"plo_15",
+		"plo_betting",
+		"medium",
+		"Standard c-bet size in PLO single-raised pot:",
+		"50-66% pot",
+		"33% pot (like NLH)",
+		"75-100% pot",
+		"25% pot"
+	],
+	[
+		"plo_16",
+		"plo_betting",
+		"hard",
+		"You pot flop, pot turn, river bricks. SPR = 1. Best size?",
+		"Pot bet (100%)",
+		"Overbet pot (150%+)",
+		"Check - too polarized",
+		"Small bet (33%)"
+	],
+	[
+		"plo_17",
+		"plo_tournament",
+		"medium",
+		"In PLO tournaments vs cash games, you should:",
+		"Play tighter preflop",
+		"Play looser preflop",
+		"Same ranges",
+		"Only play AAxx"
+	],
+	[
+		"plo_18",
+		"plo_tournament",
+		"hard",
+		"PLO MTT late stage (20bb), BTN opens pot. You have AAJ2ds in BB. Correct play?",
+		"Call and see flop",
+		"3-bet pot (commit 40% stack)",
+		"4-bet shove",
+		"Fold"
+	],
+	[
+		"plo_19",
+		"plo_mistakes",
+		"easy",
+		"Biggest mistake new PLO players make:",
+		"All of the above",
+		"Overvaluing AAxx",
+		"Undervaluing position",
+		"Playing too many hands"
+	],
+	[
+		"plo_20",
+		"plo_mistakes",
+		"medium",
+		"You hold KKxx. Flop comes AQ7 rainbow. What is the problem?",
+		"All of the above",
+		"Reverse implied odds",
+		"You rarely improve to best hand",
+		"Opponent likely has Ace"
+	],
+	[
+		"plo_21",
+		"plo_advanced",
+		"hard",
+		"What is a \"double-suited\" hand advantage over single-suited?",
+		"~4-5% equity edge",
+		"~2% equity edge",
+		"~8-10% equity edge",
+		"~1% equity edge"
+	],
+	[
+		"plo_22",
+		"plo_ranges",
+		"medium",
+		"From the BTN, which rundown is weakest?",
+		"9876 rainbow",
+		"JT98 double-suited",
+		"8765 double-suited",
+		"T987 single-suited"
+	],
+	[
+		"plo_23",
+		"plo_postflop",
+		"hard",
+		"Monotone flop (K92 all spades), you have KKT8 (one spade). What is your strategy?",
+		"Check/give up - flush likely out there",
+		"Bet for protection - you have top set",
+		"Small bet/fold - for information",
+		"Check/call - way behind vs flush"
+	],
+	[
+		"plo_24",
+		"plo_equity",
+		"medium",
+		"Flop equity realization in PLO is affected most by:",
+		"Position",
+		"Hand strength",
+		"Stack depth",
+		"All equally important"
+	],
+	[
+		"plo_25",
+		"plo_advanced",
+		"hard",
+		"Against tight 3-bettor, you should 4-bet bluff with:",
+		"Weak AAxx (blocks their AA)",
+		"Strong rundowns JT98ds",
+		"Small pairs with Broadway blockers",
+		"None - don't bluff vs tight 3-bettors"
+	]
+]
