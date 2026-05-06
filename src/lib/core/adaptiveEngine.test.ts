@@ -1,12 +1,15 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { AdaptiveEngine, DIFFICULTY_LEVELS, PerformanceTracker } from './adaptiveEngine';
 
-describe('PerformanceTracker', () => {
-	let tracker: PerformanceTracker;
+let tracker: PerformanceTracker;
+let engine: AdaptiveEngine;
 
-	beforeEach(() => {
-		tracker = new PerformanceTracker();
-	});
+beforeEach(() => {
+	tracker = new PerformanceTracker();
+	engine = new AdaptiveEngine(tracker);
+});
+
+describe('PerformanceTracker', () => {
 
 	it('initializes with empty state', () => {
 		expect(tracker.history).toHaveLength(0);
@@ -160,14 +163,6 @@ describe('PerformanceTracker', () => {
 });
 
 describe('AdaptiveEngine', () => {
-	let tracker: PerformanceTracker;
-	let engine: AdaptiveEngine;
-
-	beforeEach(() => {
-		tracker = new PerformanceTracker();
-		engine = new AdaptiveEngine(tracker);
-	});
-
 	it('initializes with easy difficulty', () => {
 		expect(engine.currentDifficulty).toBe(DIFFICULTY_LEVELS.EASY);
 	});
