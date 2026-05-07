@@ -94,11 +94,13 @@ async function complete() {
 	} catch {
 		// localStorage unavailable — continue anyway
 	}
-	posthog.capture('onboarding_completed', {
-		goal: picks.goal,
-		level: picks.level,
-		daily_minutes: picks.time
-	});
+	try {
+		posthog.capture('onboarding_completed', {
+			goal: picks.goal,
+			level: picks.level,
+			daily_minutes: picks.time
+		});
+	} catch {}
 	goto('/');
 }
 </script>

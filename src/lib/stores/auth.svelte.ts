@@ -42,13 +42,21 @@ function createAuthStore() {
 	}
 
 	async function signUp(email: string, password: string) {
-		if (!supabase) return { data: { user: null, session: null } as { user: User | null; session: Session | null }, error: new Error('Not initialized') };
+		if (!supabase)
+			return {
+				data: { user: null, session: null } as { user: User | null; session: Session | null },
+				error: new Error('Not initialized')
+			};
 		const { data, error } = await supabase.auth.signUp({ email, password });
 		return { data, error };
 	}
 
 	async function signInWithPassword(email: string, password: string) {
-		if (!supabase) return { data: { user: null, session: null } as { user: User | null; session: Session | null }, error: new Error('Not initialized') };
+		if (!supabase)
+			return {
+				data: { user: null, session: null } as { user: User | null; session: Session | null },
+				error: new Error('Not initialized')
+			};
 		const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 		return { data, error };
 	}

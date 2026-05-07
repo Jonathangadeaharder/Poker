@@ -1,4 +1,5 @@
 import type { Handle, HandleServerError } from '@sveltejs/kit';
+import { PUBLIC_POSTHOG_HOST } from '$env/static/public';
 import { getPostHogClient } from '$lib/server/posthog';
 
 export const handle: Handle = async ({ event, resolve }) => {
@@ -7,7 +8,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (pathname.startsWith('/ingest')) {
 		const useAssetHost =
 			pathname.startsWith('/ingest/static/') || pathname.startsWith('/ingest/array/');
-		const hostname = useAssetHost ? 'eu-assets.i.posthog.com' : 'eu.i.posthog.com';
+		const posthogHost = PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com';
+		const assetHost = posthogHost
+			.replace('://i.', '://eu-assets.i.')
+			.replace('://eu.', '://eu-assets.');
+		const hostname = useAssetHost
+			? assetHost.replace(/^https?:\/\//, '')
+			: posthogHost.replace(/^https?:\/\//, '');
 
 		const url = new URL(event.request.url);
 		url.protocol = 'https:';
@@ -26,7 +33,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 			const response = await fetch(url.toString(), {
 				method: event.request.method,
 				headers,
-				body: event.request.method !== 'GET' && event.request.method !== 'HEAD' ? event.request.body : null,
+				body:
+					event.request.method !== 'GET' && event.request.method !== 'HEAD'
+						? event.request.body
+						: null,
 				// @ts-expect-error - duplex is required for streaming request bodies
 				duplex: 'half'
 			});
@@ -53,8 +63,7 @@ export const handleError: HandleServerError = async ({ error, status, message, e
 				message
 			}
 		});
-	} catch {
-	}
+	} catch {}
 
 	return { message, status };
 };

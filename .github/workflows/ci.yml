@@ -10,6 +10,9 @@ jobs:
   lint-and-test:
     name: Lint and Test
     runs-on: self-hosted
+    env:
+      PUBLIC_POSTHOG_PROJECT_TOKEN: ${{ vars.PUBLIC_POSTHOG_PROJECT_TOKEN }}
+      PUBLIC_POSTHOG_HOST: ${{ vars.PUBLIC_POSTHOG_HOST }}
 
     steps:
       - name: Checkout code
@@ -67,6 +70,9 @@ jobs:
   code-quality:
     name: Code Quality
     runs-on: self-hosted
+    env:
+      PUBLIC_POSTHOG_PROJECT_TOKEN: ${{ vars.PUBLIC_POSTHOG_PROJECT_TOKEN }}
+      PUBLIC_POSTHOG_HOST: ${{ vars.PUBLIC_POSTHOG_HOST }}
 
     steps:
       - name: Checkout code
