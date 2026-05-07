@@ -10,7 +10,6 @@ beforeEach(() => {
 });
 
 describe('PerformanceTracker', () => {
-
 	it('initializes with empty state', () => {
 		expect(tracker.history).toHaveLength(0);
 		expect(tracker.currentStreak).toBe(0);
