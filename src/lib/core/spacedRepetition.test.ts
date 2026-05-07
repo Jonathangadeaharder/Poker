@@ -1,6 +1,19 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { Card, createPokerDecks, Deck, DIFFICULTY_RATINGS, StudySession } from './spacedRepetition';
 
+let card: Card;
+let deck: Deck;
+let session: StudySession;
+
+beforeEach(() => {
+	card = new Card('test_1', 'What is GTO?', 'Game Theory Optimal', 'theory', ['gto']);
+	deck = new Deck('Test Deck', 'A test deck');
+	for (let i = 0; i < 5; i++) {
+		deck.addCard(new Card(`c${i}`, `front ${i}`, `back ${i}`, 'test'));
+	}
+	session = new StudySession(deck, 3, 5);
+});
+
 describe('DIFFICULTY_RATINGS', () => {
 	it('defines AGAIN=0, HARD=1, GOOD=2, EASY=3', () => {
 		expect(DIFFICULTY_RATINGS.AGAIN).toBe(0);
@@ -11,12 +24,6 @@ describe('DIFFICULTY_RATINGS', () => {
 });
 
 describe('Card', () => {
-	let card: Card;
-
-	beforeEach(() => {
-		card = new Card('test_1', 'What is GTO?', 'Game Theory Optimal', 'theory', ['gto']);
-	});
-
 	it('initializes with default SM-2 values', () => {
 		expect(card.n).toBe(0);
 		expect(card.ef).toBe(2.5);
@@ -153,12 +160,6 @@ describe('Card', () => {
 });
 
 describe('Deck', () => {
-	let deck: Deck;
-
-	beforeEach(() => {
-		deck = new Deck('Test Deck', 'A test deck');
-	});
-
 	it('initializes correctly', () => {
 		expect(deck.name).toBe('Test Deck');
 		expect(deck.description).toBe('A test deck');
@@ -220,17 +221,6 @@ describe('Deck', () => {
 });
 
 describe('StudySession', () => {
-	let deck: Deck;
-	let session: StudySession;
-
-	beforeEach(() => {
-		deck = new Deck('Test', 'Test deck');
-		for (let i = 0; i < 5; i++) {
-			deck.addCard(new Card(`c${i}`, `front ${i}`, `back ${i}`, 'test'));
-		}
-		session = new StudySession(deck, 3, 5);
-	});
-
 	it('initializes with correct params', () => {
 		expect(session.newCardsPerSession).toBe(3);
 		expect(session.reviewsPerSession).toBe(5);
