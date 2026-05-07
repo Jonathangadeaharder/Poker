@@ -160,6 +160,10 @@ describe('Card', () => {
 });
 
 describe('Deck', () => {
+	beforeEach(() => {
+		deck = new Deck('Test Deck', 'A test deck');
+	});
+
 	it('initializes correctly', () => {
 		expect(deck.name).toBe('Test Deck');
 		expect(deck.description).toBe('A test deck');
