@@ -19,7 +19,9 @@ async function handleSubmit(e: Event) {
 			error = result.error.message;
 			posthog.captureException(result.error, { context: 'login' });
 		} else {
-			posthog.identify(result.data.user.id);
+			if (result.data.user) {
+				posthog.identify(result.data.user.id);
+			}
 			posthog.capture('user_logged_in');
 			goto('/');
 		}

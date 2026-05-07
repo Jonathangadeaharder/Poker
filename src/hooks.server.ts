@@ -17,33 +17,35 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 		const headers = new Headers(event.request.headers);
 		headers.set('host', hostname);
-		headers.set('accept-encoding', '');
-
 		const clientIp = event.request.headers.get('x-forwarded-for') || event.getClientAddress();
 		if (clientIp) {
 			headers.set('x-forwarded-for', clientIp);
 		}
 
-		const response = await fetch(url.toString(), {
-			method: event.request.method,
-			headers,
-			body: event.request.body,
-			// @ts-expect-error - duplex is required for streaming request bodies
-			duplex: 'half'
-		});
-
-		return response;
+		try {
+			const response = await fetch(url.toString(), {
+				method: event.request.method,
+				headers,
+				body: event.request.method !== 'GET' && event.request.method !== 'HEAD' ? event.request.body : null,
+				// @ts-expect-error - duplex is required for streaming request bodies
+				duplex: 'half'
+			});
+			return response;
+		} catch {
+			return new Response(null, { status: 200 });
+		}
 	}
 
 	return resolve(event);
 };
 
-export const handleError: HandleServerError = async ({ error, status, message }) => {
+export const handleError: HandleServerError = async ({ error, status, message, event }) => {
 	try {
 		const posthog = getPostHogClient();
+		const distinctId = (event.locals as any)?.session?.user?.id ?? 'server';
 
 		posthog.capture({
-			distinctId: 'server',
+			distinctId,
 			event: 'server_error',
 			properties: {
 				error: error instanceof Error ? error.message : String(error),
@@ -51,10 +53,7 @@ export const handleError: HandleServerError = async ({ error, status, message })
 				message
 			}
 		});
-
-		await posthog.shutdown();
 	} catch {
-		// PostHog capture must never throw in error handler
 	}
 
 	return { message, status };

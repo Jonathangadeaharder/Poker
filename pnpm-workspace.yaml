@@ -1,3 +1,4 @@
 allowBuilds:
   core-js: set this to true or false
   protobufjs: set this to true or false
+storeDir: /Users/jonathangadeaharder/.pnpm-store

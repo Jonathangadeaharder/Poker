@@ -33,7 +33,9 @@ async function handleSubmit(e: Event) {
 			posthog.captureException(result.error, { context: 'register' });
 		} else {
 			success = true;
-			posthog.identify(result.data.user.id);
+			if (result.data.user) {
+				posthog.identify(result.data.user.id);
+			}
 			posthog.capture('user_signed_up');
 		}
 	} finally {
