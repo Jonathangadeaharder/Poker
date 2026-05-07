@@ -1,4 +1,5 @@
 <script lang="ts">
+import posthog from 'posthog-js';
 import { goto } from '$app/navigation';
 // biome-ignore lint/correctness/noUnusedImports: Used in template
 import PlayingCard from '$lib/components/PlayingCard.svelte';
@@ -78,6 +79,8 @@ function advance(key: string | undefined, value: string | number | null) {
 	if (advanceTimer) return;
 	if (key && value !== null) {
 		picks = { ...picks, [key]: value };
+		const idx = slides[step].opts?.findIndex((o) => o.v === value) ?? -1;
+		posthog.capture('onboarding_question_answered', { question: key, answer_index: idx });
 	}
 	advanceTimer = setTimeout(() => {
 		step = step + 1;
@@ -91,7 +94,11 @@ async function complete() {
 	} catch {
 		// localStorage unavailable — continue anyway
 	}
-	// TODO: Save onboarding choices to Supabase
+	posthog.capture('onboarding_completed', {
+		goal: picks.goal,
+		level: picks.level,
+		daily_minutes: picks.time
+	});
 	goto('/');
 }
 </script>

@@ -1,4 +1,5 @@
 <script lang="ts">
+import posthog from 'posthog-js';
 import { goto } from '$app/navigation';
 import { auth } from '$lib/stores/auth.svelte';
 
@@ -16,7 +17,10 @@ async function handleSubmit(e: Event) {
 		const result = await auth.signInWithPassword(email, password);
 		if (result.error) {
 			error = result.error.message;
+			posthog.captureException(result.error, { context: 'login' });
 		} else {
+			posthog.identify(result.data.user.id);
+			posthog.capture('user_logged_in');
 			goto('/');
 		}
 	} finally {
