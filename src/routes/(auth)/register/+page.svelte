@@ -1,4 +1,5 @@
 <script lang="ts">
+import posthog from 'posthog-js';
 import { auth } from '$lib/stores/auth.svelte';
 
 let email = $state('');
@@ -29,8 +30,13 @@ async function handleSubmit(e: Event) {
 		const result = await auth.signUp(email, password);
 		if (result.error) {
 			error = result.error.message;
+			posthog.captureException(result.error, { context: 'register' });
 		} else {
 			success = true;
+			if (result.data.user) {
+				posthog.identify(result.data.user.id);
+			}
+			posthog.capture('user_signed_up');
 		}
 	} finally {
 		loading = false;

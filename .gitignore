@@ -22,3 +22,9 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Artifacts
+.claude/
+test-results/
+*.setup-report.md
+.pnpm-store/

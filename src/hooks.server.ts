@@ -1,0 +1,69 @@
+import type { Handle, HandleServerError } from '@sveltejs/kit';
+import { PUBLIC_POSTHOG_HOST } from '$env/static/public';
+import { getPostHogClient } from '$lib/server/posthog';
+
+export const handle: Handle = async ({ event, resolve }) => {
+	const { pathname } = event.url;
+
+	if (pathname.startsWith('/ingest')) {
+		const useAssetHost =
+			pathname.startsWith('/ingest/static/') || pathname.startsWith('/ingest/array/');
+		const posthogHost = PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com';
+		const assetHost = posthogHost
+			.replace('://i.', '://eu-assets.i.')
+			.replace('://eu.', '://eu-assets.');
+		const hostname = useAssetHost
+			? assetHost.replace(/^https?:\/\//, '')
+			: posthogHost.replace(/^https?:\/\//, '');
+
+		const url = new URL(event.request.url);
+		url.protocol = 'https:';
+		url.hostname = hostname;
+		url.port = '443';
+		url.pathname = pathname.replace(/^\/ingest/, '');
+
+		const headers = new Headers(event.request.headers);
+		headers.set('host', hostname);
+		const clientIp = event.request.headers.get('x-forwarded-for') || event.getClientAddress();
+		if (clientIp) {
+			headers.set('x-forwarded-for', clientIp);
+		}
+
+		try {
+			const response = await fetch(url.toString(), {
+				method: event.request.method,
+				headers,
+				body:
+					event.request.method !== 'GET' && event.request.method !== 'HEAD'
+						? event.request.body
+						: null,
+				// @ts-expect-error - duplex is required for streaming request bodies
+				duplex: 'half'
+			});
+			return response;
+		} catch {
+			return new Response(null, { status: 200 });
+		}
+	}
+
+	return resolve(event);
+};
+
+export const handleError: HandleServerError = async ({ error, status, message, event }) => {
+	try {
+		const posthog = getPostHogClient();
+		const distinctId = (event.locals as any)?.session?.user?.id ?? 'server';
+
+		posthog.capture({
+			distinctId,
+			event: 'server_error',
+			properties: {
+				error: error instanceof Error ? error.message : String(error),
+				status,
+				message
+			}
+		});
+	} catch {}
+
+	return { message, status };
+};
