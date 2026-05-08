@@ -96,7 +96,8 @@ function scrollToSettings() {
 
 <Screen>
 	{#snippet children()}
-		<TopBar center="You">
+		<TopBar>
+			{#snippet center()}You{/snippet}
 			{#snippet right()}
 				<button
 					type="button"
