@@ -10,7 +10,8 @@ export async function track(event: string, props?: Record<string, unknown>) {
 		ph?.capture(event, props);
 	} else {
 		const ph = await getServerPh();
-		ph?.capture({ distinctId: 'server', event, properties: props });
+		const distinctId = props?.userId ? String(props.userId) : 'server';
+		ph?.capture({ distinctId, event, properties: props });
 	}
 }
 
@@ -37,6 +38,7 @@ export async function captureError(err: unknown, ctx?: Record<string, unknown>) 
 			event: 'server_error',
 			properties: {
 				error: err instanceof Error ? err.message : String(err),
+				stack: err instanceof Error ? err.stack : undefined,
 				...ctx
 			}
 		});
@@ -62,32 +64,33 @@ export async function reset() {
 
 export async function shutdown() {
 	if (!enabled || browser) return;
-	const ph = await getServerPh();
-	await ph?.shutdown();
+	if (!serverPhInstance) return;
+	await serverPhInstance.shutdown();
 	serverPhInstance = null;
 }
 
-let clientPhInstance: any = null;
+let clientPhInstance: ReturnType<typeof import('posthog-js')['default']> | null = null;
 
 async function getClientPh() {
 	if (!browser) return null;
 	if (clientPhInstance) return clientPhInstance;
 	const mod = await import('posthog-js');
 	clientPhInstance = mod.default;
-	if (!(clientPhInstance as any).__tilt_init) {
+	if (!(clientPhInstance as Record<string, unknown>).__tilt_init) {
 		clientPhInstance.init(PUBLIC_POSTHOG_PROJECT_TOKEN, {
 			api_host: '/ingest',
 			ui_host: PUBLIC_POSTHOG_HOST,
 			defaults: '2026-01-30',
+			capture_pageview: false,
 			capture_exceptions: true,
 			person_profiles: 'identified_only'
 		});
-		(clientPhInstance as any).__tilt_init = true;
+		(clientPhInstance as Record<string, unknown>).__tilt_init = true;
 	}
 	return clientPhInstance;
 }
 
-let serverPhInstance: any = null;
+let serverPhInstance: Awaited<ReturnType<typeof import('posthog-node')['PostHog']>> | null = null;
 
 async function getServerPh() {
 	if (browser) return null;
@@ -95,8 +98,6 @@ async function getServerPh() {
 	const { PostHog } = await import('posthog-node');
 	serverPhInstance = new PostHog(PUBLIC_POSTHOG_PROJECT_TOKEN, {
 		host: PUBLIC_POSTHOG_HOST,
-		flushAt: 1,
-		flushInterval: 0,
 		personProfiles: 'identified_only'
 	});
 	return serverPhInstance;

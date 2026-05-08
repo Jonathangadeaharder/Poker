@@ -1,7 +1,7 @@
-import { captureError } from '$lib/telemetry';
-import { PUBLIC_POSTHOG_HOST, PUBLIC_POSTHOG_PROJECT_TOKEN } from '$env/static/public';
 import type { HandleClientError } from '@sveltejs/kit';
 import posthog from 'posthog-js';
+import { PUBLIC_POSTHOG_HOST, PUBLIC_POSTHOG_PROJECT_TOKEN } from '$env/static/public';
+import { captureError } from '$lib/telemetry';
 
 export async function init() {
 	posthog.init(PUBLIC_POSTHOG_PROJECT_TOKEN, {

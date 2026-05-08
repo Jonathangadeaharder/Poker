@@ -1,6 +1,6 @@
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { PUBLIC_POSTHOG_HOST } from '$env/static/public';
-import { pageview, captureError, shutdown } from '$lib/telemetry';
+import { captureError, pageview, shutdown } from '$lib/telemetry';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const { pathname } = event.url;
@@ -60,6 +60,8 @@ export const handleError: HandleServerError = async ({ error, status, message })
 	return { message, status };
 };
 
-process.on('SIGTERM', () => {
-	shutdown().catch(() => {});
+['SIGTERM', 'SIGINT'].forEach((signal) => {
+	process.on(signal, () => {
+		shutdown().catch(() => {});
+	});
 });
