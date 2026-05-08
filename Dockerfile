@@ -6,9 +6,11 @@ WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN pnpm install --frozen-lockfile --ignore-scripts=false
+RUN pnpm install --frozen-lockfile
 
 COPY . .
+ENV PUBLIC_POSTHOG_HOST=${PUBLIC_POSTHOG_HOST:-https://us.posthog.com}
+ENV PUBLIC_POSTHOG_PROJECT_TOKEN=${PUBLIC_POSTHOG_PROJECT_TOKEN:-}
 RUN pnpm run build
 
 FROM nginx:alpine AS runner
