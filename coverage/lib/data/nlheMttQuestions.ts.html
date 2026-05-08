@@ -1,0 +1,688 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for lib/data/nlheMttQuestions.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">lib/data</a> nlheMttQuestions.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/3</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/0</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/0</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/3</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a>
+<a name='L190'></a><a href='#L190'>190</a>
+<a name='L191'></a><a href='#L191'>191</a>
+<a name='L192'></a><a href='#L192'>192</a>
+<a name='L193'></a><a href='#L193'>193</a>
+<a name='L194'></a><a href='#L194'>194</a>
+<a name='L195'></a><a href='#L195'>195</a>
+<a name='L196'></a><a href='#L196'>196</a>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import type { QuizQuestion } from './miniGames';
+import rawData from './nlheMttQuestions.json';
+import { fromTuples, withExplanations } from './questionFactory';
+&nbsp;
+const EXPLANATIONS: Record&lt;string, string&gt; = <span class="cstat-no" title="statement not covered" >{</span>
+	mtt_1:
+		"Early in tournaments with deep stacks, play to accumulate. Small edges matter. Don't be passive - build a stack for later pressure situations.",
+	mtt_2:
+		'Isolation raise with position is profitable. Size it larger than normal (5x+) against limpers to deny them odds. AJ is strong enough to iso-raise.',
+	mtt_3:
+		'You have flush draw + backdoor straight. Small bet is profitable with range advantage and equity. No need to bet large with drawing hand.',
+	mtt_4:
+		'JJ vs BTN 3-bet range is ahead but vulnerable. Calling allows you to play post-flop and avoid commitment preflop. 4-betting commits you to flip/crushed scenario.',
+	mtt_5:
+		'Antes increase dead money in pot, making steals more profitable. Open wider, especially from late position. 30-40% BTN opening range is normal.',
+	mtt_6:
+		'You risk 25bb to win ~28bb (25 + 1.5 + 0.1 + 0.9). Need ~47% equity. KQo has ~45%+ vs most shoving ranges. Close call, slightly profitable.',
+	mtt_7:
+		'As 3-bettor you have range advantage on K-high board. Small bet works great - he folds often, and you have backdoor nut flush draw. Efficient bluff.',
+	mtt_8:
+		"Second pair weak kicker in 3-way pot is trouble. MP's range hits this board hard. You need to improve to win, and draws are limited. Fold.",
+	mtt_9:
+		"At 20bb, it's raise or fold. Limping gives away information and allows opponents to realize equity too easily. Stay aggressive.",
+	mtt_10:
+		'With 22bb in SB, min-raising commits you awkwardly. Shoving with KTo is profitable vs BB defend range. Simple and effective.',
+	mtt_11:
+		'At 25bb, small 3-bets are awkward. Shoving is better: puts maximum pressure, avoids difficult post-flop spots, and AQs has great equity vs calling range.',
+	mtt_12:
+		'TT vs MP open has great equity. With 20bb, shoving is cleaner than 3-betting small (which commits you). You get folds and have equity when called.',
+	mtt_13:
+		'Below 15bb, push/fold becomes dominant strategy. Post-flop play becomes too risky with shallow SPR. Know your push/fold charts.',
+	mtt_14:
+		"QJo from CO with 12bb is clear shove. Opens ~40%+ from CO, QJ is well above that threshold. Don't min-raise at this depth.",
+	mtt_15:
+		"A7o from BTN with 10bb is mandatory shove. Both blinds are short and can't call light. You have great fold equity plus equity when called.",
+	mtt_16:
+		"KQo has ~43% equity vs average BTN shoving range. You need 40% to call profitably. Clear call. Don't fold hands this strong.",
+	mtt_17:
+		"Bubble is time to apply pressure, especially on medium stacks who can't afford to bust. Big stacks should steal aggressively. Medium stacks play tight.",
+	mtt_18:
+		"Don't be too passive on bubble with strong hands. 99 is ahead of opening range. Small 3-bet applies pressure without committing stack.",
+	mtt_19:
+		'With shortstack in SB, BB might play tighter. Raise larger to put pressure on BB. A5s is strong enough to open from CO.',
+	mtt_20:
+		'On stone bubble with 15bb (not desperate), folding AJs can be correct due to ICM. If you bust, you get 0. Waiting has massive value. ICM &gt; chip EV.',
+	mtt_21:
+		'Final table ICM is extreme. Each pay jump is significant. Survival value is huge. Play tighter than chip-EV suggests, especially with medium stack.',
+	mtt_22:
+		"AK is too strong to fold even at FT. Shortstack desperate, you have huge equity edge. Don't overdo ICM - still need to accumulate with strong hands.",
+	mtt_23:
+		'At FT with medium stack, avoid confrontations with chipleader when you can. KQs is strong but not strong enough to risk tournament life against wide range.',
+	mtt_24:
+		'ICM (Independent Chip Model) assigns non-linear value to chips. Losing chips hurts more than gaining them helps. Survival has huge value in ICM spots.',
+	mtt_25:
+		'15-18% is standard UTG opening range at 30bb: 99+, ATs+, AJo+, KQs, some suited Broadway. Antes make ranges slightly wider than cash games.',
+	mtt_26:
+		'With top pair top kicker on dry board, small bet is optimal. Gets value from worse aces and draws. Larger bets fold out too many worse hands.',
+	mtt_27:
+		'MTTs require more aggression and stealing than cash games. You must accumulate chips. Positive red line is crucial for tournament success.',
+	mtt_28:
+		'With 10bb as short stack on bubble, push hard. You need to accumulate or bust trying. Waiting bleeds you to death. Others will avoid you (ICM).',
+	mtt_29:
+		"3-handed, 88 is very strong. BTN shoving wide, you have equity edge. Don't be too nitty 3-handed - ranges are wide.",
+	mtt_30:
+		'You have gutshot + backdoor flush. Small c-bet is profitable with range advantage. Efficient bluff with equity.',
+	mtt_31:
+		'AQo vs BTN 3-bet out of position at 45bb is tricky. Calling creates awkward postflop. 4-betting commits too much. Folding is fine here.',
+	mtt_32:
+		'With AA at 28bb, small 3-bet builds pot while keeping worse hands in. Shoving folds out hands that might stack off postflop. Optimize value.',
+	mtt_33:
+		'88 from MP with 14bb is clear shove. Opens 20%+ from MP, 88 is premium at this stack depth. Simple and effective.',
+	mtt_34:
+		'Heads up, 76s is strong. Raise (almost) every BTN. Stay aggressive. Limping gives up initiative.',
+	mtt_35:
+		'Resteal = 3-betting vs suspected steal attempt (usually BTN/CO opens). Take advantage of their wide opening ranges.',
+	mtt_36:
+		'K9s is not quite strong enough to resteal vs BTN with 35bb. Need AT+, KQ+, or pairs typically. K9s can call sometimes but folding is fine.',
+	mtt_37:
+		'With tight BB, you have isolation opportunity. ATo with 22bb vs BTN steal is great resteal shove. Fold equity + equity when called = profitable.',
+	mtt_38:
+		'Without specific reads, double-barreling and giving up river is often optimal. River bluffs work when you rep specific hands credibly. Random bluffs = chip spew.',
+	mtt_39:
+		"Bluff-catcher decision depends on opponent's bluffing frequency. If villain never bluffs, fold. If villain bluffs enough, call. Read-dependent.",
+	mtt_40:
+		"With 12bb as shortstack, you can't wait for pay jumps. Need to accumulate or bust. Ladder abuse only works with 5-8bb (true shortstack).",
+	mtt_41:
+		'45% BTN opening range is standard with antes at 35bb. Very wide: all pairs, all Ax, most Kx, suited broadways, connectors. Position + antes = open wide.',
+	mtt_42:
+		'At 25bb, 3-bets are often all-in or pot-committing. Polarized range is best: QQ+/AK for value, some suited Ax for bluffs. Avoid medium hands like TT/AQ.',
+	mtt_43:
+		'Antes add significant dead money, making steals more profitable. Open 40-50% from BTN with antes vs 30-35% without. Steal aggressively.',
+	mtt_44:
+		'With BB posting ante, BB gets better pot odds to defend (more chips invested). Defend slightly wider. Steals are also more profitable (more in pot).',
+	mtt_45:
+		'Multi-way pots = someone likely hit. C-bet only with strong hands or very good boards for your range. Reduce bluffing frequency significantly.',
+	mtt_46:
+		'On dry board multiway, small c-bet with AK high is fine. You have two overcards and represent range advantage. Keep pot small.',
+	mtt_47:
+		'With 7bb and antes, BTN shoving range is very wide: ~60%. All pairs, all Ax, most Kx, many Qx, suited connectors. Massive fold equity.',
+	mtt_48:
+		'QTo from SB with 9bb is clear shove. SB vs BB with 9bb shoves ~65% of hands. QTo is well above threshold.',
+	mtt_49:
+		'Need 30% equity at 2.3:1 odds. A9o has ~38% vs BTN 8bb shoving range. Easy call with decent ace.',
+	mtt_50:
+		'Need 33% equity at 2:1. 55 has ~45% vs MP 10bb shoving range (wider than you think). Comfortable call.',
+	mtt_51:
+		"Squeeze = 3-betting when there's an opener and caller(s). Takes advantage of weak calls and applies maximum pressure. Very profitable in MTTs.",
+	mtt_52:
+		'Perfect squeeze spot: AJs is strong, opener may have weak hand, caller is capped. Squeeze to 10bb puts huge pressure. Very profitable.',
+	mtt_53:
+		'Tight tables = more stealing opportunities. Open wider, especially from late position. Exploit passive players by stealing liberally.',
+	mtt_54:
+		"Against aggressive 3-bettors, tighten opening range and be ready to 4-bet/call with strong hands. Avoid opening hands that can't handle pressure.",
+	mtt_55:
+		'SB should open ~60-70% vs BB. Very wide range: all pairs, all Ax, most Kx, suited hands, connectors. Position + stealing BB = open wide.',
+	mtt_56:
+		'BB defends ~45% vs SB open. Getting great pot odds but OOP. Defend with pairs, broadways, suited hands, connectors. Fold weak offsuit hands.',
+	mtt_57:
+		'15-25bb is awkward: too deep to push/fold, too shallow for comfort postflop. Difficult decisions abound. Requires careful navigation.',
+	mtt_58:
+		"AK vs BB shove from BTN is always a call. You have equity advantage vs their range. Don't be too nitty with premiums.",
+	mtt_59:
+		'Satellites reward survival over chip accumulation. Play tighter, especially near bubble. Avoid marginal spots. Goal is to survive, not win.',
+	mtt_60:
+		"With above-average stack in satellite on bubble, play VERY tight. Let shortstacks bust each other. Avoid confrontations. You're nearly qualified.",
+	mtt_61:
+		'Without specific reads or improving equity, double-barreling with air is usually -EV. Give up and save chips for better spots.',
+	mtt_62:
+		'With made hand on scare turn, small bet is often best. Gets value from worse, does not commit too much if behind. Pot control with showdown value.',
+	mtt_63:
+		'Large preflop raise + 150bb deep = set mining paradise. When you flop set you can win huge pot. Calling has great implied odds.',
+	mtt_64:
+		'Isolate weak limpers with position. KJs is strong enough to iso-raise. Size it larger (5x+) to play heads-up against limper.',
+	mtt_65:
+		"MTTs require extreme patience - you'll play for hours. Discipline to avoid marginal spots is crucial. Technical skills matter, but mindset is foundation.",
+	mtt_66:
+		'20-30% ROI is excellent for regular MTTs. High variance + large fields = difficult to sustain huge ROIs. Even 15% ROI is very profitable.',
+	mtt_67:
+		'Final table bubble has extreme ICM. Pay jump from 10th to 9th is huge. More pressure than regular bubble or 3-handed (where you must play).'
+};
+&nbsp;
+export const <span class="cstat-no" title="statement not covered" >NLHE_MTT_QUESTIONS: QuizQuestion[] = withExplanations(</span>
+	fromTuples(rawData),
+	EXPLANATIONS
+);
+&nbsp;
+export interface MttStageInfo {
+	early: string;
+	middle: string;
+	late: string;
+	push_fold: string;
+	bubble: string;
+	final_table: string;
+}
+&nbsp;
+export interface IcmBasics {
+	concept: string;
+	losing_chips: string;
+	application: string;
+	example: string;
+}
+&nbsp;
+export interface StackSizes {
+	deep: string;
+	mid: string;
+	awkward: string;
+	short: string;
+	critical: string;
+}
+&nbsp;
+export interface MttConcepts {
+	STAGES: MttStageInfo;
+	ICM_BASICS: IcmBasics;
+	STACK_SIZES: StackSizes;
+}
+&nbsp;
+export const MTT_CONCEPTS: MttConcepts = <span class="cstat-no" title="statement not covered" >{</span>
+	STAGES: {
+		early: '100bb+: Accumulate chips, see flops, avoid big flips',
+		middle: '30-60bb: Steal aggressively, apply pressure, widen ranges',
+		late: '20-30bb: Push/fold considerations, ICM awareness',
+		push_fold: '&lt;20bb: Chart-based shoving, clear decisions',
+		bubble: 'Survival value peaks, exploit medium stacks',
+		final_table: 'Extreme ICM, pay jumps massive'
+	},
+&nbsp;
+	ICM_BASICS: {
+		concept: 'Chips have non-linear value in tournaments',
+		losing_chips: 'Hurts more than gaining chips helps',
+		application: 'Play tighter in high ICM spots (bubble, FT)',
+		example: 'Folding AK on stone bubble can be correct'
+	},
+&nbsp;
+	STACK_SIZES: {
+		deep: '50bb+: Postflop poker, small ball',
+		mid: '25-50bb: Mixed strategy, watch SPR',
+		awkward: '15-25bb: Most difficult depth',
+		short: '10-15bb: Push/fold dominant',
+		critical: '&lt;10bb: Pure push/fold'
+	}
+};
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-05-08T07:53:49.443Z
+            </div>
+        <script src="../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
+    </body>
+</html>
+    

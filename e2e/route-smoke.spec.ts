@@ -29,8 +29,8 @@ test.describe('Unauthenticated route smoke', () => {
 test.describe('Authenticated route smoke', () => {
 	test.beforeEach(async ({ page }) => {
 		await page.goto('/login');
-		await page.getByRole('textbox', { name: 'EMAIL' }).fill('poker@example.com');
-		await page.getByRole('textbox', { name: 'PASSWORD' }).fill('TestPassword123!');
+		await page.getByRole('textbox', { name: 'EMAIL' }).fill(process.env.E2E_TEST_EMAIL!);
+		await page.getByRole('textbox', { name: 'PASSWORD' }).fill(process.env.E2E_TEST_PASSWORD!);
 		await page.getByRole('button', { name: 'Sign in' }).click();
 		await page.waitForURL(/\/home/, { timeout: 15000 });
 	});
@@ -43,10 +43,7 @@ test.describe('Authenticated route smoke', () => {
 			await page.waitForLoadState('networkidle');
 			await expect(page.locator('body')).toBeVisible();
 			const realErrors = errors.filter(
-				(e) =>
-					!e.includes('Content Security Policy') &&
-					!e.includes('style-src') &&
-					!e.includes('PGRST116')
+				(e) => !['Content Security Policy', 'style-src', 'PGRST116'].some((ignored) => e.includes(ignored))
 			);
 			expect(realErrors).toHaveLength(0);
 		});
