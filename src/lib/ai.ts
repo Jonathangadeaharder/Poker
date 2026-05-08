@@ -1,4 +1,6 @@
-type AIProvider = 'ollama' | 'openrouter' | 'groq' | 'mini';
+import { env } from '$env/dynamic/private';
+
+type AIProvider = 'ollama' | 'mini' | 'openrouter' | 'groq';
 
 interface AIMessage {
 	role: 'system' | 'user' | 'assistant';
@@ -16,28 +18,54 @@ export interface HandInfo {
 	tableSize?: string;
 }
 
+interface ChatCompletionResponse {
+	choices?: {
+		message?: {
+			content?: string;
+		};
+	}[];
+}
+
+const VALID_PROVIDERS: AIProvider[] = ['ollama', 'mini', 'openrouter', 'groq'];
+const AI_REQUEST_TIMEOUT_MS = 30000;
+
 function getProvider(): AIProvider {
-	return (import.meta.env.VITE_AI_PROVIDER as AIProvider) || 'ollama';
+	const provider = (env.AI_PROVIDER || 'ollama') as AIProvider;
+	if (!VALID_PROVIDERS.includes(provider)) {
+		console.warn(`Invalid AI_PROVIDER "${env.AI_PROVIDER}", falling back to "ollama"`);
+		return 'ollama';
+	}
+	return provider;
 }
 
 function getBaseUrl(): string {
 	const provider = getProvider();
-	if (provider === 'ollama') {
-		return import.meta.env.VITE_LOCAL_AI_BASE_URL || 'http://localhost:11434/v1';
+	switch (provider) {
+		case 'ollama':
+		case 'mini':
+			return env.LOCAL_AI_BASE_URL || 'http://localhost:11434/v1';
+		case 'openrouter':
+			return 'https://openrouter.ai/api/v1';
+		case 'groq':
+			return 'https://api.groq.com/openai/v1';
+		default:
+			return env.LOCAL_AI_BASE_URL || 'http://localhost:11434/v1';
 	}
-	return import.meta.env.VITE_PROD_AI_BASE_URL || 'http://localhost:11434/v1';
 }
 
 function getModel(): string {
-	switch (getProvider()) {
+	const provider = getProvider();
+	switch (provider) {
 		case 'ollama':
-			return import.meta.env.VITE_LOCAL_AI_MODEL || 'llama3.2';
+			return env.OLLAMA_MODEL || 'llama3.2';
 		case 'mini':
-			return import.meta.env.VITE_PROD_AI_MODEL || 'qwen2.5:0.5b';
+			return env.MINI_MODEL || 'phi3:mini';
 		case 'openrouter':
-			return import.meta.env.VITE_OPENROUTER_MODEL || 'openai/gpt-4o-mini';
+			return env.OPENROUTER_MODEL || 'openai/gpt-4o-mini';
 		case 'groq':
-			return import.meta.env.VITE_GROQ_MODEL || 'llama-3.3-70b-versatile';
+			return env.GROQ_MODEL || 'llama-3.1-8b-instant';
+		default:
+			return 'llama3.2';
 	}
 }
 
@@ -45,13 +73,13 @@ function getAuthHeaders(): Record<string, string> {
 	const provider = getProvider();
 	if (provider === 'openrouter') {
 		return {
-			Authorization: `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY || ''}`,
-			'HTTP-Referer': typeof window !== 'undefined' ? window.location.origin : ''
+			Authorization: `Bearer ${env.OPENROUTER_API_KEY || ''}`,
+			'HTTP-Referer': ''
 		};
 	}
 	if (provider === 'groq') {
 		return {
-			Authorization: `Bearer ${import.meta.env.VITE_GROQ_API_KEY || ''}`
+			Authorization: `Bearer ${env.GROQ_API_KEY || ''}`
 		};
 	}
 	return {};
@@ -60,27 +88,43 @@ function getAuthHeaders(): Record<string, string> {
 async function callAI(messages: AIMessage[]): Promise<string> {
 	const baseUrl = getBaseUrl();
 	const model = getModel();
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => controller.abort(), AI_REQUEST_TIMEOUT_MS);
 
-	const res = await fetch(`${baseUrl}/chat/completions`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			...getAuthHeaders()
-		},
-		body: JSON.stringify({
-			model,
-			messages,
-			temperature: 0.7
-		})
-	});
+	try {
+		const res = await fetch(`${baseUrl}/chat/completions`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				...getAuthHeaders()
+			},
+			body: JSON.stringify({
+				model,
+				messages,
+				temperature: 0.7
+			}),
+			signal: controller.signal
+		});
 
-	if (!res.ok) {
-		const text = await res.text();
-		throw new Error(`AI chat failed: ${res.status} ${text}`);
+		if (!res.ok) {
+			const text = await res.text();
+			throw new Error(`AI chat failed: ${res.status} ${text}`);
+		}
+
+		const data: ChatCompletionResponse = await res.json();
+		const content = data.choices?.[0]?.message?.content;
+		if (typeof content !== 'string') {
+			throw new Error('Invalid AI response: missing message content');
+		}
+		return content;
+	} catch (error) {
+		if (error instanceof Error && error.name === 'AbortError') {
+			throw new Error('AI request timed out after 30 seconds');
+		}
+		throw error;
+	} finally {
+		clearTimeout(timeoutId);
 	}
-
-	const data = await res.json();
-	return data.choices?.[0]?.message?.content || '';
 }
 
 export async function generate(prompt: string): Promise<string> {

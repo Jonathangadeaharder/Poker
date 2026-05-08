@@ -6,15 +6,15 @@ services:
     ports:
       - '${PORT:-3000}:80'
     environment:
-      - VITE_AI_PROVIDER=${VITE_AI_PROVIDER:-mini}
-      - VITE_PROD_AI_BASE_URL=http://ollama:11434/v1
-      - VITE_PROD_AI_MODEL=${VITE_PROD_AI_MODEL:-qwen2.5:0.5b}
-      - VITE_PUBLIC_SUPABASE_URL=${VITE_PUBLIC_SUPABASE_URL}
-      - VITE_PUBLIC_SUPABASE_ANON_KEY=${VITE_PUBLIC_SUPABASE_ANON_KEY}
-      - VITE_OPENROUTER_API_KEY=${VITE_OPENROUTER_API_KEY:-}
-      - VITE_OPENROUTER_MODEL=${VITE_OPENROUTER_MODEL:-}
-      - VITE_GROQ_API_KEY=${VITE_GROQ_API_KEY:-}
-      - VITE_GROQ_MODEL=${VITE_GROQ_MODEL:-}
+      - AI_PROVIDER=${AI_PROVIDER:-mini}
+      - LOCAL_AI_BASE_URL=http://ollama:11434/v1
+      - MINI_MODEL=${MINI_MODEL:-qwen2.5:0.5b}
+      - PUBLIC_SUPABASE_URL=${PUBLIC_SUPABASE_URL}
+      - PUBLIC_SUPABASE_ANON_KEY=${PUBLIC_SUPABASE_ANON_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - GROQ_MODEL=${GROQ_MODEL:-}
     depends_on:
       - ollama
     restart: unless-stopped
@@ -24,7 +24,7 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     ports:
-      - '11434:11434'
+      - '127.0.0.1:11434:11434'
     restart: unless-stopped
 
 volumes:
