@@ -43,7 +43,7 @@ describe('calculateLevel', () => {
 	it('returns level 1 for 0 XP', () => {
 		const result = calculateLevel(0);
 		expect(result.level).toBe(1);
-		expect(result.levelData.title).toBe('Poker Novice');
+		expect(result.levelData.title).toBe('Tilt Novice');
 	});
 
 	it('returns level 2 at 100 XP', () => {

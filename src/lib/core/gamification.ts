@@ -37,7 +37,7 @@ export interface LevelData {
 }
 
 export const LEVELS: Record<number, LevelData> = {
-	1: { xpRequired: 0, title: 'Poker Novice', icon: '\u{1F331}' },
+	1: { xpRequired: 0, title: 'Tilt Novice', icon: '\u{1F331}' },
 	2: { xpRequired: 100, title: 'Enthusiast', icon: '\u{1F7F0}' },
 	3: { xpRequired: 250, title: 'Student', icon: '\u{1F4DA}' },
 	4: { xpRequired: 500, title: 'Apprentice', icon: '\u{1F393}' },
@@ -117,7 +117,7 @@ export const ACHIEVEMENTS: Record<string, Achievement> = {
 	},
 	POKER_SCHOLAR: {
 		id: 'poker_scholar',
-		title: 'Poker Scholar',
+		title: 'Tilt Scholar',
 		description: 'Complete all 7 days of the training plan',
 		icon: '🎓',
 		xpReward: 500,

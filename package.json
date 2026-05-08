@@ -2,6 +2,11 @@
 	"name": "tilt-app",
 	"private": true,
 	"version": "0.0.1",
+	"homepage": "https://github.com/Jonathangadeaharder/Tilt",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Jonathangadeaharder/Tilt.git"
+	},
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
