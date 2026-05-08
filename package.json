@@ -45,5 +45,8 @@
 		"@supabase/supabase-js": "^2.105.3",
 		"posthog-js": "^1.372.9",
 		"posthog-node": "^5.33.3"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": ["core-js", "protobufjs"]
 	}
 }

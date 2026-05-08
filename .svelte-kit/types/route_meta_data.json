@@ -13,5 +13,6 @@
 	"/practice/srs": [],
 	"/profile": [],
 	"/(auth)/register": [],
-	"/results/[sessionId]": []
+	"/results/[sessionId]": [],
+	"/you": []
 }

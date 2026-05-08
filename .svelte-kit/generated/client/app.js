@@ -1,3 +1,6 @@
+import * as client_hooks from '../../../src/hooks.client.ts';
+
+
 export { matchers } from './matchers.js';
 
 export const nodes = [
@@ -17,7 +20,8 @@ export const nodes = [
 	() => import('./nodes/13'),
 	() => import('./nodes/14'),
 	() => import('./nodes/15'),
-	() => import('./nodes/16')
+	() => import('./nodes/16'),
+	() => import('./nodes/17')
 ];
 
 export const server_loads = [];
@@ -36,12 +40,13 @@ export const dictionary = {
 		"/practice/srs": [14],
 		"/profile": [15],
 		"/(auth)/register": [5,[2]],
-		"/results/[sessionId]": [16]
+		"/results/[sessionId]": [16],
+		"/you": [17]
 	};
 
 export const hooks = {
-	handleError: (({ error }) => { console.error(error) }),
-	
+	handleError: client_hooks.handleError || (({ error }) => { console.error(error) }),
+	init: client_hooks.init,
 	reroute: (() => {}),
 	transport: {}
 };

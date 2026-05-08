@@ -29,7 +29,7 @@ declare module "$app/types" {
 	type MatcherParam<M> = M extends (param : string) => param is (infer U extends string) ? U : string;
 
 	export interface AppTypes {
-		RouteId(): "/(auth)" | "/" | "/home" | "/learn" | "/learn/exploits" | "/learn/plan" | "/learn/pushfold" | "/learn/ranges" | "/lesson" | "/(auth)/login" | "/onboarding" | "/practice" | "/practice/quiz" | "/practice/srs" | "/profile" | "/(auth)/register" | "/results" | "/results/[sessionId]";
+		RouteId(): "/(auth)" | "/" | "/home" | "/learn" | "/learn/exploits" | "/learn/plan" | "/learn/pushfold" | "/learn/ranges" | "/lesson" | "/(auth)/login" | "/onboarding" | "/practice" | "/practice/quiz" | "/practice/srs" | "/profile" | "/(auth)/register" | "/results" | "/results/[sessionId]" | "/you";
 		RouteParams(): {
 			"/results/[sessionId]": { sessionId: string }
 		};
@@ -51,9 +51,10 @@ declare module "$app/types" {
 			"/profile": Record<string, never>;
 			"/(auth)/register": Record<string, never>;
 			"/results": { sessionId?: string };
-			"/results/[sessionId]": { sessionId: string }
+			"/results/[sessionId]": { sessionId: string };
+			"/you": Record<string, never>
 		};
-		Pathname(): "/" | "/home" | "/learn/exploits" | "/learn/plan" | "/learn/pushfold" | "/learn/ranges" | "/lesson" | "/login" | "/onboarding" | "/practice/quiz" | "/practice/srs" | "/profile" | "/register" | `/results/${string}` & {};
+		Pathname(): "/" | "/home" | "/learn/exploits" | "/learn/plan" | "/learn/pushfold" | "/learn/ranges" | "/lesson" | "/login" | "/onboarding" | "/practice/quiz" | "/practice/srs" | "/profile" | "/register" | `/results/${string}` & {} | "/you";
 		ResolvedPathname(): `${"" | `/${string}`}${ReturnType<AppTypes['Pathname']>}`;
 		Asset(): "/icon-192.svg" | "/icon-512.svg" | "/manifest.json" | "/robots.txt" | string & {};
 	}
