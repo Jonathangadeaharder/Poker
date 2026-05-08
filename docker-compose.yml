@@ -7,7 +7,7 @@ services:
       - '${PORT:-3000}:80'
     environment:
       - AI_PROVIDER=${AI_PROVIDER:-mini}
-      - LOCAL_AI_BASE_URL=http://ollama:11434/v1
+      - LOCAL_AI_BASE_URL=http://ollama-shared:11434/v1
       - MINI_MODEL=${MINI_MODEL:-qwen2.5:0.5b}
       - PUBLIC_SUPABASE_URL=${PUBLIC_SUPABASE_URL}
       - PUBLIC_SUPABASE_ANON_KEY=${PUBLIC_SUPABASE_ANON_KEY}
@@ -15,17 +15,10 @@ services:
       - OPENROUTER_MODEL=${OPENROUTER_MODEL:-}
       - GROQ_API_KEY=${GROQ_API_KEY:-}
       - GROQ_MODEL=${GROQ_MODEL:-}
-    depends_on:
-      - ollama
+    networks:
+      - coolify
     restart: unless-stopped
 
-  ollama:
-    image: ollama/ollama
-    volumes:
-      - ollama_data:/root/.ollama
-    ports:
-      - '127.0.0.1:11434:11434'
-    restart: unless-stopped
-
-volumes:
-  ollama_data:
+networks:
+  coolify:
+    external: true
