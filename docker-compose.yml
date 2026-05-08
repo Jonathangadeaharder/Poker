@@ -1,0 +1,31 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '${PORT:-3000}:80'
+    environment:
+      - VITE_AI_PROVIDER=${VITE_AI_PROVIDER:-mini}
+      - VITE_PROD_AI_BASE_URL=http://ollama:11434/v1
+      - VITE_PROD_AI_MODEL=${VITE_PROD_AI_MODEL:-qwen2.5:0.5b}
+      - VITE_PUBLIC_SUPABASE_URL=${VITE_PUBLIC_SUPABASE_URL}
+      - VITE_PUBLIC_SUPABASE_ANON_KEY=${VITE_PUBLIC_SUPABASE_ANON_KEY}
+      - VITE_OPENROUTER_API_KEY=${VITE_OPENROUTER_API_KEY:-}
+      - VITE_OPENROUTER_MODEL=${VITE_OPENROUTER_MODEL:-}
+      - VITE_GROQ_API_KEY=${VITE_GROQ_API_KEY:-}
+      - VITE_GROQ_MODEL=${VITE_GROQ_MODEL:-}
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - '11434:11434'
+    restart: unless-stopped
+
+volumes:
+  ollama_data:
