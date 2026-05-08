@@ -69,7 +69,7 @@ export async function shutdown() {
 	serverPhInstance = null;
 }
 
-let clientPhInstance: import('posthog-js').default | null = null;
+let clientPhInstance: Record<string, any> | null = null;
 
 async function getClientPh() {
 	if (!browser) return null;
