@@ -69,7 +69,7 @@ export async function shutdown() {
 	serverPhInstance = null;
 }
 
-let clientPhInstance: ReturnType<typeof import('posthog-js')['default']> | null = null;
+let clientPhInstance: import('posthog-js').default | null = null;
 
 async function getClientPh() {
 	if (!browser) return null;
@@ -90,7 +90,7 @@ async function getClientPh() {
 	return clientPhInstance;
 }
 
-let serverPhInstance: Awaited<ReturnType<typeof import('posthog-node')['PostHog']>> | null = null;
+let serverPhInstance: import('posthog-node').PostHog | null = null;
 
 async function getServerPh() {
 	if (browser) return null;
