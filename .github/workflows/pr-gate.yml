@@ -111,6 +111,37 @@ jobs:
       - name: Run critical E2E tests
         run: pnpm exec playwright test --grep @critical
 
+  infra-validation:
+    name: Infra Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate docker-compose.yml
+        run: |
+          echo "Checking docker-compose.yml exists..."
+          test -f docker-compose.yml || { echo "::error::docker-compose.yml missing"; exit 1; }
+          echo "Checking ORIGIN env var is present..."
+          grep -q 'ORIGIN=' docker-compose.yml || { echo "::error::docker-compose.yml missing ORIGIN env var"; exit 1; }
+          echo "Checking Traefik TLS labels present..."
+          grep -q 'tls.certresolver=letsencrypt' docker-compose.yml || { echo "::error::docker-compose.yml missing TLS certresolver label"; exit 1; }
+          echo "Checking HEALTHCHECK in Dockerfile..."
+          test -f Dockerfile || echo "::warning::No Dockerfile found"
+          if [ -f Dockerfile ]; then
+            grep -q 'HEALTHCHECK' Dockerfile || { echo "::error::Dockerfile missing HEALTHCHECK instruction"; exit 1; }
+          fi
+          echo "All infra checks passed."
+
+      - name: Validate env var defaults
+        run: |
+          echo "Checking PostHog host is EU region..."
+          if grep -q 'us.posthog.com' docker-compose.yml 2>/dev/null; then
+            echo "::error::docker-compose.yml has wrong PostHog host (us, should be eu)"
+            exit 1
+          fi
+          echo "PostHog host check passed."
+
   required-checks:
     name: Required Checks (PR)
     runs-on: ubuntu-latest
@@ -121,6 +152,7 @@ jobs:
       - dependency-scan
       - secret-scanning
       - e2e-critical
+      - infra-validation
     if: always()
     steps:
       - name: Check all jobs passed
@@ -130,7 +162,8 @@ jobs:
                 "${{ needs.sonarcloud.result }}" == "failure" || \
                 "${{ needs.dependency-scan.result }}" == "failure" || \
                 "${{ needs.secret-scanning.result }}" == "failure" || \
-                "${{ needs.e2e-critical.result }}" == "failure" ]]; then
+                "${{ needs.e2e-critical.result }}" == "failure" || \
+                "${{ needs.infra-validation.result }}" == "failure" ]]; then
             echo "::error::One or more required checks failed"
             exit 1
           fi
