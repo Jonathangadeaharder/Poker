@@ -15,8 +15,9 @@ services:
       - OPENROUTER_MODEL=${OPENROUTER_MODEL:-}
       - GROQ_API_KEY=${GROQ_API_KEY:-}
       - GROQ_MODEL=${GROQ_MODEL:-}
-      - PUBLIC_POSTHOG_HOST=${PUBLIC_POSTHOG_HOST:-https://us.posthog.com}
+      - PUBLIC_POSTHOG_HOST=${PUBLIC_POSTHOG_HOST:-https://eu.i.posthog.com}
       - PUBLIC_POSTHOG_PROJECT_TOKEN=${PUBLIC_POSTHOG_PROJECT_TOKEN:-}
+      - ORIGIN=${ORIGIN:-http://localhost:3000}
     labels:
       - traefik.enable=true
       - traefik.http.routers.tilt.rule=Host(`tilt.159.223.26.67.sslip.io`)
