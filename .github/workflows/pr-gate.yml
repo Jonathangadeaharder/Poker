@@ -1,0 +1,137 @@
+name: PR Gate
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: pr-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  repo-hygiene:
+    name: Repo Hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for iCloud conflict files
+        run: |
+          CONFLICTS=$(find . -name ".!*sync_conflict*" -o -name "* Conflict*" 2>/dev/null)
+          if [ -n "$CONFLICTS" ]; then
+            echo "::error::iCloud conflict files detected:$CONFLICTS"
+            exit 1
+          fi
+
+  node-quality:
+    name: Node Quality
+    runs-on: ubuntu-latest
+    needs: repo-hygiene
+    env:
+      PUBLIC_POSTHOG_PROJECT_TOKEN: ${{ vars.PUBLIC_POSTHOG_PROJECT_TOKEN }}
+      PUBLIC_POSTHOG_HOST: ${{ vars.PUBLIC_POSTHOG_HOST }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm run lint
+      - name: Typecheck
+        run: pnpm run check
+      - name: Test with coverage
+        run: pnpm run test:coverage
+      - name: Build
+        run: pnpm run build
+
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    needs: repo-hygiene
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: sonarsource/sonarcloud-github-action@v3
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectKey: Jonathangadeaharder_Poker
+          organization: jonathangadeaharder
+
+  dependency-scan:
+    name: Dependency Scan
+    runs-on: ubuntu-latest
+    needs: repo-hygiene
+    steps:
+      - uses: actions/checkout@v4
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          exit-code: 1
+
+  secret-scanning:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    needs: repo-hygiene
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  e2e-critical:
+    name: E2E Critical
+    runs-on: ubuntu-latest
+    needs: node-quality
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Run critical E2E tests
+        run: pnpm exec playwright test --grep @critical
+
+  required-checks:
+    name: Required Checks (PR)
+    runs-on: ubuntu-latest
+    needs:
+      - repo-hygiene
+      - node-quality
+      - sonarcloud
+      - dependency-scan
+      - secret-scanning
+      - e2e-critical
+    if: always()
+    steps:
+      - name: Check all jobs passed
+        run: |
+          if [[ "${{ needs.repo-hygiene.result }}" == "failure" || \
+                "${{ needs.node-quality.result }}" == "failure" || \
+                "${{ needs.sonarcloud.result }}" == "failure" || \
+                "${{ needs.dependency-scan.result }}" == "failure" || \
+                "${{ needs.secret-scanning.result }}" == "failure" || \
+                "${{ needs.e2e-critical.result }}" == "failure" ]]; then
+            echo "::error::One or more required checks failed"
+            exit 1
+          fi
+          echo "All required checks passed"
