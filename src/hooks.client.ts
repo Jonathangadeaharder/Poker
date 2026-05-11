@@ -1,6 +1,7 @@
 import type { HandleClientError } from '@sveltejs/kit';
 import posthog from 'posthog-js';
 import { PUBLIC_POSTHOG_HOST, PUBLIC_POSTHOG_PROJECT_TOKEN } from '$env/static/public';
+import { captureError } from '$lib/telemetry';
 
 export async function init() {
 	posthog.init(PUBLIC_POSTHOG_PROJECT_TOKEN, {
@@ -13,6 +14,6 @@ export async function init() {
 }
 
 export const handleError: HandleClientError = async ({ error, status, message }) => {
-	posthog.captureException(error);
+	captureError(error, { status, message, source: 'client' }).catch(() => {});
 	return { message, status };
 };

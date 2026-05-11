@@ -1,6 +1,6 @@
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { PUBLIC_POSTHOG_HOST } from '$env/static/public';
-import { getPostHogClient } from '$lib/server/posthog';
+import { captureError, pageview, shutdown } from '$lib/telemetry';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const { pathname } = event.url;
@@ -46,24 +46,22 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
-	return resolve(event);
+	const response = await resolve(event);
+
+	if (!pathname.startsWith('/api') && !pathname.startsWith('/_')) {
+		pageview(pathname).catch(() => {});
+	}
+
+	return response;
 };
 
-export const handleError: HandleServerError = async ({ error, status, message, event }) => {
-	try {
-		const posthog = getPostHogClient();
-		const distinctId = (event.locals as any)?.session?.user?.id ?? 'server';
-
-		posthog.capture({
-			distinctId,
-			event: 'server_error',
-			properties: {
-				error: error instanceof Error ? error.message : String(error),
-				status,
-				message
-			}
-		});
-	} catch {}
-
+export const handleError: HandleServerError = async ({ error, status, message }) => {
+	captureError(error, { status, message, source: 'server' }).catch(() => {});
 	return { message, status };
 };
+
+['SIGTERM', 'SIGINT'].forEach((signal) => {
+	process.on(signal, () => {
+		shutdown().catch(() => {});
+	});
+});

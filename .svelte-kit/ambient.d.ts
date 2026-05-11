@@ -81,7 +81,6 @@ declare module '$env/static/private' {
 	export const OPENCODE_PROCESS_ROLE: string;
 	export const SHLVL: string;
 	export const HOME: string;
-	export const CI: string;
 	export const HOMEBREW_PREFIX: string;
 	export const FNM_DIR: string;
 	export const LOGNAME: string;
@@ -98,6 +97,13 @@ declare module '$env/static/private' {
 	export const OPENCODE: string;
 	export const COLORTERM: string;
 	export const npm_node_execpath: string;
+	export const TEST: string;
+	export const VITEST: string;
+	export const NODE_ENV: string;
+	export const PROD: string;
+	export const DEV: string;
+	export const BASE_URL: string;
+	export const MODE: string;
 }
 
 /**
@@ -134,10 +140,7 @@ declare module '$env/static/private' {
  * The above values will be the same _even if_ different values for `ENVIRONMENT` or `PUBLIC_BASE_URL` are set at runtime, as they are statically replaced in your code with their build time values.
  */
 declare module '$env/static/public' {
-	export const PUBLIC_SUPABASE_ANON_KEY: string;
-	export const PUBLIC_SUPABASE_URL: string;
-	export const PUBLIC_POSTHOG_HOST: string;
-	export const PUBLIC_POSTHOG_PROJECT_TOKEN: string;
+	
 }
 
 /**
@@ -230,7 +233,6 @@ declare module '$env/dynamic/private' {
 		OPENCODE_PROCESS_ROLE: string;
 		SHLVL: string;
 		HOME: string;
-		CI: string;
 		HOMEBREW_PREFIX: string;
 		FNM_DIR: string;
 		LOGNAME: string;
@@ -247,6 +249,13 @@ declare module '$env/dynamic/private' {
 		OPENCODE: string;
 		COLORTERM: string;
 		npm_node_execpath: string;
+		TEST: string;
+		VITEST: string;
+		NODE_ENV: string;
+		PROD: string;
+		DEV: string;
+		BASE_URL: string;
+		MODE: string;
 		[key: `PUBLIC_${string}`]: undefined;
 		[key: `${string}`]: string | undefined;
 	}
@@ -302,10 +311,6 @@ declare module '$env/dynamic/private' {
  */
 declare module '$env/dynamic/public' {
 	export const env: {
-		PUBLIC_SUPABASE_ANON_KEY: string;
-		PUBLIC_SUPABASE_URL: string;
-		PUBLIC_POSTHOG_HOST: string;
-		PUBLIC_POSTHOG_PROJECT_TOKEN: string;
 		[key: `PUBLIC_${string}`]: string | undefined;
 	}
 }
