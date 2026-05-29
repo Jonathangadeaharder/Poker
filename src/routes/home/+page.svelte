@@ -88,7 +88,7 @@ const xpPercent = $derived(Math.min(100, Math.max(0, Math.round((xpToday / DAILY
 const streak = $derived(profile?.streak_count ?? 0);
 const username = $derived(profile?.username ?? 'Player');
 const initial = $derived(username.charAt(0).toUpperCase());
-const levelTitle = $derived(levelResult?.levelData.title ?? 'Poker Novice');
+const levelTitle = $derived(levelResult?.levelData.title ?? 'Tilt Novice');
 const level = $derived(levelResult?.level ?? 1);
 const xpRemaining = $derived(Math.max(0, DAILY_GOAL - xpToday));
 

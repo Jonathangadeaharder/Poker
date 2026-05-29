@@ -20,7 +20,7 @@ async function registerUser(page: import('@playwright/test').Page, email: string
 	}
 }
 
-test.describe('Poker — Auth', () => {
+test.describe('Tilt — Auth', () => {
 	test('login page renders email/password form', async ({ page }) => {
 		await page.goto('/login');
 		await expect(page.getByRole('textbox', { name: 'EMAIL' })).toBeVisible();
@@ -46,7 +46,7 @@ test.describe('Poker — Auth', () => {
 	});
 });
 
-test.describe('Poker — Home Page', () => {
+test.describe('Tilt — Home Page', () => {
 	test.beforeEach(async ({ page }) => {
 		await loginAsExistingUser(page);
 	});
@@ -70,7 +70,7 @@ test.describe('Poker — Home Page', () => {
 	});
 });
 
-test.describe('Poker — Navigation', () => {
+test.describe('Tilt — Navigation', () => {
 	test.beforeEach(async ({ page }) => {
 		await loginAsExistingUser(page);
 	});
@@ -97,7 +97,7 @@ test.describe('Poker — Navigation', () => {
 	});
 });
 
-test.describe('Poker — Practice Page', () => {
+test.describe('Tilt — Practice Page', () => {
 	test.beforeEach(async ({ page }) => {
 		await loginAsExistingUser(page);
 		await page.goto('/practice/quiz');
@@ -108,7 +108,7 @@ test.describe('Poker — Practice Page', () => {
 	});
 });
 
-test.describe('Poker — You Page', () => {
+test.describe('Tilt — You Page', () => {
 	test.beforeEach(async ({ page }) => {
 		await loginAsExistingUser(page);
 		await page.goto('/profile');
@@ -122,7 +122,7 @@ test.describe('Poker — You Page', () => {
 	});
 });
 
-test.describe('Poker — Console Errors', () => {
+test.describe('Tilt — Console Errors', () => {
 	test('no console errors on home page load', async ({ page }) => {
 		const errors: string[] = [];
 		page.on('pageerror', (err) => errors.push(err.message));
@@ -165,7 +165,7 @@ async function loginAsExistingUser(page: import('@playwright/test').Page) {
 	await loginUser(page, EXISTING_EMAIL, EXISTING_PASSWORD);
 }
 
-test.describe('Poker — Login Flow', () => {
+test.describe('Tilt — Login Flow', () => {
 	test('login with existing user redirects to home', async ({ page }) => {
 		await loginAsExistingUser(page);
 		await expect(page).toHaveURL(/\/home/);
@@ -182,7 +182,7 @@ test.describe('Poker — Login Flow', () => {
 	});
 });
 
-test.describe('Poker — Navigation Edge Cases', () => {
+test.describe('Tilt — Navigation Edge Cases', () => {
 	test.beforeEach(async ({ page }) => {
 		await loginAsExistingUser(page);
 	});
@@ -209,7 +209,7 @@ test.describe('Poker — Navigation Edge Cases', () => {
 	});
 });
 
-test.describe('Poker — Quiz Interaction', () => {
+test.describe('Tilt — Quiz Interaction', () => {
 	test.beforeEach(async ({ page }) => {
 		await loginAsExistingUser(page);
 		await page.goto('/practice/quiz');
@@ -244,7 +244,7 @@ test.describe('Poker — Quiz Interaction', () => {
 	});
 });
 
-test.describe('Poker — Profile/You Page (enhanced)', () => {
+test.describe('Tilt — Profile/You Page (enhanced)', () => {
 	test.beforeEach(async ({ page }) => {
 		await loginAsExistingUser(page);
 		await page.goto('/profile');
@@ -268,7 +268,7 @@ test.describe('Poker — Profile/You Page (enhanced)', () => {
 	});
 });
 
-test.describe('Poker — Console Errors (stricter)', () => {
+test.describe('Tilt — Console Errors (stricter)', () => {
 	test('no real console errors on major pages', async ({ page }) => {
 		const errors: string[] = [];
 		page.on('pageerror', (err) => errors.push(err.message));
@@ -293,7 +293,7 @@ test.describe('Poker — Console Errors (stricter)', () => {
 	});
 });
 
-test.describe('Poker — Home Page Edge Cases', () => {
+test.describe('Tilt — Home Page Edge Cases', () => {
 	test.beforeEach(async ({ page }) => {
 		await loginAsExistingUser(page);
 	});
@@ -325,7 +325,7 @@ test.describe('Poker — Home Page Edge Cases', () => {
 	});
 });
 
-test.describe('Poker — Profile Creation Fallback', () => {
+test.describe('Tilt — Profile Creation Fallback', () => {
 	test.beforeEach(async ({ page }) => {
 		await loginAsExistingUser(page);
 	});
@@ -353,7 +353,7 @@ test.describe('Poker — Profile Creation Fallback', () => {
 	});
 });
 
-test.describe('Poker — Quiz Deep Interaction', () => {
+test.describe('Tilt — Quiz Deep Interaction', () => {
 	test.beforeEach(async ({ page }) => {
 		await loginAsExistingUser(page);
 		await page.goto('/practice/quiz');
@@ -395,7 +395,7 @@ test.describe('Poker — Quiz Deep Interaction', () => {
 	});
 });
 
-test.describe('Poker — XP Progress Display', () => {
+test.describe('Tilt — XP Progress Display', () => {
 	test.beforeEach(async ({ page }) => {
 		await loginAsExistingUser(page);
 	});
