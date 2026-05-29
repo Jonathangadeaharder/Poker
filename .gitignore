@@ -28,3 +28,4 @@ vite.config.ts.timestamp-*
 test-results/
 *.setup-report.md
 .pnpm-store/
+coverage/

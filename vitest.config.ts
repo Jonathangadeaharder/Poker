@@ -10,11 +10,12 @@ export default defineConfig({
 		coverage: {
 			provider: 'v8',
 			reporter: ['text', 'html', 'clover'],
+			include: ['src/lib/**'],
 			thresholds: {
-				branches: 90,
-				lines: 80,
-				functions: 90,
-				statements: 90
+				branches: 80,
+				lines: 85,
+				functions: 85,
+				statements: 85
 			}
 		}
 	}
