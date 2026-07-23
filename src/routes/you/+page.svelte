@@ -3,15 +3,6 @@
 import { untrack } from 'svelte';
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
-import AchievementBadge from '$lib/components/AchievementBadge.svelte';
-import Button from '$lib/components/Button.svelte';
-import CardStylePicker from '$lib/components/CardStylePicker.svelte';
-import ProgressRing from '$lib/components/ProgressRing.svelte';
-import Screen from '$lib/components/Screen.svelte';
-import StatCard from '$lib/components/StatCard.svelte';
-import StreakBadge from '$lib/components/StreakBadge.svelte';
-import ThemePicker from '$lib/components/ThemePicker.svelte';
-import TopBar from '$lib/components/TopBar.svelte';
 import {
 	ACHIEVEMENTS,
 	AchievementManager,
@@ -20,14 +11,6 @@ import {
 } from '$lib/core/gamification';
 import { auth } from '$lib/stores/auth.svelte';
 import { profileStore } from '$lib/stores/profile.svelte';
-import {
-	cardStyle,
-	hapticsEnabled,
-	setCardStyle,
-	soundEnabled,
-	toggleHaptics,
-	toggleSound
-} from '$lib/stores/settings.svelte';
 import { createClient } from '$lib/supabase';
 
 const supabase = createClient();
