@@ -50,7 +50,6 @@ $effect(() => {
 	<title>Tilt — Poker Training</title>
 	<meta name="description" content="Poker training app with GTO principles" />
 	<meta name="theme-color" content="#0e2a20" />
-	<link rel="manifest" href="/manifest.json" />
 </svelte:head>
 
 {#if auth.loading}
