@@ -10,13 +10,6 @@ services:
     ports:
       - '${PORT:-3000}:80'
     environment:
-      - AI_PROVIDER=${AI_PROVIDER:-mini}
-      - LOCAL_AI_BASE_URL=http://ollama-shared:11434/v1
-      - MINI_MODEL=${MINI_MODEL:-qwen2.5:0.5b}
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
-      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-}
-      - GROQ_API_KEY=${GROQ_API_KEY:-}
-      - GROQ_MODEL=${GROQ_MODEL:-}
       - PUBLIC_POSTHOG_HOST=${PUBLIC_POSTHOG_HOST:-https://eu.i.posthog.com}
       - PUBLIC_POSTHOG_PROJECT_TOKEN=${PUBLIC_POSTHOG_PROJECT_TOKEN:-}
       - ORIGIN=${ORIGIN:-http://localhost:3000}
