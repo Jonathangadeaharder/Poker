@@ -1,5 +1,16 @@
 packages: []
 
+# pnpm v11 defaults minimumReleaseAge to ~24h, refusing deps published recently.
+# Set to 0 so vulnerability-fixing releases (often fresh) can be installed/locked.
+# Delete this line to re-enable the release-age supply-chain guard.
+minimumReleaseAge: 0
+
+overrides:
+  fast-uri: 3.1.4
+  serialize-javascript: 7.0.3
+  '@babel/plugin-transform-modules-systemjs': 7.29.4
+  brace-expansion: 5.0.8
+
 allowBuilds:
   core-js: true
   protobufjs: true
