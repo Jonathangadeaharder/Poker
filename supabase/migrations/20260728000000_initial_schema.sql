@@ -132,6 +132,7 @@ CREATE INDEX IF NOT EXISTS idx_sessions_completed ON public.sessions(user_id, co
 CREATE INDEX IF NOT EXISTS idx_daily_progress_user_date ON public.daily_progress(user_id, date);
 
 -- Row Level Security (RLS) policies
+-- NOTE: progression is self-reported and safe only because Tilt is single-player — see SECURITY.md.
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.achievements ENABLE ROW LEVEL SECURITY;
