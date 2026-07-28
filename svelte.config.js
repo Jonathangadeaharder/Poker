@@ -10,7 +10,10 @@ const config = {
 		adapter: adapter({
 			pages: 'build',
 			assets: 'build',
-			fallback: '404.html',
+			// SPA shell: dynamic routes (e.g. results/[sessionId]) aren't
+			// prerendered, so unknown paths fall back to this shell and the
+			// client router resolves them. nginx serves it with a 200.
+			fallback: '200.html',
 			precompress: false
 		}),
 		prerender: {
