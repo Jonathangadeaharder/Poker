@@ -3,14 +3,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        # Baked into the static bundle at build time (see Dockerfile).
+        - VITE_PUBLIC_SUPABASE_URL=${VITE_PUBLIC_SUPABASE_URL}
+        - VITE_PUBLIC_SUPABASE_ANON_KEY=${VITE_PUBLIC_SUPABASE_ANON_KEY}
     ports:
       - '${PORT:-3000}:80'
     environment:
       - AI_PROVIDER=${AI_PROVIDER:-mini}
       - LOCAL_AI_BASE_URL=http://ollama-shared:11434/v1
       - MINI_MODEL=${MINI_MODEL:-qwen2.5:0.5b}
-      - PUBLIC_SUPABASE_URL=${PUBLIC_SUPABASE_URL}
-      - PUBLIC_SUPABASE_ANON_KEY=${PUBLIC_SUPABASE_ANON_KEY}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
       - OPENROUTER_MODEL=${OPENROUTER_MODEL:-}
       - GROQ_API_KEY=${GROQ_API_KEY:-}
