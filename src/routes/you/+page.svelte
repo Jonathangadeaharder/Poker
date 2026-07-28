@@ -3,6 +3,24 @@
 import { untrack } from 'svelte';
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import AchievementBadge from '$lib/components/AchievementBadge.svelte';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import Button from '$lib/components/Button.svelte';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import CardStylePicker from '$lib/components/CardStylePicker.svelte';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import ProgressRing from '$lib/components/ProgressRing.svelte';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import Screen from '$lib/components/Screen.svelte';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import StatCard from '$lib/components/StatCard.svelte';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import StreakBadge from '$lib/components/StreakBadge.svelte';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import ThemePicker from '$lib/components/ThemePicker.svelte';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import TopBar from '$lib/components/TopBar.svelte';
 import {
 	ACHIEVEMENTS,
 	AchievementManager,
@@ -11,6 +29,15 @@ import {
 } from '$lib/core/gamification';
 import { auth } from '$lib/stores/auth.svelte';
 import { profileStore } from '$lib/stores/profile.svelte';
+// biome-ignore lint/correctness/noUnusedImports: used in Svelte template
+import {
+	cardStyle,
+	hapticsEnabled,
+	setCardStyle,
+	soundEnabled,
+	toggleHaptics,
+	toggleSound
+} from '$lib/stores/settings.svelte';
 import { createClient } from '$lib/supabase';
 
 const supabase = createClient();
@@ -79,7 +106,8 @@ function scrollToSettings() {
 
 <Screen>
 	{#snippet children()}
-		<TopBar center="You">
+		<TopBar>
+			{#snippet center()}You{/snippet}
 			{#snippet right()}
 				<button
 					type="button"
