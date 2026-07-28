@@ -1,5 +1,7 @@
--- Tilt Poker Training App - Supabase Schema
--- Run this in your Supabase SQL Editor to set up the database
+-- 20260728000000_initial_schema.sql
+-- Initial schema for the Tilt poker-training app: tables, indexes, RLS
+-- policies, and the new-user + updated_at triggers. Applied in order by
+-- `supabase db reset` / `supabase migration up` (see supabase/config.toml).
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

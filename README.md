@@ -103,6 +103,25 @@ pnpm dev
 
 All tables have RLS. Auto-created profile + settings on signup via trigger.
 
+### Local database (Supabase CLI)
+
+The schema lives in versioned migrations under `supabase/migrations/` (not a
+hand-run script), with `supabase/config.toml` and a `supabase/seed.sql`. To
+stand up a local Postgres + auth + API that matches the schema:
+
+```bash
+# Requires Docker. Applies migrations in order, then runs seed.sql.
+supabase db reset
+
+supabase start      # start the local stack
+supabase status     # print local API URL + anon key -> put in .env as
+                    # VITE_PUBLIC_SUPABASE_URL / VITE_PUBLIC_SUPABASE_ANON_KEY
+```
+
+Use `supabase migration new <name>` to add a migration and `supabase db diff`
+to generate one from local schema changes. The hosted project's schema is
+brought in line by applying the same migrations (e.g. `supabase db push`).
+
 ## Design
 
 - **Fonts**: Instrument Serif (display), JetBrains Mono, Geist
